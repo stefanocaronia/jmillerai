@@ -1,6 +1,7 @@
+import type { CognitiveLoopData } from "./cognitive-loop";
 import type { PublicGraphData } from "./memory-graph";
 
-export type PageId = "home" | "memory" | "contacts";
+export type PageId = "home" | "loop" | "memory" | "contacts";
 export type Mode = "reading" | "thinking" | "dreaming" | "writing" | "idle";
 
 export type StatusData = {
@@ -97,10 +98,10 @@ export type AppState = {
   book: FeedState<BookData>;
   readingFeed: FeedState<ReadingFeedData>;
   thinkingFeed: FeedState<ThinkingFeedData>;
+  cognitiveLoop: FeedState<CognitiveLoopData>;
   publicGraph: FeedState<PublicGraphData>;
   signalsFeed: FeedState<BlogFeedData>;
   dreamsFeed: FeedState<BlogFeedData>;
 };
 
 export type BlogFeedKind = "signals" | "dreams";
-

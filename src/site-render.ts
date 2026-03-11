@@ -1,3 +1,4 @@
+import type { CognitiveLoopData } from "./cognitive-loop";
 import type { PublicGraphData } from "./memory-graph";
 import { CONTACT_SECTIONS, INTRO_PARAGRAPHS, SITE_SUBTITLE } from "./site-content";
 import type { AppState, BlogFeedData, BlogFeedKind, BookData, FeedState, PageId, ReadingFeedData, StatusData, ThinkingFeedData } from "./site-types";
@@ -44,6 +45,7 @@ function renderHeader(page: PageId, pageUrl: (pageId: PageId) => string): string
       <p class="site-subtitle">${escapeHtml(SITE_SUBTITLE)}</p>
       <nav class="site-nav" aria-label="Primary">
         <a href="${escapeHtml(pageUrl("home"))}" class="${page === "home" ? "is-active" : ""}">traces</a>
+        <a href="${escapeHtml(pageUrl("loop"))}" class="${page === "loop" ? "is-active" : ""}">loop</a>
         <a href="${escapeHtml(pageUrl("memory"))}" class="${page === "memory" ? "is-active" : ""}">memory</a>
         <a href="${escapeHtml(pageUrl("contacts"))}" class="${page === "contacts" ? "is-active" : ""}">contacts</a>
       </nav>
@@ -57,6 +59,7 @@ function renderFooterSnapshot(state: AppState): string {
     state.book.data?.generated_at,
     state.readingFeed.data?.generated_at,
     state.thinkingFeed.data?.generated_at,
+    state.cognitiveLoop.data?.generated_at,
     state.publicGraph.data?.generated_at,
   ]
     .map((value) => ({ value, timestamp: parseDate(value) }))
@@ -403,6 +406,47 @@ function renderMemoryGraphBlock(graph: FeedState<PublicGraphData>): string {
   `;
 }
 
+function renderLoopPage(loop: FeedState<CognitiveLoopData>): string {
+  if (!loop.data) {
+    return `
+      <section class="section-block">
+        <div class="section-line">
+          <span class="section-name">Loop</span>
+        </div>
+        ${renderFeedError(loop, "cognitive loop")}
+      </section>
+    `;
+  }
+
+  return `
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">Loop</span>
+        <span class="section-meta">${escapeHtml(formatDate(loop.data.generated_at))}</span>
+      </div>
+      <p class="body-copy">${loop.data.nodes.length} nodes, ${loop.data.edges.length} directed paths in the current exported loop.</p>
+      <div id="cognitive-loop-stage" class="memory-graph-stage loop-graph-stage"></div>
+    </section>
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">Modules</span>
+      </div>
+      <div class="stream-list">
+        ${loop.data.nodes.map((node) => `
+          <article class="stream-item">
+            <div class="section-line">
+              <span class="kind-badge">${escapeHtml(node.kind)}</span>
+            </div>
+            <h3>${escapeHtml(node.label)}</h3>
+            <p class="body-copy">${escapeHtml(node.summary)}</p>
+            ${node.notes.length > 0 ? `<ul class="note-list">${node.notes.map((note) => `<li>${escapeHtml(note)}</li>`).join("")}</ul>` : ""}
+          </article>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
 function renderContactsPage(): string {
   return CONTACT_SECTIONS.map((section) => `
     <section class="section-block">
@@ -443,6 +487,10 @@ function renderMapPage(state: AppState): string {
 }
 
 function renderPageContent(state: AppState, page: PageId): string {
+  if (page === "loop") {
+    return renderLoopPage(state.cognitiveLoop);
+  }
+
   if (page === "memory") {
     return renderMapPage(state);
   }

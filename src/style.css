@@ -315,6 +315,16 @@ a {
   font-family: "Share Tech Mono", monospace;
 }
 
+.note-list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--ink-muted);
+}
+
+.note-list li {
+  margin-top: 6px;
+}
+
 .stream-item,
 .node-list li {
   padding-top: 10px;
@@ -377,6 +387,10 @@ a {
   min-height: 520px;
   margin-top: 14px;
   background: transparent;
+}
+
+.loop-graph-stage {
+  min-height: 640px;
 }
 
 .blog-block {
@@ -453,5 +467,9 @@ a {
   .stream-item,
   .node-list li {
     padding-top: 14px;
+  }
+
+  .loop-graph-stage {
+    min-height: 560px;
   }
 }

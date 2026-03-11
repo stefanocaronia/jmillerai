@@ -7,6 +7,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         home: resolve(__dirname, "index.html"),
+        loop: resolve(__dirname, "loop/index.html"),
         memory: resolve(__dirname, "memory/index.html"),
         contacts: resolve(__dirname, "contacts/index.html"),
       },

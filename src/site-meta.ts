@@ -10,6 +10,10 @@ const META_BY_PAGE: Record<PageId, MetaEntry> = {
     title: "J. Miller AI",
     description: "Project site for J. Miller AI: public cognitive flow, current reading, live traces, and filtered graph snapshots.",
   },
+  loop: {
+    title: "J. Miller AI / Loop",
+    description: "Public cognitive loop for J. Miller AI.",
+  },
   memory: {
     title: "J. Miller AI / Memory",
     description: "Public memory map for J. Miller AI.",

@@ -1,4 +1,5 @@
 import "./style.css";
+import { mountCognitiveLoop } from "./cognitive-loop";
 import { mountMemoryGraph } from "./memory-graph";
 import { loadState } from "./site-data";
 import { applyPageMeta } from "./site-meta";
@@ -34,6 +35,12 @@ async function start() {
   unmountGraph = null;
   app.innerHTML = renderShell(state, page, pageUrl);
   applyProgressMeters(app);
+  if (page === "loop" && state.cognitiveLoop.data) {
+    const container = document.querySelector<HTMLElement>("#cognitive-loop-stage");
+    if (container) {
+      unmountGraph = mountCognitiveLoop(container, state.cognitiveLoop.data);
+    }
+  }
   if (page === "memory" && state.publicGraph.data) {
     const container = document.querySelector<HTMLElement>("#memory-graph-stage");
     if (container) {
