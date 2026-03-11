@@ -7,10 +7,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         home: resolve(__dirname, "index.html"),
-        flow: resolve(__dirname, "flow.html"),
         live: resolve(__dirname, "live.html"),
         map: resolve(__dirname, "map.html"),
-        about: resolve(__dirname, "about.html"),
       },
     },
   },

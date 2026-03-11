@@ -303,8 +303,7 @@ a {
 /* Grids */
 .hero-grid,
 .home-grid,
-.live-grid,
-.about-grid {
+.live-grid {
   display: grid;
   gap: 18px;
 }
@@ -322,43 +321,14 @@ a {
   grid-template-columns: minmax(240px, 0.82fr) minmax(0, 1.05fr) minmax(0, 1.05fr);
 }
 
-.about-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
 .stack-column {
   display: grid;
   gap: 18px;
 }
 
-/* Flow */
-.flow-grid {
+.home-text {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 16px;
-}
-
-.flow-node {
-  padding: 22px 18px 18px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--bg-panel);
-}
-
-.flow-index {
-  display: inline-flex;
-  margin-bottom: 16px;
-  color: var(--accent);
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.78rem;
-}
-
-.flow-node:nth-child(2n) {
-  margin-top: 24px;
-}
-
-.flow-node:nth-child(3n) {
-  margin-top: 54px;
 }
 
 /* Lists / streams */
@@ -455,17 +425,7 @@ a {
 
 /* Responsive */
 @media (max-width: 1180px) {
-  .flow-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .flow-node:nth-child(2n),
-  .flow-node:nth-child(3n) {
-    margin-top: 0;
-  }
-
   .live-grid,
-  .about-grid,
   .home-grid,
   .hero-grid {
     grid-template-columns: 1fr;
@@ -497,7 +457,6 @@ a {
   }
 
   .panel,
-  .flow-node,
   .stream-item,
   .plain-link,
   .metric-box,
@@ -505,7 +464,6 @@ a {
     padding: 24px;
   }
 
-  .flow-grid,
   .node-grid,
   .metrics-row {
     grid-template-columns: 1fr;

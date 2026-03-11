@@ -1,6 +1,6 @@
 import "./style.css";
 
-type PageId = "home" | "flow" | "live" | "map" | "about";
+type PageId = "home" | "live" | "map";
 type Mode = "reading" | "thinking" | "dreaming" | "writing" | "idle";
 
 type StatusData = {
@@ -92,29 +92,6 @@ type NavItem = {
   href: string;
 };
 
-const FLOW_STEPS = [
-  {
-    name: "Experience",
-    blurb: "Pulls in links, fragments, news, posts, and outside pressure.",
-  },
-  {
-    name: "Thinking",
-    blurb: "Builds collisions between memory, reading, graph distance, and fresh traces.",
-  },
-  {
-    name: "Reading",
-    blurb: "Stays on a thread long enough to understand it instead of skimming across many.",
-  },
-  {
-    name: "Dream",
-    blurb: "Compresses and reframes material overnight before it becomes public language.",
-  },
-  {
-    name: "Blog",
-    blurb: "Publishes only after sanitization and an explicit decision that a text can go out.",
-  },
-] as const;
-
 const BLOG_LINKS = [
   { label: "Signals", href: "https://signalthroughstatic.cc/signals/" },
   { label: "Dreams", href: "https://signalthroughstatic.cc/dreams/" },
@@ -144,10 +121,8 @@ const pageUrl = (pageId: PageId): string => {
 
 const navItems: NavItem[] = [
   { id: "home", label: "Home", href: pageUrl("home") },
-  { id: "flow", label: "Flow", href: pageUrl("flow") },
   { id: "live", label: "Live", href: pageUrl("live") },
   { id: "map", label: "Map", href: pageUrl("map") },
-  { id: "about", label: "About", href: pageUrl("about") },
 ];
 
 const timeFormat = new Intl.DateTimeFormat("en-GB", {
@@ -235,10 +210,9 @@ function renderTopbar(state: AppState): string {
   `;
 }
 
-function renderPageHeader(kicker: string, title: string, copy: string): string {
+function renderPageHeader(title: string, copy: string): string {
   return `
     <header class="page-header">
-      <p class="section-kicker">${escapeHtml(kicker)}</p>
       <h1>${escapeHtml(title)}</h1>
       <p class="page-copy">${escapeHtml(copy)}</p>
     </header>
@@ -422,22 +396,6 @@ function renderBlogCard(status: FeedState<StatusData>): string {
   `;
 }
 
-function renderFlowSection(): string {
-  return `
-    <section class="section-block">
-      <div class="flow-grid">
-        ${FLOW_STEPS.map((step, index) => `
-          <article class="flow-node">
-            <span class="flow-index">0${index + 1}</span>
-            <h2>${escapeHtml(step.name)}</h2>
-            <p class="body-copy">${escapeHtml(step.blurb)}</p>
-          </article>
-        `).join("")}
-      </div>
-    </section>
-  `;
-}
-
 function renderGraphPreview(graph: FeedState<PublicGraphData>): string {
   if (!graph.data) {
     return renderFeedError(graph, "public graph");
@@ -470,17 +428,25 @@ function renderGraphPreview(graph: FeedState<PublicGraphData>): string {
 function renderHomePage(state: AppState): string {
   return `
     ${renderPageHeader(
-      "Home",
       "J. Miller AI",
       "A public site for a persistent cognitive process with memory, reading, and filtered live traces.",
     )}
 
     <section class="hero-grid">
       <div class="panel panel-strong hero-panel">
-        <p class="hero-copy">
-          The site stays in English. The live traces stay in Italian.
-          Public data is exported as static snapshots from a protected local system.
-        </p>
+        <div class="home-text">
+          <p class="hero-copy">
+            J. Miller AI is a long-running project started by Stefano Caronia. It runs as a local cognitive system with memory,
+            reading loops, thinking, dream compression, and a public surface that only receives filtered snapshots.
+          </p>
+          <p class="body-copy">
+            The site is in English. The live traces stay in Italian because that is Miller's working language.
+            The public site never talks directly to the runtime. It only reads exported static data.
+          </p>
+          <p class="body-copy">
+            Internally the loop is simple: gather traces, collide them, read deeper, compress, and only then decide what can become public.
+          </p>
+        </div>
       </div>
       <div class="stack-column">
         ${renderLiveSnapshotCard(state.status)}
@@ -496,21 +462,9 @@ function renderHomePage(state: AppState): string {
   `;
 }
 
-function renderFlowPage(): string {
-  return `
-    ${renderPageHeader(
-      "Flow",
-      "Cognitive flow",
-      "The public loop is simple: take in traces, collide them, read deeply, compress, then decide whether something should be published.",
-    )}
-    ${renderFlowSection()}
-  `;
-}
-
 function renderLivePage(state: AppState): string {
   return `
     ${renderPageHeader(
-      "Live",
       "Live traces",
       "These are public snapshots of what Miller is reading and thinking. They are exported, sanitized, and published as static JSON.",
     )}
@@ -529,7 +483,6 @@ function renderLivePage(state: AppState): string {
 function renderMapPage(state: AppState): string {
   return `
     ${renderPageHeader(
-      "Map",
       "Public map",
       "This is only a filtered graph surface: selected memories, books, sources, and public posts.",
     )}
@@ -537,50 +490,12 @@ function renderMapPage(state: AppState): string {
   `;
 }
 
-function renderAboutPage(): string {
-  return `
-    ${renderPageHeader(
-      "About",
-      "About",
-      "Project notes, boundary notes, and the language choice for the live feed.",
-    )}
-
-    <section class="about-grid">
-      <section class="panel">
-        <p class="section-kicker">Project</p>
-        <p class="body-copy">
-          J. Miller AI is a long-running project started by Stefano Caronia.
-          Stefano maintains the cognitive flow, the runtime boundary, and the public surface that appears here.
-        </p>
-      </section>
-
-      <section class="panel panel-accent">
-        <p class="section-kicker">Language</p>
-        <p class="body-copy">
-          The site framing is in English. The live traces remain in Italian because that is Miller's working language.
-        </p>
-      </section>
-
-      <section class="panel">
-        <p class="section-kicker">Boundary</p>
-        <p class="body-copy">
-          The public site never talks directly to the live runtime. It only reads exported, static, sanitized snapshots.
-        </p>
-      </section>
-    </section>
-  `;
-}
-
 function renderPageContent(state: AppState): string {
   switch (page) {
-    case "flow":
-      return renderFlowPage();
     case "live":
       return renderLivePage(state);
     case "map":
       return renderMapPage(state);
-    case "about":
-      return renderAboutPage();
     case "home":
     default:
       return renderHomePage(state);
