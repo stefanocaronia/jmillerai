@@ -183,29 +183,19 @@ function renderChips(items: string[]): string {
   return items.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join("");
 }
 
-function renderTopbar(state: AppState): string {
-  const timestamp = state.status.data ? formatDate(state.status.data.generated_at) : "offline";
-
+function renderTopbar(): string {
   return `
     <header class="topbar">
-      <a class="brand" href="${escapeHtml(pageUrl("home"))}">
-        <span class="brand-mark">JM</span>
-        <span class="brand-text">J. Miller AI</span>
-      </a>
+      <a class="brand" href="${escapeHtml(pageUrl("home"))}">J. Miller AI</a>
       <nav class="topnav" aria-label="Primary">
         ${navItems
           .map((item) => `
             <a href="${escapeHtml(item.href)}" class="${item.id === page ? "is-active" : ""}">
-              ${escapeHtml(item.label)}
+              ${escapeHtml(item.label.toLowerCase())}
             </a>
           `)
           .join("")}
       </nav>
-      <div class="status-chip">
-        <span class="status-chip-dot" aria-hidden="true"></span>
-        <span>Snapshot</span>
-        <span class="status-chip-time">${escapeHtml(timestamp)}</span>
-      </div>
     </header>
   `;
 }
@@ -505,7 +495,7 @@ function renderPageContent(state: AppState): string {
 function renderShell(state: AppState): string {
   return `
     <div class="site-chassis">
-      ${renderTopbar(state)}
+      ${renderTopbar()}
       <main class="site-shell">
         ${renderPageContent(state)}
       </main>
