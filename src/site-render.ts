@@ -433,11 +433,14 @@ function renderLoopPage(loop: FeedState<CognitiveLoopData>): string {
       </div>
       <div class="stream-list">
         ${loop.data.nodes.map((node) => `
-          <article class="stream-item">
+          <article class="stream-item loop-module-item">
             <div class="section-line">
-              <span class="kind-badge">${escapeHtml(node.kind)}</span>
+              <div class="module-meta">
+                <span class="module-dot module-dot--${escapeHtml(node.id)}" aria-hidden="true"></span>
+                <span class="kind-badge kind-badge-loop">${escapeHtml(node.kind)}</span>
+              </div>
             </div>
-            <h3>${escapeHtml(node.label)}</h3>
+            <h3 class="loop-module-title">${escapeHtml(node.label)}</h3>
             <p class="body-copy">${escapeHtml(node.summary)}</p>
             ${node.notes.length > 0 ? `<ul class="note-list">${node.notes.map((note) => `<li>${escapeHtml(note)}</li>`).join("")}</ul>` : ""}
           </article>

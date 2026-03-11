@@ -383,6 +383,69 @@ a {
   text-transform: uppercase;
 }
 
+.kind-badge-loop {
+  border-color: var(--line);
+  color: var(--ink-soft);
+}
+
+.module-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.module-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex: 0 0 10px;
+}
+
+.module-dot--heartbeat {
+  background: #ff7a00;
+}
+
+.module-dot--short-state {
+  background: #f2f2f2;
+}
+
+.module-dot--experience {
+  background: #ffb000;
+}
+
+.module-dot--conversation {
+  background: #ff5ea8;
+}
+
+.module-dot--mail {
+  background: #8cf58a;
+}
+
+.module-dot--memory {
+  background: #e6e6e6;
+}
+
+.module-dot--thinking {
+  background: #46d9ff;
+}
+
+.module-dot--reading {
+  background: #f4e409;
+}
+
+.module-dot--dream {
+  background: #b07cff;
+}
+
+.module-dot--blog {
+  background: #ff6b4a;
+}
+
+.module-dot--trading {
+  background: #8f8f8f;
+}
+
 .memory-graph-stage {
   min-height: 520px;
   margin-top: 14px;
@@ -391,6 +454,10 @@ a {
 
 .loop-graph-stage {
   min-height: 640px;
+}
+
+.loop-module-title {
+  text-transform: uppercase;
 }
 
 .blog-block {

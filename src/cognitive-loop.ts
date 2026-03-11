@@ -22,11 +22,27 @@ export type CognitiveLoopData = {
   edges: CognitiveLoopEdge[];
 };
 
+const nodeColors: Record<string, string> = {
+  heartbeat: "#ff7a00",
+  "short-state": "#f2f2f2",
+  experience: "#ffb000",
+  conversation: "#ff5ea8",
+  mail: "#8cf58a",
+  memory: "#e6e6e6",
+  thinking: "#46d9ff",
+  reading: "#f4e409",
+  dream: "#b07cff",
+  blog: "#ff6b4a",
+  trading: "#8f8f8f",
+};
+
 const kindColors: Record<string, string> = {
   control: "#ff7a00",
+  state: "#d0d0d0",
   module: "#f2f2f2",
-  state: "#b6b6b6",
+  input: "#c3c3c3",
   output: "#9a9a9a",
+  operation: "#8f8f8f",
 };
 
 function shortenLabel(label: string): string {
@@ -50,7 +66,7 @@ export function mountCognitiveLoop(container: HTMLElement, loop: CognitiveLoopDa
         data: {
           id: node.id,
           label: shortenLabel(node.label),
-          color: kindColors[node.kind] || "#c3c3c3",
+          color: nodeColors[node.id] || kindColors[node.kind] || "#c3c3c3",
         },
       })),
       ...loop.edges.map((edge, index) => ({
