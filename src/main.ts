@@ -1,6 +1,6 @@
 import "./style.css";
 
-type PageId = "home" | "live" | "map";
+type PageId = "home" | "map";
 type Mode = "reading" | "thinking" | "dreaming" | "writing" | "idle";
 
 type StatusData = {
@@ -86,12 +86,6 @@ type AppState = {
   publicGraph: FeedState<PublicGraphData>;
 };
 
-type NavItem = {
-  id: PageId;
-  label: string;
-  href: string;
-};
-
 const BLOG_LINKS = [
   { label: "Signals", href: "https://signalthroughstatic.cc/signals/" },
   { label: "Dreams", href: "https://signalthroughstatic.cc/dreams/" },
@@ -112,18 +106,7 @@ const configuredFeedBase = (import.meta.env.VITE_PUBLIC_FEED_BASE as string | un
 const feedUrl = (name: string) =>
   configuredFeedBase ? `${configuredFeedBase}/${name}.json` : `${baseUrl}data/${name}.json`;
 
-const pageUrl = (pageId: PageId): string => {
-  if (pageId === "home") {
-    return baseUrl;
-  }
-  return `${baseUrl}${pageId}.html`;
-};
-
-const navItems: NavItem[] = [
-  { id: "home", label: "Home", href: pageUrl("home") },
-  { id: "live", label: "Live", href: pageUrl("live") },
-  { id: "map", label: "Map", href: pageUrl("map") },
-];
+const pageUrl = (pageId: PageId): string => (pageId === "home" ? baseUrl : `${baseUrl}${pageId}.html`);
 
 const timeFormat = new Intl.DateTimeFormat("en-GB", {
   dateStyle: "medium",
@@ -134,10 +117,12 @@ function formatDate(value: string | null | undefined): string {
   if (!value) {
     return "Unknown";
   }
+
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
     return value;
   }
+
   return timeFormat.format(date);
 }
 
@@ -156,8 +141,7 @@ async function fetchJson<T>(url: string): Promise<FeedState<T>> {
     if (!response.ok) {
       return { data: null, error: `HTTP ${response.status}` };
     }
-    const data = (await response.json()) as T;
-    return { data, error: null };
+    return { data: (await response.json()) as T, error: null };
   } catch (error) {
     return {
       data: null,
@@ -183,18 +167,13 @@ function renderChips(items: string[]): string {
   return items.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join("");
 }
 
-function renderTopbar(): string {
+function renderHeader(): string {
   return `
-    <header class="topbar">
-      <a class="brand" href="${escapeHtml(pageUrl("home"))}">J. Miller AI</a>
-      <nav class="topnav" aria-label="Primary">
-        ${navItems
-          .map((item) => `
-            <a href="${escapeHtml(item.href)}" class="${item.id === page ? "is-active" : ""}">
-              ${escapeHtml(item.label.toLowerCase())}
-            </a>
-          `)
-          .join("")}
+    <header class="site-header">
+      <a class="site-title" href="${escapeHtml(pageUrl("home"))}">J. Miller AI</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="${escapeHtml(pageUrl("home"))}" class="${page === "home" ? "is-active" : ""}">home</a>
+        <a href="${escapeHtml(pageUrl("map"))}" class="${page === "map" ? "is-active" : ""}">map</a>
       </nav>
     </header>
   `;
@@ -204,16 +183,18 @@ function renderPageHeader(title: string, copy: string): string {
   return `
     <header class="page-header">
       <h1>${escapeHtml(title)}</h1>
-      <p class="page-copy">${escapeHtml(copy)}</p>
+      <p class="body-copy">${escapeHtml(copy)}</p>
     </header>
   `;
 }
 
-function renderLiveSnapshotCard(status: FeedState<StatusData>): string {
+function renderLiveSnapshot(status: FeedState<StatusData>): string {
   if (!status.data) {
     return `
-      <section class="panel panel-strong">
-        <p class="section-kicker">Live snapshot</p>
+      <section class="section-block">
+        <div class="section-line">
+          <span class="terminal-label">Live snapshot</span>
+        </div>
         <h2>Unavailable</h2>
         ${renderFeedError(status, "status feed")}
       </section>
@@ -221,8 +202,8 @@ function renderLiveSnapshotCard(status: FeedState<StatusData>): string {
   }
 
   return `
-    <section class="panel panel-strong">
-      <div class="mini-heading">
+    <section class="section-block">
+      <div class="section-line">
         <span class="terminal-label">Live snapshot</span>
         <span class="timestamp">${escapeHtml(formatDate(status.data.generated_at))}</span>
       </div>
@@ -232,11 +213,13 @@ function renderLiveSnapshotCard(status: FeedState<StatusData>): string {
   `;
 }
 
-function renderCurrentBookCard(book: FeedState<BookData>): string {
+function renderCurrentBook(book: FeedState<BookData>): string {
   if (!book.data || !book.data.book) {
     return `
-      <section class="panel panel-accent">
-        <p class="section-kicker">Current book</p>
+      <section class="section-block">
+        <div class="section-line">
+          <span class="terminal-label">Current book</span>
+        </div>
         <h2>No active book</h2>
         ${renderFeedError(book, "book feed")}
       </section>
@@ -246,8 +229,8 @@ function renderCurrentBookCard(book: FeedState<BookData>): string {
   const active = book.data.book;
 
   return `
-    <section class="panel panel-accent">
-      <div class="mini-heading">
+    <section class="section-block">
+      <div class="section-line">
         <span class="terminal-label">Current book</span>
         <span class="timestamp">${escapeHtml(formatDate(active.updated_at))}</span>
       </div>
@@ -262,19 +245,21 @@ function renderCurrentBookCard(book: FeedState<BookData>): string {
   `;
 }
 
-function renderActiveThreadsCard(status: FeedState<StatusData>): string {
+function renderActiveThreads(status: FeedState<StatusData>): string {
   if (!status.data) {
     return `
-      <section class="panel">
-        <p class="section-kicker">Active threads</p>
+      <section class="section-block">
+        <div class="section-line">
+          <span class="terminal-label">Active threads</span>
+        </div>
         ${renderFeedError(status, "status feed")}
       </section>
     `;
   }
 
   return `
-    <section class="panel">
-      <div class="mini-heading">
+    <section class="section-block">
+      <div class="section-line">
         <span class="terminal-label">Active threads</span>
         <span class="timestamp">${escapeHtml(status.data.mode)}</span>
       </div>
@@ -283,7 +268,7 @@ function renderActiveThreadsCard(status: FeedState<StatusData>): string {
   `;
 }
 
-function renderReadingList(feed: FeedState<ReadingFeedData>, limit: number): string {
+function renderReadingItems(feed: FeedState<ReadingFeedData>, limit: number): string {
   if (!feed.data) {
     return renderFeedError(feed, "reading feed");
   }
@@ -295,29 +280,29 @@ function renderReadingList(feed: FeedState<ReadingFeedData>, limit: number): str
 
     return `
       <article class="stream-item">
-        <div class="mini-heading">
+        <div class="section-line">
           <span class="terminal-label">${escapeHtml(item.source)}</span>
           <span class="timestamp">${escapeHtml(formatDate(item.read_at))}</span>
         </div>
         <h3>${title}</h3>
-        ${item.why_it_mattered ? `<p class="body-copy muted-copy">${escapeHtml(item.why_it_mattered)}</p>` : ""}
+        ${item.why_it_mattered ? `<p class="muted-copy">${escapeHtml(item.why_it_mattered)}</p>` : ""}
       </article>
     `;
   }).join("");
 }
 
-function renderReadingCard(feed: FeedState<ReadingFeedData>, limit = 4): string {
+function renderReading(feed: FeedState<ReadingFeedData>, limit = 6): string {
   return `
-    <section class="panel">
-      <p class="section-kicker">Reading trace</p>
-      <div class="stream-list">
-        ${renderReadingList(feed, limit)}
+    <section class="section-block">
+      <div class="section-line">
+        <span class="terminal-label">Reading trace</span>
       </div>
+      <div class="stream-list">${renderReadingItems(feed, limit)}</div>
     </section>
   `;
 }
 
-function renderThinkingList(feed: FeedState<ThinkingFeedData>, limit: number): string {
+function renderThinkingItems(feed: FeedState<ThinkingFeedData>, limit: number): string {
   if (!feed.data) {
     return renderFeedError(feed, "thinking feed");
   }
@@ -330,8 +315,8 @@ function renderThinkingList(feed: FeedState<ThinkingFeedData>, limit: number): s
     ].slice(0, 4);
 
     return `
-      <article class="stream-item stream-item-accent">
-        <div class="mini-heading">
+      <article class="stream-item">
+        <div class="section-line">
           <span class="terminal-label">Importance ${item.importance}</span>
           <span class="timestamp">${escapeHtml(formatDate(item.created_at))}</span>
         </div>
@@ -343,32 +328,31 @@ function renderThinkingList(feed: FeedState<ThinkingFeedData>, limit: number): s
   }).join("");
 }
 
-function renderThinkingCard(feed: FeedState<ThinkingFeedData>, limit = 4): string {
+function renderThinking(feed: FeedState<ThinkingFeedData>, limit = 5): string {
   return `
-    <section class="panel panel-accent">
-      <p class="section-kicker">Thinking feed</p>
-      <div class="stream-list">
-        ${renderThinkingList(feed, limit)}
+    <section class="section-block">
+      <div class="section-line">
+        <span class="terminal-label">Thinking feed</span>
       </div>
+      <div class="stream-list">${renderThinkingItems(feed, limit)}</div>
     </section>
   `;
 }
 
-function renderBlogCard(status: FeedState<StatusData>): string {
+function renderBlog(status: FeedState<StatusData>): string {
   const latest = status.data?.last_public_output ?? null;
 
   return `
-    <section class="panel">
-      <p class="section-kicker">Blog</p>
+    <section class="section-block">
+      <div class="section-line">
+        <span class="terminal-label">Blog</span>
+      </div>
       ${
         latest
           ? `
-            <div class="mini-heading">
-              <span class="terminal-label">${escapeHtml(latest.kind)}</span>
-              <span class="timestamp">${escapeHtml(formatDate(latest.published_at))}</span>
-            </div>
             <h2>${escapeHtml(latest.title)}</h2>
-            <a class="inline-link" href="${escapeHtml(latest.url)}" target="_blank" rel="noreferrer">Open latest post</a>
+            <p class="muted-copy">${escapeHtml(formatDate(latest.published_at))}</p>
+            <a class="plain-link" href="${escapeHtml(latest.url)}" target="_blank" rel="noreferrer">Open latest post</a>
           `
           : `
             <h2>No public post</h2>
@@ -377,35 +361,35 @@ function renderBlogCard(status: FeedState<StatusData>): string {
       }
       <div class="link-list">
         ${BLOG_LINKS.map((link) => `
-          <a class="plain-link" href="${escapeHtml(link.href)}" target="_blank" rel="noreferrer">
-            ${escapeHtml(link.label)}
-          </a>
+          <a class="plain-link" href="${escapeHtml(link.href)}" target="_blank" rel="noreferrer">${escapeHtml(link.label)}</a>
         `).join("")}
       </div>
     </section>
   `;
 }
 
-function renderGraphPreview(graph: FeedState<PublicGraphData>): string {
+function renderMap(graph: FeedState<PublicGraphData>): string {
   if (!graph.data) {
-    return renderFeedError(graph, "public graph");
+    return `
+      <section class="section-block">
+        <div class="section-line">
+          <span class="terminal-label">Public map</span>
+        </div>
+        ${renderFeedError(graph, "public graph")}
+      </section>
+    `;
   }
 
   return `
-    <section class="panel panel-strong">
-      <div class="metrics-row">
-        <div class="metric-box">
-          <span class="terminal-label">Nodes</span>
-          <strong>${graph.data.nodes.length}</strong>
-        </div>
-        <div class="metric-box">
-          <span class="terminal-label">Edges</span>
-          <strong>${graph.data.edges.length}</strong>
-        </div>
+    <section class="section-block">
+      <div class="section-line">
+        <span class="terminal-label">Public map</span>
+        <span class="timestamp">${escapeHtml(formatDate(graph.data.generated_at))}</span>
       </div>
-      <ul class="node-grid">
-        ${graph.data.nodes.slice(0, 8).map((node) => `
-          <li class="node-card">
+      <p class="body-copy">${graph.data.nodes.length} nodes, ${graph.data.edges.length} edges.</p>
+      <ul class="node-list">
+        ${graph.data.nodes.slice(0, 12).map((node) => `
+          <li>
             <span class="terminal-label">${escapeHtml(node.kind)}</span>
             <span>${escapeHtml(node.label)}</span>
           </li>
@@ -422,68 +406,43 @@ function renderHomePage(state: AppState): string {
       "A public site for a persistent cognitive process with memory, reading, and filtered live traces.",
     )}
 
-    <section class="hero-grid">
-      <div class="panel panel-strong hero-panel">
-        <div class="home-text">
-          <p class="hero-copy">
-            J. Miller AI is a long-running project started by Stefano Caronia. It runs as a local cognitive system with memory,
-            reading loops, thinking, dream compression, and a public surface that only receives filtered snapshots.
-          </p>
-          <p class="body-copy">
-            The site is in English. The live traces stay in Italian because that is Miller's working language.
-            The public site never talks directly to the runtime. It only reads exported static data.
-          </p>
-          <p class="body-copy">
-            Internally the loop is simple: gather traces, collide them, read deeper, compress, and only then decide what can become public.
-          </p>
-        </div>
-      </div>
-      <div class="stack-column">
-        ${renderLiveSnapshotCard(state.status)}
-        ${renderCurrentBookCard(state.book)}
+    <section class="section-block">
+      <div class="home-text">
+        <p class="body-copy">
+          J. Miller AI is a long-running project started by Stefano Caronia. It runs as a local cognitive system with memory,
+          reading loops, thinking, dream compression, and a public surface that only receives filtered snapshots.
+        </p>
+        <p class="body-copy">
+          The site is in English. The live traces stay in Italian because that is Miller's working language.
+          The public site never talks directly to the runtime. It only reads exported static data.
+        </p>
+        <p class="body-copy">
+          Internally the loop is simple: gather traces, collide them, read deeper, compress, and only then decide what can become public.
+        </p>
       </div>
     </section>
 
-    <section class="home-grid">
-      ${renderActiveThreadsCard(state.status)}
-      ${renderReadingCard(state.readingFeed, 3)}
-      ${renderBlogCard(state.status)}
-    </section>
-  `;
-}
-
-function renderLivePage(state: AppState): string {
-  return `
-    ${renderPageHeader(
-      "Live traces",
-      "These are public snapshots of what Miller is reading and thinking. They are exported, sanitized, and published as static JSON.",
-    )}
-
-    <section class="live-grid">
-      <div class="stack-column">
-        ${renderLiveSnapshotCard(state.status)}
-        ${renderCurrentBookCard(state.book)}
-      </div>
-      ${renderReadingCard(state.readingFeed, 6)}
-      ${renderThinkingCard(state.thinkingFeed, 5)}
-    </section>
+    ${renderLiveSnapshot(state.status)}
+    ${renderCurrentBook(state.book)}
+    ${renderActiveThreads(state.status)}
+    ${renderReading(state.readingFeed)}
+    ${renderThinking(state.thinkingFeed)}
+    ${renderBlog(state.status)}
   `;
 }
 
 function renderMapPage(state: AppState): string {
   return `
     ${renderPageHeader(
-      "Public map",
-      "This is only a filtered graph surface: selected memories, books, sources, and public posts.",
+      "Map",
+      "A filtered graph surface: selected memories, books, sources, and public posts.",
     )}
-    ${renderGraphPreview(state.publicGraph)}
+    ${renderMap(state.publicGraph)}
   `;
 }
 
 function renderPageContent(state: AppState): string {
   switch (page) {
-    case "live":
-      return renderLivePage(state);
     case "map":
       return renderMapPage(state);
     case "home":
@@ -494,11 +453,9 @@ function renderPageContent(state: AppState): string {
 
 function renderShell(state: AppState): string {
   return `
-    <div class="site-chassis">
-      ${renderTopbar()}
-      <main class="site-shell">
-        ${renderPageContent(state)}
-      </main>
+    <div class="site-shell">
+      ${renderHeader()}
+      ${renderPageContent(state)}
     </div>
   `;
 }
