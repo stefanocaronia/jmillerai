@@ -327,7 +327,7 @@ function renderCurrentState(status: FeedState<StatusData>): string {
         <span class="section-name">Current state</span>
         <span class="section-meta">${escapeHtml(formatDate(status.data.generated_at))}</span>
       </div>
-      <h2>${escapeHtml(status.data.headline)}</h2>
+      <h2 class="state-title">${escapeHtml(status.data.headline)}</h2>
       ${status.data.detail ? `<p class="body-copy">${escapeHtml(status.data.detail)}</p>` : ""}
       <div class="state-inline">
         <span class="kind-badge">${escapeHtml(status.data.mode)}</span>

@@ -179,6 +179,10 @@ a {
   text-transform: uppercase;
 }
 
+.state-title {
+  text-transform: none !important;
+}
+
 .stream-item h3 {
   font-size: 0.96rem;
   text-transform: none;
