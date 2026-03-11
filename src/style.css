@@ -185,7 +185,7 @@ a {
 
 .stream-item h3 {
   font-size: 0.96rem;
-  text-transform: capitalize;
+  text-transform: none;
 }
 
 .section-block-plain {
@@ -280,7 +280,12 @@ a {
   font-size: 0.96rem;
   line-height: 1;
   letter-spacing: 0.03em;
-  text-transform: capitalize;
+  text-transform: none;
+}
+
+.stream-item h3::first-letter,
+.book-archive-title::first-letter {
+  text-transform: uppercase;
 }
 
 .contact-list {
