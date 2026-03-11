@@ -1,4 +1,4 @@
-import type { CognitiveLoopData } from "./cognitive-loop";
+import { projectLoopGraph, type CognitiveLoopData } from "./cognitive-loop";
 import type { PublicGraphData } from "./memory-graph";
 import { CONTACT_SECTIONS, INTRO_PARAGRAPHS, SITE_SUBTITLE } from "./site-content";
 import type { AppState, BlogFeedData, BlogFeedKind, BookData, FeedState, PageId, ReadingFeedData, StatusData, ThinkingFeedData } from "./site-types";
@@ -433,13 +433,15 @@ function renderLoopPage(loop: FeedState<CognitiveLoopData>): string {
     `;
   }
 
+  const graph = projectLoopGraph(loop.data);
+
   return `
     <section class="section-block">
       <div class="section-line">
         <span class="section-name">Loop</span>
         <span class="section-meta">${escapeHtml(formatDate(loop.data.generated_at))}</span>
       </div>
-      <p class="body-copy">${loop.data.nodes.length} nodes, ${countLoopConnections(loop.data.edges)} connections in the current exported loop.</p>
+      <p class="body-copy">${graph.nodes.length} nodes, ${countLoopConnections(graph.edges)} connections in the current exported loop.</p>
       <div id="cognitive-loop-stage" class="memory-graph-stage loop-graph-stage"></div>
     </section>
     <section class="section-block">

@@ -31,6 +31,8 @@ const kindColors: Record<string, string> = {
   operation: "#8f8f8f",
 };
 
+const GRAPH_MEMORY_NODE_ID = "memory-hub";
+
 function shortenLabel(label: string): string {
   const maxChars = 22;
   if (label.length <= maxChars) {
@@ -44,13 +46,17 @@ function shortenLabel(label: string): string {
   return `${trimmed}…`;
 }
 
-function graphLabel(node: CognitiveLoopNode): string {
-  if (node.id === "memory") {
-    return "MEMORY";
+function graphNodeId(node: CognitiveLoopNode): string {
+  if (node.id === "memory" || node.id === "short-state") {
+    return GRAPH_MEMORY_NODE_ID;
   }
 
-  if (node.id === "short-state") {
-    return "WORKING MEMORY";
+  return node.id;
+}
+
+function graphLabel(node: CognitiveLoopNode): string {
+  if (node.id === "memory" || node.id === "short-state") {
+    return "MEMORY";
   }
 
   return shortenLabel(node.label);
@@ -72,20 +78,51 @@ function dedupeEdges(edges: CognitiveLoopEdge[]): CognitiveLoopEdge[] {
   return unique;
 }
 
+export function projectLoopGraph(loop: CognitiveLoopData): { nodes: Array<{ id: string; label: string; color: string }>; edges: CognitiveLoopEdge[] } {
+  const nodeMap = new Map<string, { id: string; label: string; color: string }>();
+
+  for (const node of loop.nodes) {
+    const id = graphNodeId(node);
+    if (nodeMap.has(id)) {
+      continue;
+    }
+
+    nodeMap.set(id, {
+      id,
+      label: graphLabel(node),
+      color: kindColors[node.kind] || "#c3c3c3",
+    });
+  }
+
+  const edges = dedupeEdges(
+    loop.edges
+      .map((edge) => ({
+        source: edge.source === "memory" || edge.source === "short-state" ? GRAPH_MEMORY_NODE_ID : edge.source,
+        target: edge.target === "memory" || edge.target === "short-state" ? GRAPH_MEMORY_NODE_ID : edge.target,
+      }))
+      .filter((edge) => edge.source !== edge.target),
+  );
+
+  return {
+    nodes: Array.from(nodeMap.values()),
+    edges,
+  };
+}
+
 export function mountCognitiveLoop(container: HTMLElement, loop: CognitiveLoopData): () => void {
-  const edges = dedupeEdges(loop.edges);
+  const graph = projectLoopGraph(loop);
 
   const cy = cytoscape({
     container,
     elements: [
-      ...loop.nodes.map((node) => ({
+      ...graph.nodes.map((node) => ({
         data: {
           id: node.id,
-          label: graphLabel(node),
-          color: kindColors[node.kind] || "#c3c3c3",
+          label: node.label,
+          color: node.color,
         },
       })),
-      ...edges.map((edge, index) => ({
+      ...graph.edges.map((edge, index) => ({
         data: {
           id: `loop-edge-${index}`,
           source: edge.source,
