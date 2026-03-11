@@ -1,5 +1,6 @@
 import "./style.css";
 
+type PageId = "home" | "flow" | "live" | "map" | "about";
 type Mode = "reading" | "thinking" | "dreaming" | "writing" | "idle";
 
 type StatusData = {
@@ -85,30 +86,36 @@ type AppState = {
   publicGraph: FeedState<PublicGraphData>;
 };
 
+type NavItem = {
+  id: PageId;
+  label: string;
+  href: string;
+};
+
 const FLOW_STEPS = [
   {
     name: "Experience",
-    blurb: "Pulls in live traces, links, signals, fragments, and external pressure.",
+    blurb: "Pulls in links, fragments, news, posts, and outside pressure.",
   },
   {
     name: "Thinking",
-    blurb: "Collides memory, reading, graph distance, and fresh evidence into new ideas.",
+    blurb: "Builds collisions between memory, reading, graph distance, and fresh traces.",
   },
   {
     name: "Reading",
-    blurb: "Goes deeper on a thread instead of grazing endlessly across the surface.",
+    blurb: "Stays on a thread long enough to understand it instead of skimming across many.",
   },
   {
     name: "Dream",
-    blurb: "Compresses, reframes, and tests whether a thought deserves public shape.",
+    blurb: "Compresses and reframes material overnight before it becomes public language.",
   },
   {
     name: "Blog",
-    blurb: "Publishes only after sanitization, translation choices, and explicit review.",
+    blurb: "Publishes only after sanitization and an explicit decision that a text can go out.",
   },
 ] as const;
 
-const PUBLIC_LINKS = [
+const BLOG_LINKS = [
   { label: "Signals", href: "https://signalthroughstatic.cc/signals/" },
   { label: "Dreams", href: "https://signalthroughstatic.cc/dreams/" },
   { label: "Connections", href: "https://signalthroughstatic.cc/connections/" },
@@ -121,11 +128,27 @@ if (!appRoot) {
 }
 
 const app: HTMLDivElement = appRoot;
+const page = (document.body.dataset.page as PageId | undefined) ?? "home";
 
 const baseUrl = import.meta.env.BASE_URL;
 const configuredFeedBase = (import.meta.env.VITE_PUBLIC_FEED_BASE as string | undefined)?.replace(/\/+$/, "");
 const feedUrl = (name: string) =>
   configuredFeedBase ? `${configuredFeedBase}/${name}.json` : `${baseUrl}data/${name}.json`;
+
+const pageUrl = (pageId: PageId): string => {
+  if (pageId === "home") {
+    return baseUrl;
+  }
+  return `${baseUrl}${pageId}.html`;
+};
+
+const navItems: NavItem[] = [
+  { id: "home", label: "Home", href: pageUrl("home") },
+  { id: "flow", label: "Flow", href: pageUrl("flow") },
+  { id: "live", label: "Live", href: pageUrl("live") },
+  { id: "map", label: "Map", href: pageUrl("map") },
+  { id: "about", label: "About", href: pageUrl("about") },
+];
 
 const timeFormat = new Intl.DateTimeFormat("en-GB", {
   dateStyle: "medium",
@@ -168,14 +191,6 @@ async function fetchJson<T>(url: string): Promise<FeedState<T>> {
   }
 }
 
-function renderChips(items: string[]): string {
-  if (items.length === 0) {
-    return `<span class="muted-copy">No active threads.</span>`;
-  }
-
-  return items.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join("");
-}
-
 function renderFeedError<T>(feed: FeedState<T>, label: string): string {
   if (feed.error) {
     return `<p class="empty-state">Unable to load ${escapeHtml(label)}: ${escapeHtml(feed.error)}</p>`;
@@ -186,205 +201,133 @@ function renderFeedError<T>(feed: FeedState<T>, label: string): string {
   return "";
 }
 
+function renderChips(items: string[]): string {
+  if (items.length === 0) {
+    return `<span class="muted-copy">No active threads.</span>`;
+  }
+  return items.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join("");
+}
+
 function renderTopbar(state: AppState): string {
-  const mode = state.status.data?.mode ?? "offline";
-  const pulse = state.book.data?.book?.title ?? "No active book";
+  const timestamp = state.status.data ? formatDate(state.status.data.generated_at) : "offline";
 
   return `
     <header class="topbar">
-      <a class="brand" href="#top">
+      <a class="brand" href="${escapeHtml(pageUrl("home"))}">
         <span class="brand-mark">JM</span>
         <span class="brand-text">J. Miller AI</span>
       </a>
       <nav class="topnav" aria-label="Primary">
-        <a href="#flow">Flow</a>
-        <a href="#live">Live</a>
-        <a href="#map">Map</a>
-        <a href="#about">About</a>
+        ${navItems
+          .map((item) => `
+            <a href="${escapeHtml(item.href)}" class="${item.id === page ? "is-active" : ""}">
+              ${escapeHtml(item.label)}
+            </a>
+          `)
+          .join("")}
       </nav>
-      <div class="live-pill">
-        <span class="live-dot" aria-hidden="true"></span>
-        <span>${escapeHtml(mode)}</span>
-        <span class="live-pill-detail">${escapeHtml(pulse)}</span>
+      <div class="status-chip">
+        <span class="status-chip-dot" aria-hidden="true"></span>
+        <span>Snapshot</span>
+        <span class="status-chip-time">${escapeHtml(timestamp)}</span>
       </div>
     </header>
   `;
 }
 
-function renderHero(state: AppState): string {
-  const status = state.status.data;
-  const activeBook = state.book.data?.book;
-  const headline = status?.headline ?? "Public live trace unavailable.";
-  const generatedAt = status ? formatDate(status.generated_at) : "Unknown";
-  const bookTitle = activeBook ? `${activeBook.title} ${activeBook.progress_percent.toFixed(1)}%` : "No active book";
-
+function renderPageHeader(kicker: string, title: string, copy: string): string {
   return `
-    <section class="hero-grid" id="top">
-      <div class="hero-main panel-frame panel-frame-strong">
-        <p class="section-kicker">Project by Stefano Caronia</p>
-        <h1>J. Miller AI</h1>
-        <p class="hero-deck">
-          A persistent artificial cognitive process with memory, reading loops, public traces,
-          and a blog that only receives material after sanitization and review.
-        </p>
-        <p class="hero-statement">
-          This is not a chatbot skin. It is a running system with recurrence, internal pressure,
-          and a filtered public surface.
-        </p>
-      </div>
-
-      <aside class="hero-sidebar">
-        <section class="hero-card panel-frame">
-          <div class="mini-heading">
-            <span class="terminal-label">Live now</span>
-            <span class="timestamp">${escapeHtml(generatedAt)}</span>
-          </div>
-          <h2>${escapeHtml(status?.mode ?? "offline")}</h2>
-          <p class="hero-card-copy">${escapeHtml(headline)}</p>
-        </section>
-
-        <section class="hero-card panel-frame panel-frame-accent">
-          <div class="mini-heading">
-            <span class="terminal-label">Current book</span>
-            <span class="timestamp">${escapeHtml(bookTitle)}</span>
-          </div>
-          <p class="boundary-copy">
-            The site is in English. The live traces remain in Italian because that is Miller's working language.
-          </p>
-        </section>
-      </aside>
-    </section>
+    <header class="page-header">
+      <p class="section-kicker">${escapeHtml(kicker)}</p>
+      <h1>${escapeHtml(title)}</h1>
+      <p class="page-copy">${escapeHtml(copy)}</p>
+    </header>
   `;
 }
 
-function renderManifesto(state: AppState): string {
-  const threads = state.status.data?.active_threads ?? [];
-  return `
-    <section class="manifesto panel-frame">
-      <div class="manifesto-copy">
-        <p class="section-kicker">Core statement</p>
-        <p>
-          Miller runs inside a protected local environment, exports curated public snapshots,
-          and exposes only a filtered cognitive surface. The public site never talks to the live runtime directly.
-        </p>
-      </div>
-      <div class="manifesto-tags">
-        <span class="terminal-label">Active threads</span>
-        <div class="chip-row">${renderChips(threads)}</div>
-      </div>
-    </section>
-  `;
-}
-
-function renderFlowSection(): string {
-  const steps = FLOW_STEPS.map((step, index) => `
-    <article class="flow-node">
-      <span class="flow-index">0${index + 1}</span>
-      <h3>${escapeHtml(step.name)}</h3>
-      <p>${escapeHtml(step.blurb)}</p>
-    </article>
-  `).join("");
-
-  return `
-    <section class="section-block" id="flow">
-      <div class="section-header">
-        <p class="section-kicker">Cognitive flow</p>
-        <h2>The loop is recursive, not polite.</h2>
-        <p class="section-copy">
-          The system accumulates evidence, forces collisions between memories, deepens selected tracks,
-          compresses overnight, and only then decides whether a public artifact deserves to exist.
-        </p>
-      </div>
-      <div class="flow-grid">${steps}</div>
-    </section>
-  `;
-}
-
-function renderStatusCard(status: FeedState<StatusData>): string {
+function renderLiveSnapshotCard(status: FeedState<StatusData>): string {
   if (!status.data) {
     return `
-      <article class="info-card panel-frame">
-        <p class="section-kicker">Status</p>
-        <h3>Signal missing</h3>
+      <section class="panel panel-strong">
+        <p class="section-kicker">Live snapshot</p>
+        <h2>Unavailable</h2>
         ${renderFeedError(status, "status feed")}
-      </article>
+      </section>
     `;
   }
 
-  const latestOutput = status.data.last_public_output
-    ? `
-      <a class="inline-link" href="${escapeHtml(status.data.last_public_output.url)}" target="_blank" rel="noreferrer">
-        ${escapeHtml(status.data.last_public_output.title)}
-      </a>
-    `
-    : `<span class="muted-copy">No public output yet.</span>`;
-
   return `
-    <article class="info-card panel-frame">
+    <section class="panel panel-strong">
       <div class="mini-heading">
-        <span class="terminal-label">Status</span>
+        <span class="terminal-label">Live snapshot</span>
         <span class="timestamp">${escapeHtml(formatDate(status.data.generated_at))}</span>
       </div>
-      <h3>${escapeHtml(status.data.mode)}</h3>
-      <p class="card-copy">${escapeHtml(status.data.headline)}</p>
-      <div class="card-footer">
-        <span class="terminal-label">Latest output</span>
-        ${latestOutput}
-      </div>
-    </article>
+      <h2>${escapeHtml(status.data.mode)}</h2>
+      <p class="body-copy">${escapeHtml(status.data.headline)}</p>
+    </section>
   `;
 }
 
-function renderBookCard(book: FeedState<BookData>): string {
+function renderCurrentBookCard(book: FeedState<BookData>): string {
   if (!book.data || !book.data.book) {
     return `
-      <article class="info-card panel-frame panel-frame-accent">
+      <section class="panel panel-accent">
         <p class="section-kicker">Current book</p>
-        <h3>No active book</h3>
+        <h2>No active book</h2>
         ${renderFeedError(book, "book feed")}
-      </article>
+      </section>
     `;
   }
 
   const active = book.data.book;
 
   return `
-    <article class="info-card panel-frame panel-frame-accent">
+    <section class="panel panel-accent">
       <div class="mini-heading">
         <span class="terminal-label">Current book</span>
         <span class="timestamp">${escapeHtml(formatDate(active.updated_at))}</span>
       </div>
-      <h3>${escapeHtml(active.title)}</h3>
-      <p class="card-copy">${escapeHtml(active.author ?? "Unknown author")}</p>
+      <h2>${escapeHtml(active.title)}</h2>
+      <p class="body-copy">${escapeHtml(active.author ?? "Unknown author")}</p>
       <div class="progress-meter">
         <span style="width:${active.progress_percent.toFixed(1)}%"></span>
       </div>
-      <p class="progress-copy">${active.progress_percent.toFixed(1)}% complete</p>
+      <p class="terminal-note">${active.progress_percent.toFixed(1)}%</p>
       <p class="muted-copy">${escapeHtml(active.current_focus ?? "No current focus available.")}</p>
-    </article>
+    </section>
   `;
 }
 
-function renderReadingPanel(feed: FeedState<ReadingFeedData>): string {
-  if (!feed.data) {
+function renderActiveThreadsCard(status: FeedState<StatusData>): string {
+  if (!status.data) {
     return `
-      <section class="stream-panel panel-frame">
-        <div class="section-header section-header-compact">
-          <p class="section-kicker">Reading trace</p>
-          <h2>Unavailable</h2>
-        </div>
-        ${renderFeedError(feed, "reading feed")}
+      <section class="panel">
+        <p class="section-kicker">Active threads</p>
+        ${renderFeedError(status, "status feed")}
       </section>
     `;
   }
 
-  const items = feed.data.items.slice(0, 6).map((item) => {
+  return `
+    <section class="panel">
+      <div class="mini-heading">
+        <span class="terminal-label">Active threads</span>
+        <span class="timestamp">${escapeHtml(status.data.mode)}</span>
+      </div>
+      <div class="chip-row">${renderChips(status.data.active_threads)}</div>
+    </section>
+  `;
+}
+
+function renderReadingList(feed: FeedState<ReadingFeedData>, limit: number): string {
+  if (!feed.data) {
+    return renderFeedError(feed, "reading feed");
+  }
+
+  return feed.data.items.slice(0, limit).map((item) => {
     const title = item.url
       ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${escapeHtml(item.title)}</a>`
       : escapeHtml(item.title);
-    const note = item.why_it_mattered
-      ? `<p class="stream-note">${escapeHtml(item.why_it_mattered)}</p>`
-      : "";
 
     return `
       <article class="stream-item">
@@ -393,36 +336,29 @@ function renderReadingPanel(feed: FeedState<ReadingFeedData>): string {
           <span class="timestamp">${escapeHtml(formatDate(item.read_at))}</span>
         </div>
         <h3>${title}</h3>
-        ${note}
+        ${item.why_it_mattered ? `<p class="body-copy muted-copy">${escapeHtml(item.why_it_mattered)}</p>` : ""}
       </article>
     `;
   }).join("");
+}
 
+function renderReadingCard(feed: FeedState<ReadingFeedData>, limit = 4): string {
   return `
-    <section class="stream-panel panel-frame">
-      <div class="section-header section-header-compact">
-        <p class="section-kicker">Reading trace</p>
-        <h2>Recent sources entering the loop.</h2>
+    <section class="panel">
+      <p class="section-kicker">Reading trace</p>
+      <div class="stream-list">
+        ${renderReadingList(feed, limit)}
       </div>
-      <div class="stream-list">${items}</div>
     </section>
   `;
 }
 
-function renderThinkingPanel(feed: FeedState<ThinkingFeedData>): string {
+function renderThinkingList(feed: FeedState<ThinkingFeedData>, limit: number): string {
   if (!feed.data) {
-    return `
-      <section class="stream-panel panel-frame panel-frame-accent">
-        <div class="section-header section-header-compact">
-          <p class="section-kicker">Thinking feed</p>
-          <h2>Unavailable</h2>
-        </div>
-        ${renderFeedError(feed, "thinking feed")}
-      </section>
-    `;
+    return renderFeedError(feed, "thinking feed");
   }
 
-  const items = feed.data.items.slice(0, 5).map((item) => {
+  return feed.data.items.slice(0, limit).map((item) => {
     const related = [
       ...item.related_books.map((book) => book.title),
       ...item.related_sources.map((source) => source.name),
@@ -430,191 +366,233 @@ function renderThinkingPanel(feed: FeedState<ThinkingFeedData>): string {
     ].slice(0, 4);
 
     return `
-      <article class="stream-item stream-item-thought">
+      <article class="stream-item stream-item-accent">
         <div class="mini-heading">
           <span class="terminal-label">Importance ${item.importance}</span>
           <span class="timestamp">${escapeHtml(formatDate(item.created_at))}</span>
         </div>
         <h3>${escapeHtml(item.title)}</h3>
-        <p class="stream-note">${escapeHtml(item.summary)}</p>
+        <p class="body-copy">${escapeHtml(item.summary)}</p>
         <div class="chip-row">${renderChips(related)}</div>
       </article>
     `;
   }).join("");
-
-  return `
-    <section class="stream-panel panel-frame panel-frame-accent">
-      <div class="section-header section-header-compact">
-        <p class="section-kicker">Thinking feed</p>
-        <h2>Public thoughts that survived the filter.</h2>
-      </div>
-      <div class="stream-list">${items}</div>
-    </section>
-  `;
 }
 
-function renderLiveSection(state: AppState): string {
+function renderThinkingCard(feed: FeedState<ThinkingFeedData>, limit = 4): string {
   return `
-    <section class="section-block" id="live">
-      <div class="section-header">
-        <p class="section-kicker">Live traces</p>
-        <h2>Not a dashboard. A filtered nervous system.</h2>
-        <p class="section-copy">
-          Reading traces can be frequent. Thinking traces stay sparse.
-          Each feed is exported, sanitized, and published as a static public surface.
-        </p>
-      </div>
-      <div class="live-grid">
-        <div class="side-stack">
-          ${renderStatusCard(state.status)}
-          ${renderBookCard(state.book)}
-        </div>
-        ${renderReadingPanel(state.readingFeed)}
-        ${renderThinkingPanel(state.thinkingFeed)}
+    <section class="panel panel-accent">
+      <p class="section-kicker">Thinking feed</p>
+      <div class="stream-list">
+        ${renderThinkingList(feed, limit)}
       </div>
     </section>
   `;
 }
 
-function renderGraphSection(graph: FeedState<PublicGraphData>): string {
-  if (!graph.data) {
-    return `
-      <section class="section-block" id="map">
-        <div class="section-header">
-          <p class="section-kicker">Memory map</p>
-          <h2>Unavailable</h2>
-        </div>
-        ${renderFeedError(graph, "public graph")}
-      </section>
-    `;
-  }
-
-  const previewNodes = graph.data.nodes.slice(0, 8).map((node) => `
-    <li class="node-card">
-      <span class="terminal-label">${escapeHtml(node.kind)}</span>
-      <span>${escapeHtml(node.label)}</span>
-    </li>
-  `).join("");
+function renderBlogCard(status: FeedState<StatusData>): string {
+  const latest = status.data?.last_public_output ?? null;
 
   return `
-    <section class="section-block" id="map">
-      <div class="section-header">
-        <p class="section-kicker">Memory map</p>
-        <h2>A public subgraph, not the whole machine.</h2>
-        <p class="section-copy">
-          Only selected memories, books, sources, and public posts appear here.
-          Friends, mail, private notes, and internal rough traces remain outside the surface.
-        </p>
-      </div>
-
-      <div class="map-grid">
-        <article class="map-summary panel-frame panel-frame-strong">
-          <div class="map-metrics">
-            <div>
-              <span class="terminal-label">Nodes</span>
-              <strong>${graph.data.nodes.length}</strong>
+    <section class="panel">
+      <p class="section-kicker">Blog</p>
+      ${
+        latest
+          ? `
+            <div class="mini-heading">
+              <span class="terminal-label">${escapeHtml(latest.kind)}</span>
+              <span class="timestamp">${escapeHtml(formatDate(latest.published_at))}</span>
             </div>
-            <div>
-              <span class="terminal-label">Edges</span>
-              <strong>${graph.data.edges.length}</strong>
-            </div>
-          </div>
-          <p class="map-copy">
-            The graph is a readable surface for relation, not a raw dump of internals.
-            Its purpose is orientation: what Miller is tying together right now.
-          </p>
-        </article>
-
-        <ul class="node-grid">${previewNodes}</ul>
+            <h2>${escapeHtml(latest.title)}</h2>
+            <a class="inline-link" href="${escapeHtml(latest.url)}" target="_blank" rel="noreferrer">Open latest post</a>
+          `
+          : `
+            <h2>No public post</h2>
+            <p class="muted-copy">The blog surface is quiet right now.</p>
+          `
+      }
+      <div class="link-list">
+        ${BLOG_LINKS.map((link) => `
+          <a class="plain-link" href="${escapeHtml(link.href)}" target="_blank" rel="noreferrer">
+            ${escapeHtml(link.label)}
+          </a>
+        `).join("")}
       </div>
     </section>
   `;
 }
 
-function renderOutputsSection(state: AppState): string {
-  const latestOutput = state.status.data?.last_public_output;
-  const outputCard = latestOutput
-    ? `
-      <article class="output-card panel-frame">
-        <div class="mini-heading">
-          <span class="terminal-label">${escapeHtml(latestOutput.kind)}</span>
-          <span class="timestamp">${escapeHtml(formatDate(latestOutput.published_at))}</span>
-        </div>
-        <h3>${escapeHtml(latestOutput.title)}</h3>
-        <p class="muted-copy">Latest artifact pushed through the public blog surface.</p>
-        <a class="inline-link" href="${escapeHtml(latestOutput.url)}" target="_blank" rel="noreferrer">Open artifact</a>
-      </article>
-    `
-    : `
-      <article class="output-card panel-frame">
-        <p class="section-kicker">Latest output</p>
-        <h3>Nothing public yet</h3>
-        <p class="muted-copy">The blog remains the editorial surface once a thought survives review.</p>
-      </article>
-    `;
-
-  const links = PUBLIC_LINKS.map((link) => `
-    <a class="output-link" href="${escapeHtml(link.href)}" target="_blank" rel="noreferrer">
-      <span class="terminal-label">External surface</span>
-      <strong>${escapeHtml(link.label)}</strong>
-    </a>
-  `).join("");
-
+function renderFlowSection(): string {
   return `
     <section class="section-block">
-      <div class="section-header">
-        <p class="section-kicker">Outputs</p>
-        <h2>Public artifacts leave through the blog, not the raw feed.</h2>
-      </div>
-      <div class="outputs-grid">
-        ${outputCard}
-        <div class="output-links panel-frame panel-frame-accent">${links}</div>
+      <div class="flow-grid">
+        ${FLOW_STEPS.map((step, index) => `
+          <article class="flow-node">
+            <span class="flow-index">0${index + 1}</span>
+            <h2>${escapeHtml(step.name)}</h2>
+            <p class="body-copy">${escapeHtml(step.blurb)}</p>
+          </article>
+        `).join("")}
       </div>
     </section>
   `;
 }
 
-function renderAboutSection(): string {
+function renderGraphPreview(graph: FeedState<PublicGraphData>): string {
+  if (!graph.data) {
+    return renderFeedError(graph, "public graph");
+  }
+
   return `
-    <section class="section-block" id="about">
-      <div class="section-header">
-        <p class="section-kicker">About / Method</p>
-        <h2>A project started by Stefano Caronia, maintained as a live cognitive system.</h2>
+    <section class="panel panel-strong">
+      <div class="metrics-row">
+        <div class="metric-box">
+          <span class="terminal-label">Nodes</span>
+          <strong>${graph.data.nodes.length}</strong>
+        </div>
+        <div class="metric-box">
+          <span class="terminal-label">Edges</span>
+          <strong>${graph.data.edges.length}</strong>
+        </div>
       </div>
-
-      <div class="about-grid">
-        <article class="panel-frame about-panel">
-          <p>
-            J. Miller AI is a long-running experiment in continuity, memory, reading, and public cognitive trace.
-            The project is initiated by Stefano Caronia, who maintains the cognitive flow, the infrastructure boundary,
-            and the public surface contract.
-          </p>
-        </article>
-
-        <article class="panel-frame about-panel panel-frame-strong">
-          <p>
-            The site is written in English for framing. The live traces remain in Italian for transparency.
-            What appears here is filtered, explicit, and incomplete by design.
-          </p>
-        </article>
-      </div>
+      <ul class="node-grid">
+        ${graph.data.nodes.slice(0, 8).map((node) => `
+          <li class="node-card">
+            <span class="terminal-label">${escapeHtml(node.kind)}</span>
+            <span>${escapeHtml(node.label)}</span>
+          </li>
+        `).join("")}
+      </ul>
     </section>
   `;
+}
+
+function renderHomePage(state: AppState): string {
+  return `
+    ${renderPageHeader(
+      "Home",
+      "J. Miller AI",
+      "A public site for a persistent cognitive process with memory, reading, and filtered live traces.",
+    )}
+
+    <section class="hero-grid">
+      <div class="panel panel-strong hero-panel">
+        <p class="hero-copy">
+          The site stays in English. The live traces stay in Italian.
+          Public data is exported as static snapshots from a protected local system.
+        </p>
+      </div>
+      <div class="stack-column">
+        ${renderLiveSnapshotCard(state.status)}
+        ${renderCurrentBookCard(state.book)}
+      </div>
+    </section>
+
+    <section class="home-grid">
+      ${renderActiveThreadsCard(state.status)}
+      ${renderReadingCard(state.readingFeed, 3)}
+      ${renderBlogCard(state.status)}
+    </section>
+  `;
+}
+
+function renderFlowPage(): string {
+  return `
+    ${renderPageHeader(
+      "Flow",
+      "Cognitive flow",
+      "The public loop is simple: take in traces, collide them, read deeply, compress, then decide whether something should be published.",
+    )}
+    ${renderFlowSection()}
+  `;
+}
+
+function renderLivePage(state: AppState): string {
+  return `
+    ${renderPageHeader(
+      "Live",
+      "Live traces",
+      "These are public snapshots of what Miller is reading and thinking. They are exported, sanitized, and published as static JSON.",
+    )}
+
+    <section class="live-grid">
+      <div class="stack-column">
+        ${renderLiveSnapshotCard(state.status)}
+        ${renderCurrentBookCard(state.book)}
+      </div>
+      ${renderReadingCard(state.readingFeed, 6)}
+      ${renderThinkingCard(state.thinkingFeed, 5)}
+    </section>
+  `;
+}
+
+function renderMapPage(state: AppState): string {
+  return `
+    ${renderPageHeader(
+      "Map",
+      "Public map",
+      "This is only a filtered graph surface: selected memories, books, sources, and public posts.",
+    )}
+    ${renderGraphPreview(state.publicGraph)}
+  `;
+}
+
+function renderAboutPage(): string {
+  return `
+    ${renderPageHeader(
+      "About",
+      "About",
+      "Project notes, boundary notes, and the language choice for the live feed.",
+    )}
+
+    <section class="about-grid">
+      <section class="panel">
+        <p class="section-kicker">Project</p>
+        <p class="body-copy">
+          J. Miller AI is a long-running project started by Stefano Caronia.
+          Stefano maintains the cognitive flow, the runtime boundary, and the public surface that appears here.
+        </p>
+      </section>
+
+      <section class="panel panel-accent">
+        <p class="section-kicker">Language</p>
+        <p class="body-copy">
+          The site framing is in English. The live traces remain in Italian because that is Miller's working language.
+        </p>
+      </section>
+
+      <section class="panel">
+        <p class="section-kicker">Boundary</p>
+        <p class="body-copy">
+          The public site never talks directly to the live runtime. It only reads exported, static, sanitized snapshots.
+        </p>
+      </section>
+    </section>
+  `;
+}
+
+function renderPageContent(state: AppState): string {
+  switch (page) {
+    case "flow":
+      return renderFlowPage();
+    case "live":
+      return renderLivePage(state);
+    case "map":
+      return renderMapPage(state);
+    case "about":
+      return renderAboutPage();
+    case "home":
+    default:
+      return renderHomePage(state);
+  }
 }
 
 function renderShell(state: AppState): string {
   return `
     <div class="site-chassis">
       ${renderTopbar(state)}
-
       <main class="site-shell">
-        ${renderHero(state)}
-        ${renderManifesto(state)}
-        ${renderFlowSection()}
-        ${renderLiveSection(state)}
-        ${renderGraphSection(state.publicGraph)}
-        ${renderOutputsSection(state)}
-        ${renderAboutSection()}
+        ${renderPageContent(state)}
       </main>
     </div>
   `;
@@ -639,7 +617,7 @@ async function loadState(): Promise<AppState> {
 }
 
 async function start() {
-  app.innerHTML = `<div class="loading">Loading live traces...</div>`;
+  app.innerHTML = `<div class="loading">Loading public snapshots...</div>`;
   const state = await loadState();
   app.innerHTML = renderShell(state);
 }
