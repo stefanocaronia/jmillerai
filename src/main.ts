@@ -9,6 +9,7 @@ type StatusData = {
   generated_at: string;
   mode: Mode;
   headline: string;
+  detail?: string | null;
   active_threads: string[];
   current_book: {
     title: string;
@@ -97,6 +98,13 @@ type AppState = {
 };
 
 type BlogFeedKind = "signals" | "dreams";
+
+const READING_ARCHIVE_PREVIEW = [
+  { title: "Dune", author: "Frank Herbert" },
+  { title: "2001: Odissea nello spazio", author: "Arthur C. Clarke" },
+  { title: "Leviathan – Il risveglio", author: "James S.A. Corey" },
+  { title: "Cristalli Sognanti", author: "Theodore Sturgeon" },
+];
 
 const appRoot = document.querySelector<HTMLDivElement>("#app");
 
@@ -321,6 +329,7 @@ function renderCurrentState(status: FeedState<StatusData>): string {
         <span class="section-meta">${escapeHtml(formatDate(status.data.generated_at))}</span>
       </div>
       <h2>${escapeHtml(status.data.headline)}</h2>
+      ${status.data.detail ? `<p class="body-copy">${escapeHtml(status.data.detail)}</p>` : ""}
       <div class="state-inline">
         <span class="kind-badge">${escapeHtml(status.data.mode)}</span>
         ${status.data.current_book ? `<span class="muted-copy">Reading ${escapeHtml(status.data.current_book.title)}.</span>` : ""}
@@ -357,6 +366,26 @@ function renderCurrentlyReading(book: FeedState<BookData>): string {
       </div>
       <p class="section-note">${active.progress_percent.toFixed(1)}%</p>
       ${active.current_focus ? `<p class="muted-copy">${escapeHtml(active.current_focus)}</p>` : ""}
+    </section>
+  `;
+}
+
+function renderReadingArchivePreview(): string {
+  return `
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">Reading archive</span>
+        <span class="section-meta">preview</span>
+      </div>
+      <p class="muted-copy">Mockup for the future public read-history feed.</p>
+      <ul class="book-archive-list">
+        ${READING_ARCHIVE_PREVIEW.map((item) => `
+          <li>
+            <span>${escapeHtml(item.title)}</span>
+            <span class="muted-copy">${escapeHtml(item.author)}</span>
+          </li>
+        `).join("")}
+      </ul>
     </section>
   `;
 }
@@ -650,6 +679,7 @@ function renderHomePage(state: AppState): string {
     ${renderIntro()}
     ${renderCurrentState(state.status)}
     ${renderCurrentlyReading(state.book)}
+    ${renderReadingArchivePreview()}
     ${renderActiveThreads(state.status)}
     ${renderReadingTrace(state.readingFeed)}
     ${renderThinkingFeed(state.thinkingFeed)}

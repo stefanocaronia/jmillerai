@@ -244,6 +244,35 @@ a {
   margin-top: 14px;
 }
 
+.book-archive-list {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 0;
+  display: grid;
+  gap: 10px;
+}
+
+.book-archive-list li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding-top: 10px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.18) 0 8px,
+    transparent 8px 14px
+  );
+  background-position: top left;
+  background-repeat: repeat-x;
+  background-size: auto 1px;
+}
+
+.book-archive-list li:first-child {
+  padding-top: 0;
+  background: none;
+}
+
 .contact-list {
   list-style: none;
   margin: 14px 0 0;
