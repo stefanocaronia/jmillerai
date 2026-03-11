@@ -552,7 +552,14 @@ function renderLastMemories(graph: FeedState<PublicGraphData>): string {
     `;
   }
 
-  const memories = graph.data.nodes.filter((node) => node.kind === "memory").slice(0, 12);
+  const memories = graph.data.nodes
+    .filter((node) => node.kind === "memory")
+    .sort((left, right) => {
+      const leftTime = parseDate(left.timestamp) ?? 0;
+      const rightTime = parseDate(right.timestamp) ?? 0;
+      return rightTime - leftTime;
+    })
+    .slice(0, 12);
 
   return `
     <section class="section-block">
@@ -564,7 +571,7 @@ function renderLastMemories(graph: FeedState<PublicGraphData>): string {
       <ul class="node-list">
         ${memories.map((node) => `
           <li>
-            <span class="kind-badge">${escapeHtml(node.kind)}</span>
+            <span class="kind-badge">${escapeHtml(node.memory_type ?? node.kind)}</span>
             <span>${escapeHtml(node.label)}</span>
           </li>
         `).join("")}

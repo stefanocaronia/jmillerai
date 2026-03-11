@@ -5,6 +5,8 @@ export type PublicGraphNode = {
   kind: string;
   label: string;
   url: string | null;
+  timestamp?: string | null;
+  memory_type?: string | null;
 };
 
 export type PublicGraphEdge = {
