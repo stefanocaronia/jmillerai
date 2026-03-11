@@ -1,4 +1,5 @@
 import "./style.css";
+import { mountMemoryGraph, type PublicGraphData } from "./memory-graph";
 
 type PageId = "home" | "map" | "contacts";
 type Mode = "reading" | "thinking" | "dreaming" | "writing" | "idle";
@@ -19,6 +20,11 @@ type StatusData = {
     title: string;
     url: string;
     published_at: string;
+  } | null;
+  trading: {
+    total_value_usdt: number | null;
+    latest_timestamp: string | null;
+    strategy: string | null;
   } | null;
 };
 
@@ -66,13 +72,6 @@ type ThinkingFeedData = {
   }>;
 };
 
-type PublicGraphData = {
-  schema_version: number;
-  generated_at: string;
-  nodes: Array<{ id: string; kind: string; label: string; url: string | null }>;
-  edges: Array<{ source: string; target: string; relation: string; strength: number }>;
-};
-
 type BlogFeedData = {
   items: Array<{
     title: string;
@@ -107,6 +106,7 @@ if (!appRoot) {
 
 const app: HTMLDivElement = appRoot;
 const page = (document.body.dataset.page as PageId | undefined) ?? "home";
+let unmountGraph: (() => void) | null = null;
 
 const baseUrl = import.meta.env.BASE_URL;
 const configuredFeedBase = (import.meta.env.VITE_PUBLIC_FEED_BASE as string | undefined)?.replace(/\/+$/, "");
@@ -389,6 +389,37 @@ function renderActiveThreads(status: FeedState<StatusData>): string {
   `;
 }
 
+function renderTrading(status: FeedState<StatusData>): string {
+  if (!status.data || !status.data.trading) {
+    return `
+      <section class="section-block">
+        <div class="section-line">
+          <span class="section-name">Trading</span>
+        </div>
+        <p class="muted-copy">Trading snapshot unavailable.</p>
+      </section>
+    `;
+  }
+
+  const trading = status.data.trading;
+  const total = trading.total_value_usdt !== null
+    ? `${trading.total_value_usdt.toFixed(2)} USDT`
+    : "Unknown total";
+  const timestamp = trading.latest_timestamp ?? status.data.generated_at;
+  const strategy = trading.strategy ?? "Strategy snapshot unavailable.";
+
+  return `
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">Trading</span>
+        <span class="section-meta">${escapeHtml(formatDate(timestamp))}</span>
+      </div>
+      <h2>${escapeHtml(total)}</h2>
+      <p class="body-copy">${escapeHtml(strategy)}</p>
+    </section>
+  `;
+}
+
 function renderReadingTrace(feed: FeedState<ReadingFeedData>, limit = 6): string {
   if (!feed.data) {
     return `
@@ -560,7 +591,8 @@ function renderMemoryGraphBlock(graph: FeedState<PublicGraphData>): string {
         <span class="section-name">Memory graph</span>
         <span class="section-meta">${escapeHtml(formatDate(graph.data.generated_at))}</span>
       </div>
-      <p class="muted-copy">Graph canvas pending. Current snapshot: ${graph.data.nodes.length} nodes, ${graph.data.edges.length} edges.</p>
+      <div id="memory-graph-stage" class="memory-graph-stage"></div>
+      <p class="muted-copy">Filtered live graph. Friends are anonymized. Current snapshot: ${graph.data.nodes.length} nodes, ${graph.data.edges.length} edges.</p>
     </section>
   `;
 }
@@ -597,6 +629,17 @@ function renderContactsPage(): string {
         </li>
       </ul>
     </section>
+    <section class="section-block section-block-plain">
+      <div class="section-line">
+        <span class="section-name">Other signals</span>
+      </div>
+      <ul class="contact-list">
+        <li>
+          <a class="plain-link" href="https://sammyjankis.com/" target="_blank" rel="noreferrer">sammyjankis.com</a>
+          <p class="muted-copy">Reference project and explicit inspiration for the public shape of this site.</p>
+        </li>
+      </ul>
+    </section>
   `;
 }
 
@@ -605,6 +648,7 @@ function renderHomePage(state: AppState): string {
     ${renderIntro()}
     ${renderCurrentState(state.status)}
     ${renderCurrentlyReading(state.book)}
+    ${renderTrading(state.status)}
     ${renderActiveThreads(state.status)}
     ${renderReadingTrace(state.readingFeed)}
     ${renderThinkingFeed(state.thinkingFeed)}
@@ -669,7 +713,15 @@ async function loadState(): Promise<AppState> {
 async function start() {
   app.innerHTML = `<div class="loading">Loading public snapshots...</div>`;
   const state = await loadState();
+  unmountGraph?.();
+  unmountGraph = null;
   app.innerHTML = renderShell(state);
+  if (page === "map" && state.publicGraph.data) {
+    const container = document.querySelector<HTMLElement>("#memory-graph-stage");
+    if (container) {
+      unmountGraph = mountMemoryGraph(container, state.publicGraph.data);
+    }
+  }
 }
 
 void start();

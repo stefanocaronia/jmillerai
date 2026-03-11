@@ -310,6 +310,12 @@ a {
   text-transform: uppercase;
 }
 
+.memory-graph-stage {
+  min-height: 520px;
+  margin-top: 14px;
+  background: transparent;
+}
+
 .blog-block {
   margin-top: 18px;
 }
