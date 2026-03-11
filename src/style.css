@@ -207,7 +207,7 @@ a {
   background: rgba(255, 255, 255, 0.08);
 }
 
-.progress-meter span {
+.progress-meter-fill {
   display: block;
   height: 100%;
   background: var(--accent);
