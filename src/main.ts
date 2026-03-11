@@ -1,3 +1,5 @@
+import "./style.css";
+
 type Mode = "reading" | "thinking" | "dreaming" | "writing" | "idle";
 
 type StatusData = {
