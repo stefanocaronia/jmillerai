@@ -78,6 +78,7 @@ type BlogFeedData = {
     title: string;
     url: string;
     published_at: string;
+    excerpt: string;
   }>;
 };
 
@@ -169,11 +170,18 @@ async function fetchBlogFeed(url: string): Promise<FeedState<BlogFeedData>> {
       return { data: null, error: "Invalid XML" };
     }
 
-    const items = Array.from(doc.querySelectorAll("item")).slice(0, 3).map((item) => ({
-      title: item.querySelector("title")?.textContent?.trim() ?? "Untitled",
-      url: item.querySelector("link")?.textContent?.trim() ?? "",
-      published_at: item.querySelector("pubDate")?.textContent?.trim() ?? "",
-    }));
+    const items = Array.from(doc.querySelectorAll("item")).slice(0, 3).map((item) => {
+      const description = item.querySelector("description")?.textContent?.trim() ?? "";
+      const excerptDoc = new DOMParser().parseFromString(description, "text/html");
+      const excerpt = excerptDoc.body.textContent?.trim().replace(/\s+/g, " ") ?? "";
+
+      return {
+        title: item.querySelector("title")?.textContent?.trim() ?? "Untitled",
+        url: item.querySelector("link")?.textContent?.trim() ?? "",
+        published_at: item.querySelector("pubDate")?.textContent?.trim() ?? "",
+        excerpt,
+      };
+    });
 
     return { data: { items }, error: null };
   } catch (error) {
@@ -218,7 +226,7 @@ function renderRelatedList(items: string[]): string {
   `;
 }
 
-function summarizeThinking(text: string, maxLength = 220): string {
+function summarizeText(text: string, maxLength = 220): string {
   const normalized = text.trim().replace(/\s+/g, " ");
   if (normalized.length <= maxLength && /[.!?]$/.test(normalized)) {
     return normalized;
@@ -279,24 +287,6 @@ function renderFooterSnapshot(state: AppState): string {
 
   return `
     <span class="site-footer-snapshot">Snapshot ${escapeHtml(formatDate(latest.value))}</span>
-  `;
-}
-
-function renderMapHeader(): string {
-  return `
-    <header class="page-header">
-      <h1>Memory map</h1>
-      <p class="body-copy">A filtered public surface built from selected memories, books, sources, and published outputs.</p>
-    </header>
-  `;
-}
-
-function renderContactsHeader(): string {
-  return `
-    <header class="page-header">
-      <h1>Contacts</h1>
-      <p class="body-copy">Public entry points for the project, its maintainer, and Miller's public surface.</p>
-    </header>
   `;
 }
 
@@ -470,7 +460,7 @@ function renderThinkingFeed(feed: FeedState<ThinkingFeedData>, limit = 5): strin
                 <span class="section-meta">${escapeHtml(formatDate(item.created_at))}</span>
               </div>
               <h3>${escapeHtml(item.title)}</h3>
-              <p class="body-copy">${escapeHtml(summarizeThinking(item.summary))}</p>
+              <p class="body-copy">${escapeHtml(summarizeText(item.summary))}</p>
               ${renderRelatedList(related)}
             </article>
           `;
@@ -499,6 +489,7 @@ function renderBlogFeedBlock(kind: BlogFeedKind, feed: FeedState<BlogFeedData>):
               <span class="section-meta">${escapeHtml(formatDate(item.published_at))}</span>
             </div>
             <h3><a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${escapeHtml(item.title)}</a></h3>
+            <p class="muted-copy">${escapeHtml(summarizeText(item.excerpt, 190))}</p>
           </article>
         `).join("")}
       </div>
@@ -523,7 +514,7 @@ function renderLastMemories(graph: FeedState<PublicGraphData>): string {
     return `
       <section class="section-block">
         <div class="section-line">
-          <span class="section-name">Last memories</span>
+          <span class="section-name">Latest memories</span>
         </div>
         ${renderFeedError(graph, "public graph")}
       </section>
@@ -535,14 +526,14 @@ function renderLastMemories(graph: FeedState<PublicGraphData>): string {
   return `
     <section class="section-block">
       <div class="section-line">
-        <span class="section-name">Last memories</span>
+        <span class="section-name">Latest memories</span>
         <span class="section-meta">${escapeHtml(formatDate(graph.data.generated_at))}</span>
       </div>
       <p class="body-copy">${memories.length} public memory nodes from the latest exported graph snapshot.</p>
       <ul class="node-list">
         ${memories.map((node) => `
           <li>
-            <span class="section-name section-name-small">${escapeHtml(node.kind)}</span>
+            <span class="kind-badge">${escapeHtml(node.kind)}</span>
             <span>${escapeHtml(node.label)}</span>
           </li>
         `).join("")}
@@ -576,8 +567,7 @@ function renderMemoryGraphBlock(graph: FeedState<PublicGraphData>): string {
 
 function renderContactsPage(): string {
   return `
-    ${renderContactsHeader()}
-    <section class="section-block">
+    <section class="section-block section-block-plain">
       <div class="section-line">
         <span class="section-name">Stefano Caronia</span>
       </div>
@@ -586,7 +576,7 @@ function renderContactsPage(): string {
         <a class="plain-link" href="https://github.com/stefanocaronia" target="_blank" rel="noreferrer">github.com/stefanocaronia</a>
       </div>
     </section>
-    <section class="section-block">
+    <section class="section-block section-block-plain">
       <div class="section-line">
         <span class="section-name">J. Miller AI</span>
       </div>
@@ -612,7 +602,6 @@ function renderHomePage(state: AppState): string {
 
 function renderMapPage(state: AppState): string {
   return `
-    ${renderMapHeader()}
     ${renderLastMemories(state.publicGraph)}
     ${renderMemoryGraphBlock(state.publicGraph)}
   `;

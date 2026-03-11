@@ -79,7 +79,7 @@ a {
 
 .site-subtitle {
   margin: 6px 0 0;
-  color: var(--ink-soft);
+  color: var(--ink-muted);
   line-height: 1.5;
 }
 
@@ -92,7 +92,7 @@ a {
 .site-nav a {
   text-decoration: none;
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.74rem;
+  font-size: 0.84rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-soft);
@@ -101,19 +101,6 @@ a {
 .site-nav a.is-active,
 .site-nav a:hover {
   color: var(--accent);
-}
-
-.page-header {
-  margin-bottom: 26px;
-}
-
-.page-header h1 {
-  margin: 0 0 10px;
-  font-family: "Oxanium", sans-serif;
-  font-size: clamp(1.9rem, 5vw, 2.8rem);
-  line-height: 0.95;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
 }
 
 .body-copy,
@@ -130,7 +117,13 @@ a {
   color: var(--ink-muted);
 }
 
-.section-name,
+.section-name {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .section-meta,
 .section-note {
   font-family: "IBM Plex Mono", monospace;
@@ -182,13 +175,19 @@ a {
 }
 
 .section-block h2 {
-  font-size: clamp(1.36rem, 3vw, 1.62rem);
+  font-size: clamp(1.5rem, 3.2vw, 1.82rem);
   text-transform: uppercase;
 }
 
 .stream-item h3 {
   font-size: 0.96rem;
   text-transform: none;
+}
+
+.section-block-plain {
+  margin-top: 18px;
+  padding-top: 0;
+  background: none;
 }
 
 .text-flow {
@@ -266,6 +265,10 @@ a {
   text-decoration: underline;
 }
 
+.plain-link {
+  font-size: 1rem;
+}
+
 .related-list {
   display: flex;
   flex-wrap: wrap;
@@ -277,6 +280,18 @@ a {
   color: var(--ink-soft);
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.74rem;
+}
+
+.kind-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .blog-block {
@@ -343,10 +358,6 @@ a {
   .site-shell {
     width: 100%;
     padding: 24px 24px 88px;
-  }
-
-  .page-header h1 {
-    font-size: clamp(1.65rem, 10vw, 2.2rem);
   }
 
   .section-block {
