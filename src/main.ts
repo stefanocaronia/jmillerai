@@ -614,7 +614,7 @@ function renderContactsPage(): string {
         </li>
       </ul>
     </section>
-    <section class="section-block section-block-plain">
+    <section class="section-block">
       <div class="section-line">
         <span class="section-name">J. Miller AI</span>
       </div>
@@ -629,7 +629,7 @@ function renderContactsPage(): string {
         </li>
       </ul>
     </section>
-    <section class="section-block section-block-plain">
+    <section class="section-block">
       <div class="section-line">
         <span class="section-name">Other signals</span>
       </div>
