@@ -173,16 +173,17 @@ a {
 .stream-item h3 {
   margin: 12px 0 10px;
   font-family: "Oxanium", sans-serif;
-  font-size: 1.08rem;
   line-height: 1;
   letter-spacing: 0.03em;
 }
 
 .section-block h2 {
+  font-size: 1.22rem;
   text-transform: uppercase;
 }
 
 .stream-item h3 {
+  font-size: 0.96rem;
   text-transform: none;
 }
 
@@ -237,7 +238,7 @@ a {
   padding-top: 10px;
   background-image: repeating-linear-gradient(
     90deg,
-    rgba(255, 122, 0, 0.7) 0 8px,
+    rgba(255, 255, 255, 0.18) 0 8px,
     transparent 8px 14px
   );
   background-position: top left;
