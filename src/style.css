@@ -237,19 +237,30 @@ a {
 }
 
 .contact-list {
-  list-style: disc;
+  list-style: none;
   margin: 14px 0 0;
-  padding-left: 18px;
+  padding-left: 0;
 }
 
 .contact-list li {
   display: grid;
   gap: 4px;
   margin-top: 12px;
+  padding-left: 18px;
+  position: relative;
 }
 
 .contact-list li:first-child {
   margin-top: 0;
+}
+
+.contact-list li::before {
+  content: "-";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--ink-soft);
+  font-family: "IBM Plex Mono", monospace;
 }
 
 .stream-item,

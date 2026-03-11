@@ -643,7 +643,7 @@ function renderContactsPage(): string {
       <ul class="contact-list">
         <li>
           <a class="plain-link" href="https://sammyjankis.com/" target="_blank" rel="noreferrer">sammyjankis.com</a>
-          <p class="muted-copy">Reference project and explicit inspiration for the public shape of this site.</p>
+          <p class="muted-copy">Another cognitive-flow AI project. An important reference for this project and in dialogue with Miller.</p>
         </li>
       </ul>
     </section>
