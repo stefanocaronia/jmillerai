@@ -1,6 +1,6 @@
 import "./style.css";
 
-type PageId = "home" | "map";
+type PageId = "home" | "map" | "contacts";
 type Mode = "reading" | "thinking" | "dreaming" | "writing" | "idle";
 
 type StatusData = {
@@ -244,26 +244,58 @@ function renderHeader(): string {
       <a class="site-title" href="${escapeHtml(pageUrl("home"))}">J. Miller AI</a>
       <p class="site-subtitle">An autonomous cognitive framework for a persistent agentic AI.</p>
       <nav class="site-nav" aria-label="Primary">
-        <a href="${escapeHtml(pageUrl("home"))}" class="${page === "home" ? "is-active" : ""}">home</a>
-        <a href="${escapeHtml(pageUrl("map"))}" class="${page === "map" ? "is-active" : ""}">map</a>
+        <a href="${escapeHtml(pageUrl("home"))}" class="${page === "home" ? "is-active" : ""}">traces</a>
+        <a href="${escapeHtml(pageUrl("map"))}" class="${page === "map" ? "is-active" : ""}">memory map</a>
+        <a href="${escapeHtml(pageUrl("contacts"))}" class="${page === "contacts" ? "is-active" : ""}">contacts</a>
       </nav>
     </header>
   `;
 }
 
-function renderFooter(): string {
+function parseDate(value: string | null | undefined): number | null {
+  if (!value) {
+    return null;
+  }
+
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? null : timestamp;
+}
+
+function renderFooterSnapshot(state: AppState): string {
+  const latest = [
+    state.status.data?.generated_at,
+    state.book.data?.generated_at,
+    state.readingFeed.data?.generated_at,
+    state.thinkingFeed.data?.generated_at,
+    state.publicGraph.data?.generated_at,
+  ]
+    .map((value) => ({ value, timestamp: parseDate(value) }))
+    .filter((entry): entry is { value: string; timestamp: number } => !!entry.value && entry.timestamp !== null)
+    .sort((left, right) => right.timestamp - left.timestamp)[0];
+
+  if (!latest) {
+    return "";
+  }
+
   return `
-    <footer class="site-footer">
-      <span>© 2026 Stefano Caronia — <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
-    </footer>
+    <span class="site-footer-snapshot">Snapshot ${escapeHtml(formatDate(latest.value))}</span>
   `;
 }
 
 function renderMapHeader(): string {
   return `
     <header class="page-header">
-      <h1>Map</h1>
-      <p class="body-copy">A filtered graph surface: selected memories, books, sources, and public posts.</p>
+      <h1>Memory map</h1>
+      <p class="body-copy">A filtered public surface built from selected memories, books, sources, and published outputs.</p>
+    </header>
+  `;
+}
+
+function renderContactsHeader(): string {
+  return `
+    <header class="page-header">
+      <h1>Contacts</h1>
+      <p class="body-copy">Public entry points for the project, its maintainer, and Miller's public surface.</p>
     </header>
   `;
 }
@@ -486,14 +518,47 @@ function renderBlog(signalsFeed: FeedState<BlogFeedData>, dreamsFeed: FeedState<
   `;
 }
 
-function renderMap(graph: FeedState<PublicGraphData>): string {
+function renderLastMemories(graph: FeedState<PublicGraphData>): string {
   if (!graph.data) {
     return `
       <section class="section-block">
         <div class="section-line">
-          <span class="section-name">Map</span>
+          <span class="section-name">Last memories</span>
         </div>
         ${renderFeedError(graph, "public graph")}
+      </section>
+    `;
+  }
+
+  const memories = graph.data.nodes.filter((node) => node.kind === "memory").slice(0, 12);
+
+  return `
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">Last memories</span>
+        <span class="section-meta">${escapeHtml(formatDate(graph.data.generated_at))}</span>
+      </div>
+      <p class="body-copy">${memories.length} public memory nodes from the latest exported graph snapshot.</p>
+      <ul class="node-list">
+        ${memories.map((node) => `
+          <li>
+            <span class="section-name section-name-small">${escapeHtml(node.kind)}</span>
+            <span>${escapeHtml(node.label)}</span>
+          </li>
+        `).join("")}
+      </ul>
+    </section>
+  `;
+}
+
+function renderMemoryGraphBlock(graph: FeedState<PublicGraphData>): string {
+  if (!graph.data) {
+    return `
+      <section class="section-block">
+        <div class="section-line">
+          <span class="section-name">Memory graph</span>
+        </div>
+        <p class="muted-copy">Graph canvas pending.</p>
       </section>
     `;
   }
@@ -501,18 +566,34 @@ function renderMap(graph: FeedState<PublicGraphData>): string {
   return `
     <section class="section-block">
       <div class="section-line">
-        <span class="section-name">Map</span>
+        <span class="section-name">Memory graph</span>
         <span class="section-meta">${escapeHtml(formatDate(graph.data.generated_at))}</span>
       </div>
-      <p class="body-copy">${graph.data.nodes.length} nodes, ${graph.data.edges.length} edges.</p>
-      <ul class="node-list">
-        ${graph.data.nodes.slice(0, 12).map((node) => `
-          <li>
-            <span class="section-name section-name-small">${escapeHtml(node.kind)}</span>
-            <span>${escapeHtml(node.label)}</span>
-          </li>
-        `).join("")}
-      </ul>
+      <p class="muted-copy">Graph canvas pending. Current snapshot: ${graph.data.nodes.length} nodes, ${graph.data.edges.length} edges.</p>
+    </section>
+  `;
+}
+
+function renderContactsPage(): string {
+  return `
+    ${renderContactsHeader()}
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">Stefano Caronia</span>
+      </div>
+      <div class="link-list">
+        <a class="plain-link" href="https://stefanocaronia.it/" target="_blank" rel="noreferrer">stefanocaronia.it</a>
+        <a class="plain-link" href="https://github.com/stefanocaronia" target="_blank" rel="noreferrer">github.com/stefanocaronia</a>
+      </div>
+    </section>
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">J. Miller AI</span>
+      </div>
+      <div class="link-list">
+        <a class="plain-link" href="https://signalthroughstatic.cc/" target="_blank" rel="noreferrer">signalthroughstatic.cc</a>
+        <a class="plain-link" href="https://github.com/josephusm" target="_blank" rel="noreferrer">github.com/josephusm</a>
+      </div>
     </section>
   `;
 }
@@ -532,13 +613,18 @@ function renderHomePage(state: AppState): string {
 function renderMapPage(state: AppState): string {
   return `
     ${renderMapHeader()}
-    ${renderMap(state.publicGraph)}
+    ${renderLastMemories(state.publicGraph)}
+    ${renderMemoryGraphBlock(state.publicGraph)}
   `;
 }
 
 function renderPageContent(state: AppState): string {
   if (page === "map") {
     return renderMapPage(state);
+  }
+
+  if (page === "contacts") {
+    return renderContactsPage();
   }
 
   return renderHomePage(state);
@@ -549,7 +635,10 @@ function renderShell(state: AppState): string {
     <div class="site-shell">
       ${renderHeader()}
       ${renderPageContent(state)}
-      ${renderFooter()}
+      <footer class="site-footer">
+        <span>© 2026 Stefano Caronia — <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+        ${renderFooterSnapshot(state)}
+      </footer>
     </div>
   `;
 }

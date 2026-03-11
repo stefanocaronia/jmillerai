@@ -8,6 +8,7 @@ export default defineConfig({
       input: {
         home: resolve(__dirname, "index.html"),
         map: resolve(__dirname, "map.html"),
+        contacts: resolve(__dirname, "contacts.html"),
       },
     },
   },
