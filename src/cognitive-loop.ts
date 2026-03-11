@@ -33,6 +33,19 @@ const kindColors: Record<string, string> = {
 
 const GRAPH_MEMORY_NODE_ID = "memory-hub";
 
+const graphPositions: Record<string, { x: number; y: number }> = {
+  heartbeat: { x: 420, y: 44 },
+  experience: { x: 168, y: 132 },
+  conversation: { x: 76, y: 270 },
+  mail: { x: 164, y: 432 },
+  [GRAPH_MEMORY_NODE_ID]: { x: 420, y: 260 },
+  thinking: { x: 672, y: 132 },
+  reading: { x: 760, y: 270 },
+  dream: { x: 672, y: 432 },
+  blog: { x: 420, y: 540 },
+  trading: { x: 760, y: 500 },
+};
+
 function shortenLabel(label: string): string {
   const maxChars = 22;
   if (label.length <= maxChars) {
@@ -62,24 +75,17 @@ function graphLabel(node: CognitiveLoopNode): string {
   return shortenLabel(node.label);
 }
 
-function dedupeEdges(edges: CognitiveLoopEdge[]): CognitiveLoopEdge[] {
-  const seen = new Set<string>();
-  const unique: CognitiveLoopEdge[] = [];
-
-  for (const edge of edges) {
-    const pair = [edge.source, edge.target].sort().join("::");
-    if (seen.has(pair)) {
-      continue;
-    }
-    seen.add(pair);
-    unique.push(edge);
-  }
-
-  return unique;
-}
-
-export function projectLoopGraph(loop: CognitiveLoopData): { nodes: Array<{ id: string; label: string; color: string }>; edges: CognitiveLoopEdge[] } {
-  const nodeMap = new Map<string, { id: string; label: string; color: string }>();
+export function projectLoopGraph(loop: CognitiveLoopData): {
+  nodes: Array<{ id: string; label: string; color: string; position: { x: number; y: number } }>;
+  edges: Array<{
+    source: string;
+    target: string;
+    sourceArrow: "none" | "triangle";
+    targetArrow: "none" | "triangle";
+    curveDistance: number;
+  }>;
+} {
+  const nodeMap = new Map<string, { id: string; label: string; color: string; position: { x: number; y: number } }>();
 
   for (const node of loop.nodes) {
     const id = graphNodeId(node);
@@ -91,21 +97,51 @@ export function projectLoopGraph(loop: CognitiveLoopData): { nodes: Array<{ id: 
       id,
       label: graphLabel(node),
       color: kindColors[node.kind] || "#c3c3c3",
+      position: graphPositions[id] ?? { x: 420, y: 260 },
     });
   }
 
-  const edges = dedupeEdges(
-    loop.edges
-      .map((edge) => ({
-        source: edge.source === "memory" || edge.source === "short-state" ? GRAPH_MEMORY_NODE_ID : edge.source,
-        target: edge.target === "memory" || edge.target === "short-state" ? GRAPH_MEMORY_NODE_ID : edge.target,
-      }))
-      .filter((edge) => edge.source !== edge.target),
-  );
+  const orientedEdges = loop.edges
+    .map((edge) => ({
+      source: edge.source === "memory" || edge.source === "short-state" ? GRAPH_MEMORY_NODE_ID : edge.source,
+      target: edge.target === "memory" || edge.target === "short-state" ? GRAPH_MEMORY_NODE_ID : edge.target,
+    }))
+    .filter((edge) => edge.source !== edge.target);
+
+  const edgeMap = new Map<
+    string,
+    {
+      source: string;
+      target: string;
+      sourceArrow: "none" | "triangle";
+      targetArrow: "none" | "triangle";
+      curveDistance: number;
+    }
+  >();
+
+  for (const edge of orientedEdges) {
+    const pairKey = [edge.source, edge.target].sort().join("::");
+    const existing = edgeMap.get(pairKey);
+    if (!existing) {
+      edgeMap.set(pairKey, {
+        source: edge.source,
+        target: edge.target,
+        sourceArrow: "none",
+        targetArrow: "triangle",
+        curveDistance: edge.source === GRAPH_MEMORY_NODE_ID || edge.target === GRAPH_MEMORY_NODE_ID ? 26 : 38,
+      });
+      continue;
+    }
+
+    if (existing.source === edge.target && existing.target === edge.source) {
+      existing.sourceArrow = "triangle";
+      existing.targetArrow = "triangle";
+    }
+  }
 
   return {
     nodes: Array.from(nodeMap.values()),
-    edges,
+    edges: Array.from(edgeMap.values()),
   };
 }
 
@@ -121,21 +157,24 @@ export function mountCognitiveLoop(container: HTMLElement, loop: CognitiveLoopDa
           label: node.label,
           color: node.color,
         },
+        position: node.position,
       })),
       ...graph.edges.map((edge, index) => ({
         data: {
           id: `loop-edge-${index}`,
           source: edge.source,
           target: edge.target,
+          sourceArrow: edge.sourceArrow,
+          targetArrow: edge.targetArrow,
+          curveDistance: edge.curveDistance,
         },
       })),
     ],
     layout: {
-      name: "breadthfirst",
-      directed: false,
+      name: "preset",
       padding: 18,
       animate: false,
-      spacingFactor: 1.28,
+      fit: true,
     },
     style: [
       {
@@ -160,7 +199,13 @@ export function mountCognitiveLoop(container: HTMLElement, loop: CognitiveLoopDa
           width: "2",
           "line-color": "#666666",
           opacity: 0.82,
-          "curve-style": "straight",
+          "curve-style": "unbundled-bezier",
+          "control-point-distances": "data(curveDistance)",
+          "control-point-weights": 0.5,
+          "source-arrow-shape": "data(sourceArrow)",
+          "source-arrow-color": "#666666",
+          "target-arrow-shape": "data(targetArrow)",
+          "target-arrow-color": "#666666",
         } as never,
       },
     ],
