@@ -1,4 +1,4 @@
-import { projectLoopGraph, type CognitiveLoopData } from "./cognitive-loop";
+import { isLoopDebugEnabled, projectLoopGraph, type CognitiveLoopData } from "./cognitive-loop";
 import type { PublicGraphData } from "./memory-graph";
 import { CONTACT_SECTIONS, INTRO_PARAGRAPHS, SITE_SUBTITLE } from "./site-content";
 import type { AppState, BlogFeedData, BlogFeedKind, BookData, FeedState, PageId, ReadingFeedData, StatusData, ThinkingFeedData } from "./site-types";
@@ -434,6 +434,7 @@ function renderLoopPage(loop: FeedState<CognitiveLoopData>): string {
   }
 
   const graph = projectLoopGraph(loop.data);
+  const debugEnabled = isLoopDebugEnabled();
 
   return `
     <section class="section-block">
@@ -442,6 +443,27 @@ function renderLoopPage(loop: FeedState<CognitiveLoopData>): string {
         <span class="section-meta">${escapeHtml(formatDate(loop.data.generated_at))}</span>
       </div>
       <p class="body-copy">${graph.nodes.length} nodes, ${countLoopConnections(graph.edges)} connections in the current exported loop.</p>
+      ${debugEnabled ? `
+        <div class="loop-debug-panel" data-loop-debug-panel>
+          <div class="section-line">
+            <span class="section-name">Local debug</span>
+            <span class="section-meta">?loopDebug=1</span>
+          </div>
+          <p class="muted-copy" data-loop-debug-status>Preparing local controls...</p>
+          <p class="muted-copy" data-loop-debug-edge>No edge selected.</p>
+          <div class="loop-debug-actions">
+            <button type="button" class="loop-debug-button" data-loop-debug-action="dump-nodes">Dump nodes</button>
+            <button type="button" class="loop-debug-button" data-loop-debug-action="dump-curves">Dump curves</button>
+            <button type="button" class="loop-debug-button" data-loop-debug-action="flip-curve">Flip edge</button>
+            <button type="button" class="loop-debug-button" data-loop-debug-action="curve-less">Curve -</button>
+            <button type="button" class="loop-debug-button" data-loop-debug-action="curve-more">Curve +</button>
+            <button type="button" class="loop-debug-button" data-loop-debug-action="weight-less">Weight -</button>
+            <button type="button" class="loop-debug-button" data-loop-debug-action="weight-more">Weight +</button>
+            <button type="button" class="loop-debug-button" data-loop-debug-action="fit">Refit canvas</button>
+          </div>
+          <p class="muted-copy">Use <code>/loop/?loopDebug=1</code>. Drag nodes to log positions. Click an edge, then use the buttons to tweak and log <code>graphEdgeCurves</code>.</p>
+        </div>
+      ` : ""}
       <div id="cognitive-loop-stage" class="memory-graph-stage loop-graph-stage"></div>
     </section>
     <section class="section-block">

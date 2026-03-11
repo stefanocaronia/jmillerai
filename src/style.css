@@ -539,6 +539,53 @@ a {
   min-height: 640px;
 }
 
+.loop-debug-panel {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  display: grid;
+  gap: 10px;
+}
+
+.loop-debug-panel code {
+  font-family: "Share Tech Mono", monospace;
+  color: var(--ink-soft);
+}
+
+.loop-debug-panel .muted-copy {
+  font-size: 0.84rem;
+}
+
+.loop-debug-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.loop-debug-button {
+  appearance: none;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--accent);
+  font-family: "Share Tech Mono", monospace;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.loop-debug-button:hover {
+  background: rgba(255, 122, 0, 0.12);
+}
+
+.loop-debug-button:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .loop-module-title {
   text-transform: uppercase;
 }

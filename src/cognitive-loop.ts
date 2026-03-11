@@ -1,4 +1,4 @@
-import cytoscape from "cytoscape";
+import cytoscape, { type Core } from "cytoscape";
 
 export type CognitiveLoopNode = {
   id: string;
@@ -22,6 +22,32 @@ export type CognitiveLoopData = {
   edges: CognitiveLoopEdge[];
 };
 
+type GraphPosition = {
+  x: number;
+  y: number;
+};
+
+type GraphCurveConfig = {
+  distance: number;
+  weight?: number;
+};
+
+type ProjectedLoopNode = {
+  id: string;
+  label: string;
+  color: string;
+  position: GraphPosition;
+};
+
+type ProjectedLoopEdge = {
+  source: string;
+  target: string;
+  sourceArrow: "none" | "triangle";
+  targetArrow: "none" | "triangle";
+  curveDistance: number;
+  curveWeight: number;
+};
+
 const kindColors: Record<string, string> = {
   control: "#ff7a00",
   state: "#f2f2f2",
@@ -32,19 +58,256 @@ const kindColors: Record<string, string> = {
 };
 
 const GRAPH_MEMORY_NODE_ID = "memory-hub";
+const DEFAULT_NODE_POSITION: GraphPosition = { x: 420, y: 260 };
+const DEFAULT_CURVE_WEIGHT = 0.5;
+const LOOP_DEBUG_QUERY_PARAM = "loopDebug";
+const DISABLED_DEBUG_VALUES = new Set(["0", "false", "off", "no"]);
 
-const graphPositions: Record<string, { x: number; y: number }> = {
-  heartbeat: { x: 420, y: 44 },
-  experience: { x: 168, y: 132 },
-  conversation: { x: 76, y: 270 },
-  mail: { x: 164, y: 432 },
-  [GRAPH_MEMORY_NODE_ID]: { x: 420, y: 260 },
+export const graphPositions: Record<string, GraphPosition> = {
+  heartbeat: { x: 417, y: 13 },
+  experience: { x: 169, y: 136 },
+  conversation: { x: 124, y: 292 },
+  mail: { x: 210, y: 451 },
+  [GRAPH_MEMORY_NODE_ID]: { x: 390, y: 294 },
   thinking: { x: 672, y: 132 },
-  reading: { x: 760, y: 270 },
-  dream: { x: 672, y: 432 },
-  blog: { x: 420, y: 540 },
-  trading: { x: 760, y: 500 },
+  reading: { x: 537, y: 319 },
+  dream: { x: 385, y: 528 },
+  blog: { x: 645, y: 461 },
+  trading: { x: 300, y: 140 },
 };
+
+export const graphEdgeCurves: Record<string, GraphCurveConfig> = {
+  "blog::dream": { distance: 38, weight: 0.5 },
+  "blog::reading": { distance: 38, weight: 0.5 },
+  "blog::thinking": { distance: -98, weight: 0.5 },
+  "conversation::memory-hub": { distance: -8, weight: 0.5 },
+  "dream::memory-hub": { distance: 8, weight: 0.5 },
+  "experience::heartbeat": { distance: 56, weight: 0.5 },
+  "experience::memory-hub": { distance: -50, weight: 0.5 },
+  "heartbeat::memory-hub": { distance: 8, weight: 0.5 },
+  "heartbeat::thinking": { distance: -44, weight: 0.55 },
+  "heartbeat::trading": { distance: 38, weight: 0.5 },
+  "mail::memory-hub": { distance: 8, weight: 0.5 },
+  "memory-hub::reading": { distance: 26, weight: 0.5 },
+  "memory-hub::thinking": { distance: -62, weight: 0.5 },
+  "memory-hub::trading": { distance: 26, weight: 0.4 },
+  "reading::thinking": { distance: -50, weight: 0.5 },
+};
+
+declare global {
+  interface Window {
+    __JM_LOOP_DEBUG__?: {
+      cy: Core;
+      dumpPositions: () => void;
+      dumpCurves: () => void;
+      dumpAll: () => void;
+      fit: () => void;
+    };
+  }
+}
+
+function canonicalEdgeKey(source: string, target: string): string {
+  return [source, target].sort().join("::");
+}
+
+function formatGraphKey(key: string): string {
+  return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key) ? key : `"${key}"`;
+}
+
+function roundGraphPosition(value: number): number {
+  return Math.round(value);
+}
+
+function formatNodePositions(cy: Core): string {
+  const orderedIds = [
+    ...Object.keys(graphPositions),
+    ...cy.nodes()
+      .map((node) => node.id())
+      .filter((id) => !(id in graphPositions))
+      .sort((left, right) => left.localeCompare(right)),
+  ];
+
+  const seenIds = new Set<string>();
+  const lines = orderedIds.flatMap((id) => {
+    if (seenIds.has(id)) {
+      return [];
+    }
+
+    seenIds.add(id);
+    const node = cy.getElementById(id);
+    if (!node.nonempty()) {
+      return [];
+    }
+
+    const position = node.position();
+    return `  ${formatGraphKey(id)}: { x: ${roundGraphPosition(position.x)}, y: ${roundGraphPosition(position.y)} },`;
+  });
+
+  return ["export const graphPositions = {", ...lines, "};"].join("\n");
+}
+
+function sortEdgesByKey(cy: Core) {
+  return cy.edges().sort((left, right) => {
+    const leftKey = String(left.data("pairKey"));
+    const rightKey = String(right.data("pairKey"));
+    return leftKey.localeCompare(rightKey);
+  });
+}
+
+function formatEdgeCurves(cy: Core): string {
+  const lines = sortEdgesByKey(cy).map((edge) => {
+    const pairKey = String(edge.data("pairKey"));
+    const distance = roundGraphPosition(Number(edge.data("curveDistance")) || 0);
+    const weight = Number(Number(edge.data("curveWeight")) || DEFAULT_CURVE_WEIGHT).toFixed(2);
+    return `  "${pairKey}": { distance: ${distance}, weight: ${weight} },`;
+  });
+
+  return ["export const graphEdgeCurves = {", ...lines, "};"].join("\n");
+}
+
+function logNodePositions(cy: Core, reason: string): void {
+  console.groupCollapsed(`[loop debug] node positions (${reason})`);
+  console.info(formatNodePositions(cy));
+  console.groupEnd();
+}
+
+function logEdgeCurves(cy: Core, reason: string): void {
+  console.groupCollapsed(`[loop debug] edge curves (${reason})`);
+  console.info(formatEdgeCurves(cy));
+  console.groupEnd();
+}
+
+function bindDebugControls(container: HTMLElement, cy: Core): () => void {
+  const panel = container.parentElement?.querySelector<HTMLElement>("[data-loop-debug-panel]");
+  const dumpNodesButton = panel?.querySelector<HTMLButtonElement>("[data-loop-debug-action='dump-nodes']");
+  const dumpCurvesButton = panel?.querySelector<HTMLButtonElement>("[data-loop-debug-action='dump-curves']");
+  const flipCurveButton = panel?.querySelector<HTMLButtonElement>("[data-loop-debug-action='flip-curve']");
+  const increaseCurveButton = panel?.querySelector<HTMLButtonElement>("[data-loop-debug-action='curve-more']");
+  const decreaseCurveButton = panel?.querySelector<HTMLButtonElement>("[data-loop-debug-action='curve-less']");
+  const increaseWeightButton = panel?.querySelector<HTMLButtonElement>("[data-loop-debug-action='weight-more']");
+  const decreaseWeightButton = panel?.querySelector<HTMLButtonElement>("[data-loop-debug-action='weight-less']");
+  const fitButton = panel?.querySelector<HTMLButtonElement>("[data-loop-debug-action='fit']");
+  const status = panel?.querySelector<HTMLElement>("[data-loop-debug-status]");
+  const edgeStatus = panel?.querySelector<HTMLElement>("[data-loop-debug-edge]");
+
+  let selectedEdgeId: string | null = null;
+
+  if (status) {
+    status.textContent = "Debug active. Drag nodes to log positions. Click an edge to tune and log its curve.";
+  }
+
+  const dumpPositions = () => logNodePositions(cy, "manual");
+  const dumpCurves = () => logEdgeCurves(cy, "manual");
+  const fitGraph = () => cy.fit(undefined, 18);
+  const selectedEdge = () => (selectedEdgeId ? cy.getElementById(selectedEdgeId) : null);
+  const setEdgeStatus = (message: string) => {
+    if (edgeStatus) {
+      edgeStatus.textContent = message;
+    }
+  };
+  const describeEdge = (edge: cytoscape.SingularElementReturnValue) => {
+    const pairKey = String(edge.data("pairKey"));
+    const distance = roundGraphPosition(Number(edge.data("curveDistance")) || 0);
+    const weight = Number(Number(edge.data("curveWeight")) || DEFAULT_CURVE_WEIGHT).toFixed(2);
+    return `${pairKey} | distance ${distance} | weight ${weight}`;
+  };
+  const syncSelectedEdge = () => {
+    cy.edges().removeClass("is-debug-selected");
+    const edge = selectedEdge();
+    if (!edge?.nonempty()) {
+      setEdgeStatus("No edge selected.");
+      return;
+    }
+    edge.addClass("is-debug-selected");
+    setEdgeStatus(`Selected edge: ${describeEdge(edge)}`);
+  };
+  const selectEdge = (edge: cytoscape.SingularElementReturnValue) => {
+    selectedEdgeId = edge.id();
+    syncSelectedEdge();
+  };
+  const updateSelectedEdge = (updater: (distance: number, weight: number) => GraphCurveConfig) => {
+    const edge = selectedEdge();
+    if (!edge?.nonempty()) {
+      setEdgeStatus("Select an edge first.");
+      return;
+    }
+
+    const currentDistance = Number(edge.data("curveDistance")) || 0;
+    const currentWeight = Number(edge.data("curveWeight")) || DEFAULT_CURVE_WEIGHT;
+    const next = updater(currentDistance, currentWeight);
+    edge.data("curveDistance", roundGraphPosition(next.distance));
+    edge.data("curveWeight", Number((next.weight ?? currentWeight).toFixed(2)));
+    syncSelectedEdge();
+    logEdgeCurves(cy, "edge-adjust");
+  };
+  const onEdgeTap = (event: cytoscape.EventObject) => {
+    selectEdge(event.target);
+  };
+  const clearSelection = (event: cytoscape.EventObject) => {
+    if (event.target === cy) {
+      selectedEdgeId = null;
+      syncSelectedEdge();
+    }
+  };
+  const flipCurve = () => updateSelectedEdge((distance, weight) => ({ distance: distance === 0 ? 38 : -distance, weight }));
+  const increaseCurve = () => updateSelectedEdge((distance, weight) => {
+    const direction = distance < 0 ? -1 : 1;
+    const magnitude = Math.max(8, Math.abs(distance || 38) + 6);
+    return { distance: direction * magnitude, weight };
+  });
+  const decreaseCurve = () => updateSelectedEdge((distance, weight) => {
+    const direction = distance < 0 ? -1 : 1;
+    const magnitude = Math.max(8, Math.abs(distance || 38) - 6);
+    return { distance: direction * magnitude, weight };
+  });
+  const increaseWeight = () => updateSelectedEdge((distance, weight) => ({
+    distance,
+    weight: Math.min(0.9, weight + 0.05),
+  }));
+  const decreaseWeight = () => updateSelectedEdge((distance, weight) => ({
+    distance,
+    weight: Math.max(0.1, weight - 0.05),
+  }));
+
+  cy.on("tap", "edge", onEdgeTap);
+  cy.on("tap", clearSelection);
+
+  dumpNodesButton?.addEventListener("click", dumpPositions);
+  dumpCurvesButton?.addEventListener("click", dumpCurves);
+  flipCurveButton?.addEventListener("click", flipCurve);
+  increaseCurveButton?.addEventListener("click", increaseCurve);
+  decreaseCurveButton?.addEventListener("click", decreaseCurve);
+  increaseWeightButton?.addEventListener("click", increaseWeight);
+  decreaseWeightButton?.addEventListener("click", decreaseWeight);
+  fitButton?.addEventListener("click", fitGraph);
+  syncSelectedEdge();
+
+  return () => {
+    cy.off("tap", "edge", onEdgeTap);
+    cy.off("tap", clearSelection);
+    dumpNodesButton?.removeEventListener("click", dumpPositions);
+    dumpCurvesButton?.removeEventListener("click", dumpCurves);
+    flipCurveButton?.removeEventListener("click", flipCurve);
+    increaseCurveButton?.removeEventListener("click", increaseCurve);
+    decreaseCurveButton?.removeEventListener("click", decreaseCurve);
+    increaseWeightButton?.removeEventListener("click", increaseWeight);
+    decreaseWeightButton?.removeEventListener("click", decreaseWeight);
+    fitButton?.removeEventListener("click", fitGraph);
+  };
+}
+
+function defaultCurveDistance(source: string, target: string): number {
+  return source === GRAPH_MEMORY_NODE_ID || target === GRAPH_MEMORY_NODE_ID ? 26 : 38;
+}
+
+export function isLoopDebugEnabled(): boolean {
+  if (!import.meta.env.DEV || typeof window === "undefined") {
+    return false;
+  }
+
+  const value = new URLSearchParams(window.location.search).get(LOOP_DEBUG_QUERY_PARAM);
+  return value !== null && !DISABLED_DEBUG_VALUES.has(value.trim().toLowerCase());
+}
 
 function shortenLabel(label: string): string {
   const maxChars = 22;
@@ -76,16 +339,10 @@ function graphLabel(node: CognitiveLoopNode): string {
 }
 
 export function projectLoopGraph(loop: CognitiveLoopData): {
-  nodes: Array<{ id: string; label: string; color: string; position: { x: number; y: number } }>;
-  edges: Array<{
-    source: string;
-    target: string;
-    sourceArrow: "none" | "triangle";
-    targetArrow: "none" | "triangle";
-    curveDistance: number;
-  }>;
+  nodes: ProjectedLoopNode[];
+  edges: ProjectedLoopEdge[];
 } {
-  const nodeMap = new Map<string, { id: string; label: string; color: string; position: { x: number; y: number } }>();
+  const nodeMap = new Map<string, ProjectedLoopNode>();
 
   for (const node of loop.nodes) {
     const id = graphNodeId(node);
@@ -97,7 +354,7 @@ export function projectLoopGraph(loop: CognitiveLoopData): {
       id,
       label: graphLabel(node),
       color: kindColors[node.kind] || "#c3c3c3",
-      position: graphPositions[id] ?? { x: 420, y: 260 },
+      position: graphPositions[id] ?? DEFAULT_NODE_POSITION,
     });
   }
 
@@ -110,25 +367,21 @@ export function projectLoopGraph(loop: CognitiveLoopData): {
 
   const edgeMap = new Map<
     string,
-    {
-      source: string;
-      target: string;
-      sourceArrow: "none" | "triangle";
-      targetArrow: "none" | "triangle";
-      curveDistance: number;
-    }
+    ProjectedLoopEdge
   >();
 
   for (const edge of orientedEdges) {
-    const pairKey = [edge.source, edge.target].sort().join("::");
+    const pairKey = canonicalEdgeKey(edge.source, edge.target);
     const existing = edgeMap.get(pairKey);
     if (!existing) {
+      const curve = graphEdgeCurves[pairKey];
       edgeMap.set(pairKey, {
         source: edge.source,
         target: edge.target,
         sourceArrow: "none",
         targetArrow: "triangle",
-        curveDistance: edge.source === GRAPH_MEMORY_NODE_ID || edge.target === GRAPH_MEMORY_NODE_ID ? 26 : 38,
+        curveDistance: curve?.distance ?? defaultCurveDistance(edge.source, edge.target),
+        curveWeight: curve?.weight ?? DEFAULT_CURVE_WEIGHT,
       });
       continue;
     }
@@ -147,9 +400,11 @@ export function projectLoopGraph(loop: CognitiveLoopData): {
 
 export function mountCognitiveLoop(container: HTMLElement, loop: CognitiveLoopData): () => void {
   const graph = projectLoopGraph(loop);
+  const debugEnabled = isLoopDebugEnabled();
 
   const cy = cytoscape({
     container,
+    autoungrabify: !debugEnabled,
     elements: [
       ...graph.nodes.map((node) => ({
         data: {
@@ -158,15 +413,18 @@ export function mountCognitiveLoop(container: HTMLElement, loop: CognitiveLoopDa
           color: node.color,
         },
         position: node.position,
+        grabbable: debugEnabled,
       })),
       ...graph.edges.map((edge, index) => ({
         data: {
           id: `loop-edge-${index}`,
+          pairKey: canonicalEdgeKey(edge.source, edge.target),
           source: edge.source,
           target: edge.target,
           sourceArrow: edge.sourceArrow,
           targetArrow: edge.targetArrow,
           curveDistance: edge.curveDistance,
+          curveWeight: edge.curveWeight,
         },
       })),
     ],
@@ -201,15 +459,61 @@ export function mountCognitiveLoop(container: HTMLElement, loop: CognitiveLoopDa
           opacity: 0.82,
           "curve-style": "unbundled-bezier",
           "control-point-distances": "data(curveDistance)",
-          "control-point-weights": 0.5,
+          "control-point-weights": "data(curveWeight)",
           "source-arrow-shape": "data(sourceArrow)",
           "source-arrow-color": "#666666",
           "target-arrow-shape": "data(targetArrow)",
           "target-arrow-color": "#666666",
         } as never,
       },
+      {
+        selector: "edge.is-debug-selected",
+        style: {
+          width: "3",
+          "line-color": "#ff7a00",
+          "source-arrow-color": "#ff7a00",
+          "target-arrow-color": "#ff7a00",
+        } as never,
+      },
     ],
   });
 
-  return () => cy.destroy();
+  const cleanup: Array<() => void> = [];
+
+  if (debugEnabled) {
+    const reportDrag = (event: cytoscape.EventObject) => {
+      const node = event.target;
+      const position = node.position();
+      console.info(
+        `[loop debug] ${node.id()} -> { x: ${roundGraphPosition(position.x)}, y: ${roundGraphPosition(position.y)} }`,
+      );
+      logNodePositions(cy, "drag");
+    };
+
+    cy.on("dragfree", "node", reportDrag);
+    cleanup.push(() => cy.off("dragfree", "node", reportDrag));
+    cleanup.push(bindDebugControls(container, cy));
+
+    window.__JM_LOOP_DEBUG__ = {
+      cy,
+      dumpPositions: () => logNodePositions(cy, "console"),
+      dumpCurves: () => logEdgeCurves(cy, "console"),
+      dumpAll: () => {
+        logNodePositions(cy, "console");
+        logEdgeCurves(cy, "console");
+      },
+      fit: () => cy.fit(undefined, 18),
+    };
+
+    logNodePositions(cy, "initial");
+    logEdgeCurves(cy, "initial");
+  }
+
+  return () => {
+    cleanup.forEach((dispose) => dispose());
+    if (window.__JM_LOOP_DEBUG__?.cy === cy) {
+      delete window.__JM_LOOP_DEBUG__;
+    }
+    cy.destroy();
+  };
 }
