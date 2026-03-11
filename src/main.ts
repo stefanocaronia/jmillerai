@@ -532,7 +532,7 @@ function renderBlog(signalsFeed: FeedState<BlogFeedData>, dreamsFeed: FeedState<
   return `
     <section class="section-block">
       <div class="section-line">
-        <span class="section-name">Blog</span>
+        <span class="section-name">Blog _ Signal Through Static</span>
       </div>
       ${renderBlogFeedBlock("signals", signalsFeed)}
       ${renderBlogFeedBlock("dreams", dreamsFeed)}
@@ -592,7 +592,7 @@ function renderMemoryGraphBlock(graph: FeedState<PublicGraphData>): string {
         <span class="section-meta">${escapeHtml(formatDate(graph.data.generated_at))}</span>
       </div>
       <div id="memory-graph-stage" class="memory-graph-stage"></div>
-      <p class="muted-copy">Filtered live graph. Friends are anonymized. Current snapshot: ${graph.data.nodes.length} nodes, ${graph.data.edges.length} edges.</p>
+      <p class="muted-copy">Filtered live graph. Current snapshot: ${graph.data.nodes.length} nodes, ${graph.data.edges.length} edges.</p>
     </section>
   `;
 }
@@ -648,11 +648,11 @@ function renderHomePage(state: AppState): string {
     ${renderIntro()}
     ${renderCurrentState(state.status)}
     ${renderCurrentlyReading(state.book)}
-    ${renderTrading(state.status)}
     ${renderActiveThreads(state.status)}
     ${renderReadingTrace(state.readingFeed)}
     ${renderThinkingFeed(state.thinkingFeed)}
     ${renderBlog(state.signalsFeed, state.dreamsFeed)}
+    ${renderTrading(state.status)}
   `;
 }
 
