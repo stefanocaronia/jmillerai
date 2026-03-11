@@ -253,9 +253,7 @@ a {
 }
 
 .book-archive-list li {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  display: grid;
   gap: 8px 16px;
   padding-top: 10px;
   background-image: repeating-linear-gradient(
@@ -271,6 +269,13 @@ a {
 .book-archive-list li:first-child {
   padding-top: 0;
   background: none;
+}
+
+.book-archive-title {
+  font-family: "Oxanium", sans-serif;
+  font-size: 0.96rem;
+  line-height: 1;
+  letter-spacing: 0.03em;
 }
 
 .contact-list {

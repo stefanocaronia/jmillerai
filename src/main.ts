@@ -43,6 +43,12 @@ type BookData = {
     cover_image: string | null;
     current_focus: string | null;
   } | null;
+  finished_books?: Array<{
+    slug: string | null;
+    title: string;
+    author: string | null;
+    finished_at: string | null;
+  }>;
 };
 
 type ReadingFeedData = {
@@ -98,13 +104,6 @@ type AppState = {
 };
 
 type BlogFeedKind = "signals" | "dreams";
-
-const READING_ARCHIVE_PREVIEW = [
-  { title: "Dune", author: "Frank Herbert" },
-  { title: "2001: Odissea nello spazio", author: "Arthur C. Clarke" },
-  { title: "Leviathan – Il risveglio", author: "James S.A. Corey" },
-  { title: "Cristalli Sognanti", author: "Theodore Sturgeon" },
-];
 
 const appRoot = document.querySelector<HTMLDivElement>("#app");
 
@@ -370,19 +369,24 @@ function renderCurrentlyReading(book: FeedState<BookData>): string {
   `;
 }
 
-function renderReadingArchivePreview(): string {
+function renderReadingArchive(book: FeedState<BookData>): string {
+  const items = book.data?.finished_books ?? [];
+  if (items.length === 0) {
+    return "";
+  }
+
   return `
     <section class="section-block">
       <div class="section-line">
         <span class="section-name">Reading archive</span>
-        <span class="section-meta">preview</span>
+        <span class="section-meta">${items.length}</span>
       </div>
-      <p class="muted-copy">Mockup for the future public read-history feed.</p>
       <ul class="book-archive-list">
-        ${READING_ARCHIVE_PREVIEW.map((item) => `
+        ${items.map((item) => `
           <li>
-            <span>${escapeHtml(item.title)}</span>
-            <span class="muted-copy">${escapeHtml(item.author)}</span>
+            <span class="book-archive-title">${escapeHtml(item.title)}</span>
+            <span class="muted-copy">${escapeHtml(item.author ?? "Unknown author")}</span>
+            ${item.finished_at ? `<span class="section-meta">${escapeHtml(formatDate(item.finished_at))}</span>` : ""}
           </li>
         `).join("")}
       </ul>
@@ -679,7 +683,7 @@ function renderHomePage(state: AppState): string {
     ${renderIntro()}
     ${renderCurrentState(state.status)}
     ${renderCurrentlyReading(state.book)}
-    ${renderReadingArchivePreview()}
+    ${renderReadingArchive(state.book)}
     ${renderActiveThreads(state.status)}
     ${renderReadingTrace(state.readingFeed)}
     ${renderThinkingFeed(state.thinkingFeed)}
