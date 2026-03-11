@@ -354,9 +354,9 @@ a {
 .kind-badge {
   display: inline-block;
   padding: 3px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--accent);
   border-radius: 999px;
-  color: var(--ink-soft);
+  color: var(--accent);
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.68rem;
   letter-spacing: 0.08em;
