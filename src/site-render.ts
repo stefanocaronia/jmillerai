@@ -387,7 +387,7 @@ function renderMemoryGraphBlock(graph: FeedState<PublicGraphData>): string {
     return `
       <section class="section-block">
         <div class="section-line">
-          <span class="section-name">Memory graph</span>
+          <span class="section-name">Memory network</span>
         </div>
         <p class="muted-copy">Graph canvas pending.</p>
       </section>
@@ -397,7 +397,7 @@ function renderMemoryGraphBlock(graph: FeedState<PublicGraphData>): string {
   return `
     <section class="section-block">
       <div class="section-line">
-        <span class="section-name">Memory graph</span>
+        <span class="section-name">Memory network</span>
         <span class="section-meta">${escapeHtml(formatDate(graph.data.generated_at))}</span>
       </div>
       <p class="body-copy">Filtered live graph. Current snapshot: ${graph.data.nodes.length} nodes, ${graph.data.edges.length} edges.</p>
@@ -436,8 +436,8 @@ function renderLoopPage(loop: FeedState<CognitiveLoopData>): string {
           <article class="stream-item loop-module-item">
             <div class="section-line">
               <div class="module-meta">
-                <span class="module-dot module-dot--${escapeHtml(node.id)}" aria-hidden="true"></span>
-                <span class="kind-badge kind-badge-loop">${escapeHtml(node.kind)}</span>
+                <span class="module-dot module-dot--${escapeHtml(node.kind)}" aria-hidden="true"></span>
+                <span class="kind-badge kind-badge-loop kind-badge-loop--${escapeHtml(node.kind)}">${escapeHtml(node.kind)}</span>
               </div>
             </div>
             <h3 class="loop-module-title">${escapeHtml(node.label)}</h3>
@@ -484,8 +484,8 @@ function renderHomePage(state: AppState): string {
 
 function renderMapPage(state: AppState): string {
   return `
-    ${renderLastMemories(state.publicGraph)}
     ${renderMemoryGraphBlock(state.publicGraph)}
+    ${renderLastMemories(state.publicGraph)}
   `;
 }
 

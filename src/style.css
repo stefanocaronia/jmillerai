@@ -388,6 +388,36 @@ a {
   color: var(--ink-soft);
 }
 
+.kind-badge-loop--control {
+  border-color: #ff7a00;
+  color: #ff7a00;
+}
+
+.kind-badge-loop--state {
+  border-color: #f2f2f2;
+  color: #f2f2f2;
+}
+
+.kind-badge-loop--module {
+  border-color: #46d9ff;
+  color: #46d9ff;
+}
+
+.kind-badge-loop--input {
+  border-color: #ff5ea8;
+  color: #ff5ea8;
+}
+
+.kind-badge-loop--output {
+  border-color: #ff6b4a;
+  color: #ff6b4a;
+}
+
+.kind-badge-loop--operation {
+  border-color: #8f8f8f;
+  color: #8f8f8f;
+}
+
 .module-meta {
   display: inline-flex;
   align-items: center;
@@ -402,47 +432,27 @@ a {
   flex: 0 0 10px;
 }
 
-.module-dot--heartbeat {
+.module-dot--control {
   background: #ff7a00;
 }
 
-.module-dot--short-state {
+.module-dot--state {
   background: #f2f2f2;
 }
 
-.module-dot--experience {
-  background: #ffb000;
-}
-
-.module-dot--conversation {
-  background: #ff5ea8;
-}
-
-.module-dot--mail {
-  background: #8cf58a;
-}
-
-.module-dot--memory {
-  background: #e6e6e6;
-}
-
-.module-dot--thinking {
+.module-dot--module {
   background: #46d9ff;
 }
 
-.module-dot--reading {
-  background: #f4e409;
+.module-dot--input {
+  background: #ff5ea8;
 }
 
-.module-dot--dream {
-  background: #b07cff;
-}
-
-.module-dot--blog {
+.module-dot--output {
   background: #ff6b4a;
 }
 
-.module-dot--trading {
+.module-dot--operation {
   background: #8f8f8f;
 }
 
