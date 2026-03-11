@@ -397,8 +397,8 @@ function renderMemoryGraphBlock(graph: FeedState<PublicGraphData>): string {
         <span class="section-name">Memory graph</span>
         <span class="section-meta">${escapeHtml(formatDate(graph.data.generated_at))}</span>
       </div>
+      <p class="body-copy">Filtered live graph. Current snapshot: ${graph.data.nodes.length} nodes, ${graph.data.edges.length} edges.</p>
       <div id="memory-graph-stage" class="memory-graph-stage"></div>
-      <p class="muted-copy">Filtered live graph. Current snapshot: ${graph.data.nodes.length} nodes, ${graph.data.edges.length} edges.</p>
     </section>
   `;
 }
@@ -474,4 +474,3 @@ export function applyProgressMeters(root: ParentNode): void {
     element.style.width = `${progress}%`;
   });
 }
-
