@@ -228,6 +228,14 @@ a {
   font-size: 0.8rem;
 }
 
+.state-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-top: 12px;
+}
+
 .stream-list,
 .link-list,
 .node-list {

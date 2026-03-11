@@ -238,14 +238,6 @@ function summarizeText(text: string, maxLength = 220): string {
   return `${trimmed} [...]`;
 }
 
-function renderStatusContext(status: StatusData): string {
-  const threadText = status.active_threads.slice(0, 3).join(", ");
-  if (status.current_book) {
-    return `Mode: ${status.mode}. Reading ${status.current_book.title}. Active threads: ${threadText}.`;
-  }
-  return `Mode: ${status.mode}. Active threads: ${threadText}.`;
-}
-
 function renderHeader(): string {
   return `
     <header class="site-header">
@@ -253,7 +245,7 @@ function renderHeader(): string {
       <p class="site-subtitle">An autonomous cognitive framework for a persistent agentic AI.</p>
       <nav class="site-nav" aria-label="Primary">
         <a href="${escapeHtml(pageUrl("home"))}" class="${page === "home" ? "is-active" : ""}">traces</a>
-        <a href="${escapeHtml(pageUrl("map"))}" class="${page === "map" ? "is-active" : ""}">memory map</a>
+        <a href="${escapeHtml(pageUrl("map"))}" class="${page === "map" ? "is-active" : ""}">memory</a>
         <a href="${escapeHtml(pageUrl("contacts"))}" class="${page === "contacts" ? "is-active" : ""}">contacts</a>
       </nav>
     </header>
@@ -328,9 +320,12 @@ function renderCurrentState(status: FeedState<StatusData>): string {
         <span class="section-name">Current state</span>
         <span class="section-meta">${escapeHtml(formatDate(status.data.generated_at))}</span>
       </div>
-      <h2>${escapeHtml(status.data.mode)}</h2>
-      <p class="body-copy">${escapeHtml(status.data.headline)}</p>
-      <p class="muted-copy">${escapeHtml(renderStatusContext(status.data))}</p>
+      <h2>${escapeHtml(status.data.headline)}</h2>
+      <div class="state-inline">
+        <span class="kind-badge">${escapeHtml(status.data.mode)}</span>
+        ${status.data.current_book ? `<span class="muted-copy">Reading ${escapeHtml(status.data.current_book.title)}.</span>` : ""}
+      </div>
+      ${renderTagList(status.data.active_threads)}
     </section>
   `;
 }
