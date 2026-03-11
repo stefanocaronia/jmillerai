@@ -11,7 +11,7 @@ export type CognitiveLoopNode = {
 export type CognitiveLoopEdge = {
   source: string;
   target: string;
-  label: string;
+  label?: string;
 };
 
 export type CognitiveLoopData = {
@@ -44,32 +44,61 @@ function shortenLabel(label: string): string {
   return `${trimmed}…`;
 }
 
+function graphLabel(node: CognitiveLoopNode): string {
+  if (node.id === "memory") {
+    return "MEMORY";
+  }
+
+  if (node.id === "short-state") {
+    return "WORKING MEMORY";
+  }
+
+  return shortenLabel(node.label);
+}
+
+function dedupeEdges(edges: CognitiveLoopEdge[]): CognitiveLoopEdge[] {
+  const seen = new Set<string>();
+  const unique: CognitiveLoopEdge[] = [];
+
+  for (const edge of edges) {
+    const pair = [edge.source, edge.target].sort().join("::");
+    if (seen.has(pair)) {
+      continue;
+    }
+    seen.add(pair);
+    unique.push(edge);
+  }
+
+  return unique;
+}
+
 export function mountCognitiveLoop(container: HTMLElement, loop: CognitiveLoopData): () => void {
+  const edges = dedupeEdges(loop.edges);
+
   const cy = cytoscape({
     container,
     elements: [
       ...loop.nodes.map((node) => ({
         data: {
           id: node.id,
-          label: shortenLabel(node.label),
+          label: graphLabel(node),
           color: kindColors[node.kind] || "#c3c3c3",
         },
       })),
-      ...loop.edges.map((edge, index) => ({
+      ...edges.map((edge, index) => ({
         data: {
           id: `loop-edge-${index}`,
           source: edge.source,
           target: edge.target,
-          label: edge.label,
         },
       })),
     ],
     layout: {
       name: "breadthfirst",
-      directed: true,
+      directed: false,
       padding: 18,
       animate: false,
-      spacingFactor: 1.2,
+      spacingFactor: 1.28,
     },
     style: [
       {
@@ -93,15 +122,8 @@ export function mountCognitiveLoop(container: HTMLElement, loop: CognitiveLoopDa
         style: {
           width: "2",
           "line-color": "#666666",
-          "target-arrow-color": "#666666",
-          "target-arrow-shape": "triangle",
-          "curve-style": "bezier",
-          label: "data(label)",
-          "font-size": "8",
-          color: "#9a9a9a",
-          "text-background-color": "#000000",
-          "text-background-opacity": 1,
-          "text-background-padding": "2",
+          opacity: 0.82,
+          "curve-style": "straight",
         } as never,
       },
     ],

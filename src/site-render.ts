@@ -47,6 +47,12 @@ function renderRelatedList(items: string[]): string {
   `;
 }
 
+function countLoopConnections(edges: CognitiveLoopData["edges"]): number {
+  return new Set(
+    edges.map((edge) => [edge.source, edge.target].sort().join("::")),
+  ).size;
+}
+
 function renderHeader(page: PageId, pageUrl: (pageId: PageId) => string): string {
   return `
     <header class="site-header">
@@ -433,7 +439,7 @@ function renderLoopPage(loop: FeedState<CognitiveLoopData>): string {
         <span class="section-name">Loop</span>
         <span class="section-meta">${escapeHtml(formatDate(loop.data.generated_at))}</span>
       </div>
-      <p class="body-copy">${loop.data.nodes.length} nodes, ${loop.data.edges.length} directed paths in the current exported loop.</p>
+      <p class="body-copy">${loop.data.nodes.length} nodes, ${countLoopConnections(loop.data.edges)} connections in the current exported loop.</p>
       <div id="cognitive-loop-stage" class="memory-graph-stage loop-graph-stage"></div>
     </section>
     <section class="section-block">
