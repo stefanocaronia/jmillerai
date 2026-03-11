@@ -96,6 +96,8 @@ type AppState = {
   dreamsFeed: FeedState<BlogFeedData>;
 };
 
+type BlogFeedKind = "signals" | "dreams";
+
 const appRoot = document.querySelector<HTMLDivElement>("#app");
 
 if (!appRoot) {
@@ -216,10 +218,31 @@ function renderRelatedList(items: string[]): string {
   `;
 }
 
+function summarizeThinking(text: string, maxLength = 220): string {
+  const normalized = text.trim().replace(/\s+/g, " ");
+  if (normalized.length <= maxLength && /[.!?]$/.test(normalized)) {
+    return normalized;
+  }
+
+  const slice = normalized.slice(0, maxLength + 1);
+  const boundary = slice.lastIndexOf(" ");
+  const trimmed = (boundary > 0 ? slice.slice(0, boundary) : slice).trim().replace(/[.,;:!?-]+$/, "");
+  return `${trimmed} [...]`;
+}
+
+function renderStatusContext(status: StatusData): string {
+  const threadText = status.active_threads.slice(0, 3).join(", ");
+  if (status.current_book) {
+    return `Mode: ${status.mode}. Reading ${status.current_book.title}. Active threads: ${threadText}.`;
+  }
+  return `Mode: ${status.mode}. Active threads: ${threadText}.`;
+}
+
 function renderHeader(): string {
   return `
     <header class="site-header">
       <a class="site-title" href="${escapeHtml(pageUrl("home"))}">J. Miller AI</a>
+      <p class="site-subtitle">An autonomous cognitive framework for a persistent agentic AI.</p>
       <nav class="site-nav" aria-label="Primary">
         <a href="${escapeHtml(pageUrl("home"))}" class="${page === "home" ? "is-active" : ""}">home</a>
         <a href="${escapeHtml(pageUrl("map"))}" class="${page === "map" ? "is-active" : ""}">map</a>
@@ -277,6 +300,7 @@ function renderCurrentState(status: FeedState<StatusData>): string {
       </div>
       <h2>${escapeHtml(status.data.mode)}</h2>
       <p class="body-copy">${escapeHtml(status.data.headline)}</p>
+      <p class="muted-copy">${escapeHtml(renderStatusContext(status.data))}</p>
     </section>
   `;
 }
@@ -405,7 +429,7 @@ function renderThinkingFeed(feed: FeedState<ThinkingFeedData>, limit = 5): strin
                 <span class="section-meta">${escapeHtml(formatDate(item.created_at))}</span>
               </div>
               <h3>${escapeHtml(item.title)}</h3>
-              <p class="body-copy">${escapeHtml(item.summary)}</p>
+              <p class="body-copy">${escapeHtml(summarizeThinking(item.summary))}</p>
               ${renderRelatedList(related)}
             </article>
           `;
@@ -415,28 +439,22 @@ function renderThinkingFeed(feed: FeedState<ThinkingFeedData>, limit = 5): strin
   `;
 }
 
-function renderBlogFeedBlock(label: string, feed: FeedState<BlogFeedData>): string {
+function renderBlogFeedBlock(kind: BlogFeedKind, feed: FeedState<BlogFeedData>): string {
   if (!feed.data) {
     return `
       <div class="blog-block">
-        <div class="section-line">
-          <span class="section-name">${escapeHtml(label)}</span>
-        </div>
-        ${renderFeedError(feed, `${label.toLowerCase()} feed`)}
+        ${renderFeedError(feed, `${kind} feed`)}
       </div>
     `;
   }
 
   return `
     <div class="blog-block">
-      <div class="section-line">
-        <span class="section-name">${escapeHtml(label)}</span>
-      </div>
       <div class="stream-list">
         ${feed.data.items.map((item) => `
           <article class="stream-item">
             <div class="section-line">
-              <span class="section-name section-name-small">${escapeHtml(label)}</span>
+              <span class="section-name section-name-small">${kind}</span>
               <span class="section-meta">${escapeHtml(formatDate(item.published_at))}</span>
             </div>
             <h3><a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${escapeHtml(item.title)}</a></h3>
@@ -453,8 +471,8 @@ function renderBlog(signalsFeed: FeedState<BlogFeedData>, dreamsFeed: FeedState<
       <div class="section-line">
         <span class="section-name">Blog</span>
       </div>
-      ${renderBlogFeedBlock("Signals", signalsFeed)}
-      ${renderBlogFeedBlock("Dreams", dreamsFeed)}
+      ${renderBlogFeedBlock("signals", signalsFeed)}
+      ${renderBlogFeedBlock("dreams", dreamsFeed)}
     </section>
   `;
 }

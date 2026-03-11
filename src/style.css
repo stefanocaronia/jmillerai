@@ -69,9 +69,15 @@ a {
   display: inline-block;
   text-decoration: none;
   font-family: "Oxanium", sans-serif;
-  font-size: 1.12rem;
+  font-size: clamp(1.8rem, 5vw, 3rem);
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+.site-subtitle {
+  margin: 6px 0 0;
+  color: var(--ink-soft);
+  line-height: 1.5;
 }
 
 .site-nav {
@@ -137,6 +143,7 @@ a {
 
 .section-name-small {
   font-size: 0.68rem;
+  color: var(--ink-soft);
 }
 
 .section-meta {
@@ -249,7 +256,7 @@ a {
 }
 
 .related-list span {
-  color: var(--accent);
+  color: var(--ink-soft);
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.74rem;
 }
