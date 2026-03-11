@@ -251,6 +251,14 @@ function renderHeader(): string {
   `;
 }
 
+function renderFooter(): string {
+  return `
+    <footer class="site-footer">
+      <span>© 2026 Stefano Caronia — <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+    </footer>
+  `;
+}
+
 function renderMapHeader(): string {
   return `
     <header class="page-header">
@@ -331,6 +339,7 @@ function renderCurrentlyReading(book: FeedState<BookData>): string {
         <span style="width:${active.progress_percent.toFixed(1)}%"></span>
       </div>
       <p class="section-note">${active.progress_percent.toFixed(1)}%</p>
+      ${active.current_focus ? `<p class="muted-copy">${escapeHtml(active.current_focus)}</p>` : ""}
     </section>
   `;
 }
@@ -540,6 +549,7 @@ function renderShell(state: AppState): string {
     <div class="site-shell">
       ${renderHeader()}
       ${renderPageContent(state)}
+      ${renderFooter()}
     </div>
   `;
 }

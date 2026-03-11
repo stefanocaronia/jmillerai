@@ -8,7 +8,6 @@
   --line: rgba(255, 255, 255, 0.14);
   --accent: #ff7a00;
   --radius: 2px;
-  --content-width: min(860px, calc(100vw - 32px));
 }
 
 *,
@@ -56,9 +55,9 @@ a {
 }
 
 .site-shell {
-  width: var(--content-width);
+  width: min(100%, 860px);
   margin: 0 auto;
-  padding: 24px 0 96px;
+  padding: 24px 24px 96px;
 }
 
 .site-header {
@@ -153,7 +152,14 @@ a {
 .section-block {
   margin-top: 24px;
   padding-top: 14px;
-  border-top: 1px solid var(--line);
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--accent) 0 10px,
+    transparent 10px 16px
+  );
+  background-position: top left;
+  background-repeat: repeat-x;
+  background-size: auto 2px;
 }
 
 .section-line {
@@ -213,7 +219,7 @@ a {
 }
 
 .tag-list li {
-  color: var(--accent);
+  color: var(--ink-soft);
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.8rem;
 }
@@ -229,13 +235,20 @@ a {
 .stream-item,
 .node-list li {
   padding-top: 10px;
-  border-top: 1px solid var(--line);
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(255, 122, 0, 0.7) 0 8px,
+    transparent 8px 14px
+  );
+  background-position: top left;
+  background-repeat: repeat-x;
+  background-size: auto 1px;
 }
 
 .stream-item:first-child,
 .node-list li:first-child {
   padding-top: 0;
-  border-top: 0;
+  background: none;
 }
 
 .stream-item h3 a,
@@ -286,10 +299,35 @@ a {
   color: #ff4d4d;
 }
 
+.site-footer {
+  margin-top: 42px;
+  padding-top: 14px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--accent) 0 10px,
+    transparent 10px 16px
+  );
+  background-position: top left;
+  background-repeat: repeat-x;
+  background-size: auto 2px;
+  color: var(--ink-soft);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  line-height: 1.6;
+}
+
+.site-footer a {
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 640px) {
   .site-shell {
-    width: min(100vw - 24px, 860px);
-    padding-bottom: 88px;
+    width: 100%;
+    padding: 24px 24px 88px;
   }
 
   .page-header h1 {
