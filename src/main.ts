@@ -16,7 +16,11 @@ const page = (document.body.dataset.page as PageId | undefined) ?? "home";
 let unmountGraph: (() => void) | null = null;
 
 const baseUrl = import.meta.env.BASE_URL;
-const configuredFeedBase = (import.meta.env.VITE_PUBLIC_FEED_BASE as string | undefined)?.replace(/\/+$/, "");
+const defaultDevFeedBase = "https://stefanocaronia.it/jmillerai/data";
+const configuredFeedBase = (
+  (import.meta.env.VITE_PUBLIC_FEED_BASE as string | undefined) ||
+  (import.meta.env.DEV ? defaultDevFeedBase : undefined)
+)?.replace(/\/+$/, "");
 const feedUrl = (name: string) =>
   configuredFeedBase ? `${configuredFeedBase}/${name}.json` : `${baseUrl}data/${name}.json`;
 

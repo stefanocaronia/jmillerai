@@ -25,7 +25,10 @@ Copy `.env.example` to `.env` and set:
 
 - `VITE_PUBLIC_FEED_BASE=https://your-feed-host/path/to/data`
 
-If `VITE_PUBLIC_FEED_BASE` is not set, the app falls back to `${BASE_URL}data/`.
+If `VITE_PUBLIC_FEED_BASE` is not set:
+
+- in development, the app falls back to `https://stefanocaronia.it/jmillerai/data`
+- in production, the app falls back to `${BASE_URL}data/`
 
 ## Scripts
 
