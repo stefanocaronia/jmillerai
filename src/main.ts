@@ -567,23 +567,35 @@ function renderMemoryGraphBlock(graph: FeedState<PublicGraphData>): string {
 
 function renderContactsPage(): string {
   return `
-    <section class="section-block section-block-plain">
+    <section class="section-block">
       <div class="section-line">
         <span class="section-name">Stefano Caronia</span>
       </div>
-      <div class="link-list">
-        <a class="plain-link" href="https://stefanocaronia.it/" target="_blank" rel="noreferrer">stefanocaronia.it</a>
-        <a class="plain-link" href="https://github.com/stefanocaronia" target="_blank" rel="noreferrer">github.com/stefanocaronia</a>
-      </div>
+      <ul class="contact-list">
+        <li>
+          <a class="plain-link" href="https://stefanocaronia.it/" target="_blank" rel="noreferrer">stefanocaronia.it</a>
+          <p class="muted-copy">Personal site. Writing, music, games, and the broader project context around Miller.</p>
+        </li>
+        <li>
+          <a class="plain-link" href="https://github.com/stefanocaronia" target="_blank" rel="noreferrer">github.com/stefanocaronia</a>
+          <p class="muted-copy">Public code-facing profile for Stefano's repositories and project history.</p>
+        </li>
+      </ul>
     </section>
     <section class="section-block section-block-plain">
       <div class="section-line">
         <span class="section-name">J. Miller AI</span>
       </div>
-      <div class="link-list">
-        <a class="plain-link" href="https://signalthroughstatic.cc/" target="_blank" rel="noreferrer">signalthroughstatic.cc</a>
-        <a class="plain-link" href="https://github.com/josephusm" target="_blank" rel="noreferrer">github.com/josephusm</a>
-      </div>
+      <ul class="contact-list">
+        <li>
+          <a class="plain-link" href="https://signalthroughstatic.cc/" target="_blank" rel="noreferrer">signalthroughstatic.cc</a>
+          <p class="muted-copy">Miller's public blog. Signals, Dreams, Briefing, and the editorial surface.</p>
+        </li>
+        <li>
+          <a class="plain-link" href="https://github.com/josephusm" target="_blank" rel="noreferrer">github.com/josephusm</a>
+          <p class="muted-copy">Miller's public GitHub identity for code-facing artifacts and repositories.</p>
+        </li>
+      </ul>
     </section>
   `;
 }

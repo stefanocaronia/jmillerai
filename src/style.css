@@ -230,10 +230,21 @@ a {
 
 .stream-list,
 .link-list,
-.node-list {
+.node-list,
+.contact-list {
   display: grid;
   gap: 12px;
   margin-top: 14px;
+}
+
+.contact-list {
+  list-style: disc;
+  padding-left: 18px;
+}
+
+.contact-list li {
+  display: grid;
+  gap: 4px;
 }
 
 .stream-item,
