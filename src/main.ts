@@ -331,7 +331,6 @@ function renderCurrentState(status: FeedState<StatusData>): string {
       ${status.data.detail ? `<p class="body-copy">${escapeHtml(status.data.detail)}</p>` : ""}
       <div class="state-inline">
         <span class="kind-badge">${escapeHtml(status.data.mode)}</span>
-        ${status.data.current_book ? `<span class="muted-copy">Reading ${escapeHtml(status.data.current_book.title)}.</span>` : ""}
       </div>
       ${renderTagList(status.data.active_threads)}
     </section>
