@@ -24,11 +24,23 @@ export type PublicGraphData = {
 };
 
 const kindColors: Record<string, string> = {
-  memory: "#ff7a00",
+  memory: "#f2f2f2",
   book: "#c3c3c3",
   source: "#8f8f8f",
   blog_post: "#f2f2f2",
   friend: "#9a9a9a",
+};
+
+const memoryTypeColors: Record<string, string> = {
+  thinking: "#46d9ff",
+  experience: "#ffb000",
+  reading: "#f4e409",
+  dream: "#b07cff",
+  conversation: "#ff5ea8",
+  heartbeat: "#ff7a00",
+  belief: "#6ee7b7",
+  trade: "#8f8f8f",
+  summary: "#c3c3c3",
 };
 
 const relationColors: Record<string, string> = {
@@ -76,7 +88,12 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
         data: {
           id: node.id,
           label: shortenLabel(node.label),
-          color: kindColors[node.kind] || "#c3c3c3",
+          color:
+            (node.kind === "memory" && node.memory_type
+              ? memoryTypeColors[node.memory_type.toLowerCase()]
+              : undefined) ||
+            kindColors[node.kind] ||
+            "#c3c3c3",
         },
       })),
       ...normalized.edges.map((edge, index) => ({

@@ -8,6 +8,21 @@
   --line: rgba(255, 255, 255, 0.14);
   --accent: #ff7a00;
   --radius: 2px;
+  --kind-control: #ff7a00;
+  --kind-state: #f2f2f2;
+  --kind-module: #46d9ff;
+  --kind-input: #ff5ea8;
+  --kind-output: #ff6b4a;
+  --kind-operation: #8f8f8f;
+  --memory-thinking: #46d9ff;
+  --memory-experience: #ffb000;
+  --memory-reading: #f4e409;
+  --memory-dream: #b07cff;
+  --memory-conversation: #ff5ea8;
+  --memory-heartbeat: #ff7a00;
+  --memory-belief: #6ee7b7;
+  --memory-trade: #8f8f8f;
+  --memory-summary: #c3c3c3;
 }
 
 html {
@@ -383,39 +398,86 @@ a {
   text-transform: uppercase;
 }
 
+.kind-badge--thinking {
+  border-color: var(--memory-thinking);
+  color: var(--memory-thinking);
+}
+
+.kind-badge--experience {
+  border-color: var(--memory-experience);
+  color: var(--memory-experience);
+}
+
+.kind-badge--reading {
+  border-color: var(--memory-reading);
+  color: var(--memory-reading);
+}
+
+.kind-badge--dream,
+.kind-badge--dreaming {
+  border-color: var(--memory-dream);
+  color: var(--memory-dream);
+}
+
+.kind-badge--conversation {
+  border-color: var(--memory-conversation);
+  color: var(--memory-conversation);
+}
+
+.kind-badge--heartbeat {
+  border-color: var(--memory-heartbeat);
+  color: var(--memory-heartbeat);
+}
+
+.kind-badge--belief {
+  border-color: var(--memory-belief);
+  color: var(--memory-belief);
+}
+
+.kind-badge--trade,
+.kind-badge--trading {
+  border-color: var(--memory-trade);
+  color: var(--memory-trade);
+}
+
+.kind-badge--summary {
+  border-color: var(--memory-summary);
+  color: var(--memory-summary);
+}
+
 .kind-badge-loop {
   border-color: var(--line);
   color: var(--ink-soft);
 }
 
 .kind-badge-loop--control {
-  border-color: #ff7a00;
-  color: #ff7a00;
+  border-color: var(--kind-control);
+  color: var(--kind-control);
 }
 
 .kind-badge-loop--state {
-  border-color: #f2f2f2;
-  color: #f2f2f2;
+  border-color: var(--kind-state);
+  color: var(--kind-state);
 }
 
 .kind-badge-loop--module {
-  border-color: #46d9ff;
-  color: #46d9ff;
+  border-color: var(--kind-module);
+  color: var(--kind-module);
 }
 
 .kind-badge-loop--input {
-  border-color: #ff5ea8;
-  color: #ff5ea8;
+  border-color: var(--kind-input);
+  color: var(--kind-input);
 }
 
 .kind-badge-loop--output {
-  border-color: #ff6b4a;
-  color: #ff6b4a;
+  border-color: var(--kind-output);
+  color: var(--kind-output);
 }
 
 .kind-badge-loop--operation {
-  border-color: #8f8f8f;
-  color: #8f8f8f;
+  border-color: var(--kind-operation);
+  color: var(--kind-operation);
 }
 
 .module-meta {
@@ -433,27 +495,38 @@ a {
 }
 
 .module-dot--control {
-  background: #ff7a00;
+  background: var(--kind-control);
 }
 
 .module-dot--state {
-  background: #f2f2f2;
+  background: var(--kind-state);
 }
 
 .module-dot--module {
-  background: #46d9ff;
+  background: var(--kind-module);
 }
 
 .module-dot--input {
-  background: #ff5ea8;
+  background: var(--kind-input);
 }
 
 .module-dot--output {
-  background: #ff6b4a;
+  background: var(--kind-output);
 }
 
 .module-dot--operation {
-  background: #8f8f8f;
+  background: var(--kind-operation);
+}
+
+.node-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.node-list-label {
+  display: block;
+  padding-top: 2px;
 }
 
 .memory-graph-stage {

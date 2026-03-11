@@ -4,6 +4,15 @@ import { CONTACT_SECTIONS, INTRO_PARAGRAPHS, SITE_SUBTITLE } from "./site-conten
 import type { AppState, BlogFeedData, BlogFeedKind, BookData, FeedState, PageId, ReadingFeedData, StatusData, ThinkingFeedData } from "./site-types";
 import { escapeHtml, formatDate, parseDate, summarizeText } from "./site-utils";
 
+function badgeClass(value: string | null | undefined): string {
+  const key = (value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return key ? ` kind-badge--${key}` : "";
+}
+
 function renderFeedError<T>(feed: FeedState<T>, label: string): string {
   if (feed.error) {
     return `<p class="empty-state">Unable to load ${escapeHtml(label)}: ${escapeHtml(feed.error)}</p>`;
@@ -104,7 +113,7 @@ function renderCurrentState(status: FeedState<StatusData>): string {
       <h2 class="state-title">${escapeHtml(status.data.headline)}</h2>
       ${status.data.detail ? `<p class="body-copy">${escapeHtml(status.data.detail)}</p>` : ""}
       <div class="state-inline">
-        <span class="kind-badge">${escapeHtml(status.data.mode)}</span>
+        <span class="kind-badge${badgeClass(status.data.mode)}">${escapeHtml(status.data.mode)}</span>
       </div>
       ${renderTagList(status.data.active_threads)}
     </section>
@@ -372,9 +381,9 @@ function renderLastMemories(graph: FeedState<PublicGraphData>): string {
       <p class="body-copy">${memories.length} public memory nodes from the latest exported graph snapshot.</p>
       <ul class="node-list">
         ${memories.map((node) => `
-          <li>
-            <span class="kind-badge">${escapeHtml(node.memory_type ?? node.kind)}</span>
-            <span>${escapeHtml(node.label)}</span>
+          <li class="node-list-item">
+            <span class="kind-badge${badgeClass(node.memory_type ?? node.kind)}">${escapeHtml(node.memory_type ?? node.kind)}</span>
+            <span class="node-list-label">${escapeHtml(node.label)}</span>
           </li>
         `).join("")}
       </ul>
