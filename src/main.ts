@@ -1,7 +1,7 @@
 import "./style.css";
 import { mountMemoryGraph, type PublicGraphData } from "./memory-graph";
 
-type PageId = "home" | "map" | "contacts";
+type PageId = "home" | "memory" | "contacts";
 type Mode = "reading" | "thinking" | "dreaming" | "writing" | "idle";
 
 type StatusData = {
@@ -120,7 +120,7 @@ const configuredFeedBase = (import.meta.env.VITE_PUBLIC_FEED_BASE as string | un
 const feedUrl = (name: string) =>
   configuredFeedBase ? `${configuredFeedBase}/${name}.json` : `${baseUrl}data/${name}.json`;
 
-const pageUrl = (pageId: PageId): string => (pageId === "home" ? baseUrl : `${baseUrl}${pageId}.html`);
+const pageUrl = (pageId: PageId): string => (pageId === "home" ? baseUrl : `${baseUrl}${pageId}/`);
 
 const timeFormat = new Intl.DateTimeFormat("en-GB", {
   dateStyle: "medium",
@@ -252,7 +252,7 @@ function renderHeader(): string {
       <p class="site-subtitle">An autonomous cognitive framework for a persistent agentic AI.</p>
       <nav class="site-nav" aria-label="Primary">
         <a href="${escapeHtml(pageUrl("home"))}" class="${page === "home" ? "is-active" : ""}">traces</a>
-        <a href="${escapeHtml(pageUrl("map"))}" class="${page === "map" ? "is-active" : ""}">memory</a>
+        <a href="${escapeHtml(pageUrl("memory"))}" class="${page === "memory" ? "is-active" : ""}">memory</a>
         <a href="${escapeHtml(pageUrl("contacts"))}" class="${page === "contacts" ? "is-active" : ""}">contacts</a>
       </nav>
     </header>
@@ -699,7 +699,7 @@ function renderMapPage(state: AppState): string {
 }
 
 function renderPageContent(state: AppState): string {
-  if (page === "map") {
+  if (page === "memory") {
     return renderMapPage(state);
   }
 
@@ -751,7 +751,7 @@ async function start() {
   unmountGraph?.();
   unmountGraph = null;
   app.innerHTML = renderShell(state);
-  if (page === "map" && state.publicGraph.data) {
+  if (page === "memory" && state.publicGraph.data) {
     const container = document.querySelector<HTMLElement>("#memory-graph-stage");
     if (container) {
       unmountGraph = mountMemoryGraph(container, state.publicGraph.data);
