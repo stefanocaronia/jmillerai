@@ -501,7 +501,7 @@ a:visited {
   display: inline-block;
   padding: 3px 8px;
   border: 1px solid var(--accent);
-  border-radius: 999px;
+  border-radius: 2px;
   color: var(--accent);
   font-family: "Share Tech Mono", monospace;
   font-size: 0.74rem;
@@ -660,7 +660,7 @@ a:visited {
 }
 
 .graph-tooltip-type {
-  color: var(--ink);
+  color: var(--tooltip-type-color, var(--ink));
   font-family: "Share Tech Mono", monospace;
   font-size: 0.72rem;
   letter-spacing: 0.08em;

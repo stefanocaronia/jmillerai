@@ -278,21 +278,25 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
   const cy = cytoscape({
     container,
     elements: [
-      ...normalized.nodes.map((node) => ({
-        data: {
-          id: node.id,
-          label: shortenLabel(node.displayLabel),
-          fullLabel: node.hoverLabel,
-          typeLabel: publicNodeTypeLabel(node),
-          color:
-            (node.kind === "memory" && node.memory_type
-              ? memoryTypeColors[node.memory_type.toLowerCase()]
-              : undefined) ||
-            kindColors[node.kind] ||
-            "#c3c3c3",
-          size: nodeSizeForImportance(node),
-        },
-      })),
+      ...normalized.nodes.map((node) => {
+        const color =
+          (node.kind === "memory" && node.memory_type
+            ? memoryTypeColors[node.memory_type.toLowerCase()]
+            : undefined) ||
+          kindColors[node.kind] ||
+          "#c3c3c3";
+        return {
+          data: {
+            id: node.id,
+            label: shortenLabel(node.displayLabel),
+            fullLabel: node.hoverLabel,
+            typeLabel: publicNodeTypeLabel(node),
+            color,
+            typeColor: color,
+            size: nodeSizeForImportance(node),
+          },
+        };
+      }),
       ...normalized.edges.map((edge, index) => ({
         data: {
           id: `edge-${index}`,
@@ -347,11 +351,12 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
   });
   enforceNodeSpacing(cy, PUBLIC_MIN_NODE_DISTANCE);
 
-  const showTooltip = (x: number, y: number, typeLabel: string, fullLabel: string) => {
+  const showTooltip = (x: number, y: number, typeLabel: string, fullLabel: string, typeColor: string) => {
     tooltip.innerHTML = `
       <div class="graph-tooltip-type">${typeLabel}</div>
       <div class="graph-tooltip-label">${fullLabel}</div>
     `;
+    tooltip.style.setProperty("--tooltip-type-color", typeColor);
     tooltip.style.left = `${x + 18}px`;
     tooltip.style.top = `${y + 18}px`;
     tooltip.hidden = false;
@@ -368,6 +373,7 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
       position.y,
       String(event.target.data("typeLabel") ?? ""),
       String(event.target.data("fullLabel") ?? ""),
+      String(event.target.data("typeColor") ?? "#f2f2f2"),
     );
   });
   cy.on("mousemove", "node", (event) => {
