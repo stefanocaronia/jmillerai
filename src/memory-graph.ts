@@ -31,10 +31,10 @@ export type MemoryGraphLegendItem = {
 
 const kindColors: Record<string, string> = {
   memory: "#f2f2f2",
-  book: "#c3c3c3",
-  source: "#8f8f8f",
-  blog_post: "#f2f2f2",
-  friend: "#9a9a9a",
+  book: "#7dd3fc",
+  source: "#f59e0b",
+  blog_post: "#f97316",
+  friend: "#34d399",
 };
 
 const memoryTypeColors: Record<string, string> = {
@@ -45,8 +45,8 @@ const memoryTypeColors: Record<string, string> = {
   conversation: "#ff5ea8",
   heartbeat: "#ff7a00",
   belief: "#6ee7b7",
-  trade: "#8f8f8f",
-  summary: "#c3c3c3",
+  trade: "#60a5fa",
+  summary: "#f9a8d4",
 };
 
 const relationColors: Record<string, string> = {
@@ -102,7 +102,12 @@ function normalizeGraph(graph: PublicGraphData) {
     .filter((node) => connectedNodeIds.has(node.id))
     .map((node) => ({
       ...node,
-      label: node.kind === "friend" ? "CONTACT" : cleanLabel(node.label),
+      label:
+        node.kind === "friend"
+          ? "CONTACT"
+          : node.kind === "memory" && node.memory_type === "conversation"
+            ? "CONVERSATION"
+            : cleanLabel(node.label),
     }));
   const allowedIds = new Set(nodes.map((node) => node.id));
   const edges = graph.edges.filter((edge) => allowedIds.has(edge.source) && allowedIds.has(edge.target));
