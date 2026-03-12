@@ -7,6 +7,7 @@ export type PublicGraphNode = {
   url: string | null;
   timestamp?: string | null;
   memory_type?: string | null;
+  importance?: number | null;
 };
 
 export type PublicGraphEdge = {
@@ -65,8 +66,12 @@ const relationColors: Record<string, string> = {
   relates_to: "#b07cff",
 };
 
+const PUBLIC_MIN_NODE_DISTANCE = 68;
+
 function cleanLabel(label: string): string {
   return label
+    .replace(/\s*[–—]+\s*/g, " ")
+    .replace(/\s+/g, " ")
     .trim()
     .replace(/[\s,:;/.!?\-–—]+$/g, "")
     .trim();
@@ -124,6 +129,60 @@ function shortenLabel(label: string): string {
   return trimmed;
 }
 
+function nodeSizeForImportance(node: PublicGraphNode): number {
+  const raw = Number(node.importance ?? 5);
+  const importance = Number.isFinite(raw) ? Math.max(1, Math.min(10, raw)) : 5;
+  return 12 + (importance - 1) * 1.8;
+}
+
+function enforceNodeSpacing(cy: cytoscape.Core, minDistance: number) {
+  const nodes = cy.nodes().toArray();
+  if (nodes.length < 2) return;
+
+  for (let iteration = 0; iteration < 120; iteration += 1) {
+    let moved = false;
+
+    for (let i = 0; i < nodes.length; i += 1) {
+      for (let j = i + 1; j < nodes.length; j += 1) {
+        const left = nodes[i];
+        const right = nodes[j];
+        const leftPos = left.position();
+        const rightPos = right.position();
+        let dx = rightPos.x - leftPos.x;
+        let dy = rightPos.y - leftPos.y;
+        let distance = Math.hypot(dx, dy);
+
+        if (distance === 0) {
+          const seed = ((i + 1) * 37 + (j + 1) * 17) % 360;
+          const angle = (seed * Math.PI) / 180;
+          dx = Math.cos(angle);
+          dy = Math.sin(angle);
+          distance = 1;
+        }
+
+        if (distance >= minDistance) continue;
+        const shift = ((minDistance - distance) / 2) * 0.55;
+        const nx = dx / distance;
+        const ny = dy / distance;
+
+        left.position({
+          x: leftPos.x - nx * shift,
+          y: leftPos.y - ny * shift,
+        });
+        right.position({
+          x: rightPos.x + nx * shift,
+          y: rightPos.y + ny * shift,
+        });
+        moved = true;
+      }
+    }
+
+    if (!moved) break;
+  }
+
+  cy.fit(undefined, 30);
+}
+
 function collapseChatContactClusters(nodes: PublicGraphNode[], edges: PublicGraphEdge[]) {
   const nodeById = new Map(nodes.map((node) => [node.id, node]));
   const degrees = new Map<string, number>();
@@ -132,12 +191,13 @@ function collapseChatContactClusters(nodes: PublicGraphNode[], edges: PublicGrap
     degrees.set(edge.target, (degrees.get(edge.target) ?? 0) + 1);
   }
 
-  type ChatCluster = {
+type ChatCluster = {
     contactId: string;
     relation: string;
     direction: "chat-to-contact" | "contact-to-chat";
     chatIds: string[];
     strengths: number[];
+    importances: number[];
   };
 
   const clusters = new Map<string, ChatCluster>();
@@ -175,9 +235,11 @@ function collapseChatContactClusters(nodes: PublicGraphNode[], edges: PublicGrap
       direction,
       chatIds: [],
       strengths: [],
+      importances: [],
     };
     cluster.chatIds.push(chatNode.id);
     cluster.strengths.push(edge.strength);
+    cluster.importances.push(Number(chatNode.importance ?? 5));
     clusters.set(clusterKey, cluster);
   }
 
@@ -196,6 +258,8 @@ function collapseChatContactClusters(nodes: PublicGraphNode[], edges: PublicGrap
     const clusterId = `chat-group:${cluster.contactId}:${cluster.relation}:${cluster.direction}`;
     const averageStrength =
       cluster.strengths.reduce((sum, value) => sum + value, 0) / cluster.strengths.length;
+    const averageImportance =
+      cluster.importances.reduce((sum, value) => sum + value, 0) / cluster.importances.length;
 
     collapsedNodes.push({
       id: clusterId,
@@ -203,6 +267,7 @@ function collapseChatContactClusters(nodes: PublicGraphNode[], edges: PublicGrap
       label: `${cluster.chatIds.length} Chat`,
       url: null,
       memory_type: "conversation",
+      importance: Math.max(5, Math.round(averageImportance)),
     });
 
     collapsedEdges.push({
@@ -285,6 +350,7 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
               : undefined) ||
             kindColors[node.kind] ||
             "#c3c3c3",
+          size: nodeSizeForImportance(node),
         },
       })),
       ...normalized.edges.map((edge, index) => ({
@@ -301,7 +367,11 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
       name: "cose",
       animate: false,
       fit: true,
-      padding: 12,
+      padding: 28,
+      nodeRepulsion: 160000,
+      idealEdgeLength: 88,
+      componentSpacing: 104,
+      nodeOverlap: 20,
     },
     style: [
       {
@@ -315,8 +385,8 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
           "text-max-width": "110px",
           "text-valign": "bottom",
           "text-margin-y": 8,
-          width: 14,
-          height: 14,
+          width: "data(size)",
+          height: "data(size)",
           "border-width": 0,
         },
       },
@@ -334,6 +404,7 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
       },
     ],
   });
+  enforceNodeSpacing(cy, PUBLIC_MIN_NODE_DISTANCE);
 
   return () => cy.destroy();
 }
