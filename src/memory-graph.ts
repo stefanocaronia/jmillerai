@@ -66,7 +66,7 @@ const relationColors: Record<string, string> = {
   relates_to: "#b07cff",
 };
 
-const PUBLIC_MIN_NODE_DISTANCE = 150;
+const PUBLIC_MIN_NODE_DISTANCE = 190;
 
 function cleanLabel(label: string): string {
   return label
@@ -139,7 +139,7 @@ function enforceNodeSpacing(cy: cytoscape.Core, minDistance: number) {
   const nodes = cy.nodes().toArray();
   if (nodes.length < 2) return;
 
-  for (let iteration = 0; iteration < 260; iteration += 1) {
+  for (let iteration = 0; iteration < 420; iteration += 1) {
     let moved = false;
 
     for (let i = 0; i < nodes.length; i += 1) {
@@ -162,9 +162,9 @@ function enforceNodeSpacing(cy: cytoscape.Core, minDistance: number) {
           distance = 1;
         }
 
-        const requiredDistance = minDistance + ((leftSize + rightSize) / 2) * 0.95;
+        const requiredDistance = minDistance + ((leftSize + rightSize) / 2) * 1.25;
         if (distance >= requiredDistance) continue;
-        const shift = ((requiredDistance - distance) / 2) * 0.84;
+        const shift = ((requiredDistance - distance) / 2) * 1.02;
         const nx = dx / distance;
         const ny = dy / distance;
 
@@ -183,7 +183,9 @@ function enforceNodeSpacing(cy: cytoscape.Core, minDistance: number) {
     if (!moved) break;
   }
 
-  cy.fit(undefined, 54);
+  cy.fit(undefined, 22);
+  cy.zoom(Math.min(cy.maxZoom(), cy.zoom() * 1.06));
+  cy.center();
 }
 
 function collapseChatContactClusters(nodes: PublicGraphNode[], edges: PublicGraphEdge[]) {
@@ -370,11 +372,11 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
       name: "cose",
       animate: false,
       fit: true,
-      padding: 60,
-      nodeRepulsion: 900000,
-      idealEdgeLength: 210,
-      componentSpacing: 300,
-      nodeOverlap: 68,
+      padding: 36,
+      nodeRepulsion: 1300000,
+      idealEdgeLength: 260,
+      componentSpacing: 380,
+      nodeOverlap: 92,
     },
     style: [
       {
@@ -383,11 +385,12 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
           "background-color": "data(color)",
           label: "data(label)",
           color: "#f2f2f2",
-          "font-size": 18,
+          "font-size": 40,
           "text-wrap": "wrap",
-          "text-max-width": "280px",
+          "text-max-width": "420px",
           "text-valign": "bottom",
-          "text-margin-y": 18,
+          "text-margin-y": 24,
+          "min-zoomed-font-size": 14,
           width: "data(size)",
           height: "data(size)",
           "border-width": 0,
@@ -396,12 +399,12 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
       {
         selector: "edge",
         style: {
-          width: "mapData(strength, 1, 3, 4.8, 12)",
+          width: "mapData(strength, 1, 3, 5.8, 13)",
           "line-color": "data(edgeColor)",
           "curve-style": "bezier",
           "target-arrow-shape": "triangle",
           "target-arrow-color": "data(edgeColor)",
-          "arrow-scale": 3.6,
+          "arrow-scale": 1.5,
           opacity: 0.9,
         },
       },
