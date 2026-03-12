@@ -99,6 +99,16 @@ export function presentPublicMemoryTypeLabel(memoryType: string | null | undefin
   return memoryType === "conversation" ? "chat" : memoryType;
 }
 
+function publicNodeTypeLabel(node: Pick<PublicGraphNode, "kind" | "memory_type">): string {
+  if (node.kind === "memory") {
+    const memoryType = presentPublicMemoryTypeLabel(node.memory_type);
+    return capitalizeLabel(memoryType);
+  }
+  if (node.kind === "friend") return "Contact";
+  if (node.kind === "blog_post") return "Blog post";
+  return capitalizeLabel(node.kind.replace(/_/g, " "));
+}
+
 function shortenLabel(label: string): string {
   const maxChars = 22;
   const normalized = cleanLabel(label);
@@ -188,104 +198,6 @@ function enforceNodeSpacing(cy: cytoscape.Core, minDistance: number) {
   cy.center();
 }
 
-function collapseChatContactClusters(nodes: PublicGraphNode[], edges: PublicGraphEdge[]) {
-  const nodeById = new Map(nodes.map((node) => [node.id, node]));
-  const degrees = new Map<string, number>();
-  for (const edge of edges) {
-    degrees.set(edge.source, (degrees.get(edge.source) ?? 0) + 1);
-    degrees.set(edge.target, (degrees.get(edge.target) ?? 0) + 1);
-  }
-
-  type ChatCluster = {
-    contactId: string;
-    relation: string;
-    direction: "chat-to-contact" | "contact-to-chat";
-    chatIds: string[];
-    strengths: number[];
-    importances: number[];
-  };
-
-  const clusters = new Map<string, ChatCluster>();
-
-  for (const edge of edges) {
-    const sourceNode = nodeById.get(edge.source);
-    const targetNode = nodeById.get(edge.target);
-    if (!sourceNode || !targetNode) continue;
-
-    let chatNode: PublicGraphNode | null = null;
-    let contactNode: PublicGraphNode | null = null;
-    let direction: ChatCluster["direction"] | null = null;
-
-    if (sourceNode.kind === "memory" && sourceNode.memory_type === "conversation" && targetNode.kind === "friend") {
-      chatNode = sourceNode;
-      contactNode = targetNode;
-      direction = "chat-to-contact";
-    } else if (
-      targetNode.kind === "memory" &&
-      targetNode.memory_type === "conversation" &&
-      sourceNode.kind === "friend"
-    ) {
-      chatNode = targetNode;
-      contactNode = sourceNode;
-      direction = "contact-to-chat";
-    }
-
-    if (!chatNode || !contactNode || !direction) continue;
-    if ((degrees.get(chatNode.id) ?? 0) !== 1) continue;
-
-    const clusterKey = [contactNode.id, edge.relation, direction].join("::");
-    const cluster = clusters.get(clusterKey) ?? {
-      contactId: contactNode.id,
-      relation: edge.relation,
-      direction,
-      chatIds: [],
-      strengths: [],
-      importances: [],
-    };
-    cluster.chatIds.push(chatNode.id);
-    cluster.strengths.push(edge.strength);
-    cluster.importances.push(Number(chatNode.importance ?? 5));
-    clusters.set(clusterKey, cluster);
-  }
-
-  const collapsedClusters = Array.from(clusters.values()).filter((cluster) => cluster.chatIds.length >= 2);
-  if (collapsedClusters.length === 0) {
-    return { nodes, edges };
-  }
-
-  const removedChatIds = new Set(collapsedClusters.flatMap((cluster) => cluster.chatIds));
-  const collapsedNodes = nodes.filter((node) => !removedChatIds.has(node.id));
-  const collapsedEdges = edges.filter(
-    (edge) => !removedChatIds.has(edge.source) && !removedChatIds.has(edge.target),
-  );
-
-  for (const cluster of collapsedClusters) {
-    const clusterId = `chat-group:${cluster.contactId}:${cluster.relation}:${cluster.direction}`;
-    const averageStrength =
-      cluster.strengths.reduce((sum, value) => sum + value, 0) / cluster.strengths.length;
-    const averageImportance =
-      cluster.importances.reduce((sum, value) => sum + value, 0) / cluster.importances.length;
-
-    collapsedNodes.push({
-      id: clusterId,
-      kind: "memory",
-      label: `${cluster.chatIds.length} Chat`,
-      url: null,
-      memory_type: "conversation",
-      importance: Math.max(5, Math.round(averageImportance)),
-    });
-
-    collapsedEdges.push({
-      source: cluster.direction === "chat-to-contact" ? clusterId : cluster.contactId,
-      target: cluster.direction === "chat-to-contact" ? cluster.contactId : clusterId,
-      relation: cluster.relation,
-      strength: Math.max(1, Math.min(3, Math.round(averageStrength))),
-    });
-  }
-
-  return { nodes: collapsedNodes, edges: collapsedEdges };
-}
-
 function normalizeGraph(graph: PublicGraphData) {
   const connectedNodeIds = new Set(graph.edges.flatMap((edge) => [edge.source, edge.target]));
   const nodes = graph.nodes
@@ -300,7 +212,7 @@ function normalizeGraph(graph: PublicGraphData) {
     }));
   const allowedIds = new Set(nodes.map((node) => node.id));
   const edges = graph.edges.filter((edge) => allowedIds.has(edge.source) && allowedIds.has(edge.target));
-  return collapseChatContactClusters(nodes, edges);
+  return { nodes, edges };
 }
 
 export function getMemoryGraphStats(graph: PublicGraphData) {
@@ -342,6 +254,10 @@ export function getMemoryGraphEdgeLegend(): MemoryGraphEdgeLegendItem[] {
 
 export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData): () => void {
   const normalized = normalizeGraph(graph);
+  const tooltip = document.createElement("div");
+  tooltip.className = "graph-tooltip";
+  tooltip.hidden = true;
+  container.appendChild(tooltip);
   const cy = cytoscape({
     container,
     elements: [
@@ -349,6 +265,8 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
         data: {
           id: node.id,
           label: shortenLabel(node.label),
+          fullLabel: capitalizeLabel(cleanLabel(node.label)),
+          typeLabel: publicNodeTypeLabel(node),
           color:
             (node.kind === "memory" && node.memory_type
               ? memoryTypeColors[node.memory_type.toLowerCase()]
@@ -412,5 +330,38 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
   });
   enforceNodeSpacing(cy, PUBLIC_MIN_NODE_DISTANCE);
 
-  return () => cy.destroy();
+  const showTooltip = (x: number, y: number, typeLabel: string, fullLabel: string) => {
+    tooltip.innerHTML = `
+      <div class="graph-tooltip-type">${typeLabel}</div>
+      <div class="graph-tooltip-label">${fullLabel}</div>
+    `;
+    tooltip.style.left = `${x + 18}px`;
+    tooltip.style.top = `${y + 18}px`;
+    tooltip.hidden = false;
+  };
+
+  const hideTooltip = () => {
+    tooltip.hidden = true;
+  };
+
+  cy.on("mouseover", "node", (event) => {
+    const position = event.target.renderedPosition();
+    showTooltip(
+      position.x,
+      position.y,
+      String(event.target.data("typeLabel") ?? ""),
+      String(event.target.data("fullLabel") ?? ""),
+    );
+  });
+  cy.on("mousemove", "node", (event) => {
+    const position = event.target.renderedPosition();
+    tooltip.style.left = `${position.x + 18}px`;
+    tooltip.style.top = `${position.y + 18}px`;
+  });
+  cy.on("mouseout", "node", hideTooltip);
+
+  return () => {
+    tooltip.remove();
+    cy.destroy();
+  };
 }

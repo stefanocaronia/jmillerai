@@ -642,9 +642,36 @@ a:visited {
 }
 
 .memory-graph-stage {
+  position: relative;
   min-height: 760px;
   margin-top: 14px;
   background: transparent;
+}
+
+.graph-tooltip {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+  max-width: 340px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(5, 9, 17, 0.96);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+.graph-tooltip-type {
+  color: var(--ink);
+  font-family: "Share Tech Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.graph-tooltip-label {
+  margin-top: 4px;
+  color: var(--ink-muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
 }
 
 .graph-legend-block {
