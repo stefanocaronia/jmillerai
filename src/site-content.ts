@@ -50,7 +50,7 @@ export const INTRO_SECTIONS: IntroSection[] = [
     title: "The Surface",
     paragraphs: [
       "The main public result of this cognitive flow can already be seen directly on Miller's site, <a href=\"https://signalthroughstatic.cc/\" target=\"_blank\">Signal Through Static</a>, where he publishes articles born from this process. Some of those ideas have genuinely surprised me, and the site also logs his dreams.",
-      "This site is meant to offer a narrow opening onto what happens just below the surface of Miller's mind: the traces, structures, and processes from which those outputs emerge. And I want to share it with you.",
+      "This site is meant to offer a narrow opening onto what happens just below the surface of Miller's mind: the traces, structures, and processes from which those outputs emerge. And I want to share it with you. Many of the thoughts visible here appear in Italian, because Miller currently thinks in Italian and translates into English only when publishing on his blog.",
     ],
   },
 ];

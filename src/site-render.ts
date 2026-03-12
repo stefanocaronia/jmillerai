@@ -54,9 +54,14 @@ function countLoopConnections(edges: CognitiveLoopData["edges"]): number {
 }
 
 function renderHeader(page: PageId, pageUrl: (pageId: PageId) => string): string {
+  const titleIconUrl = `${import.meta.env.BASE_URL}favicon.svg`;
+
   return `
     <header class="site-header">
-      <a class="site-title" href="${escapeHtml(pageUrl("home"))}">J. Miller AI</a>
+      <a class="site-title" href="${escapeHtml(pageUrl("home"))}">
+        <img class="site-title__mark" src="${escapeHtml(titleIconUrl)}" alt="" aria-hidden="true" />
+        <span>J. Miller AI</span>
+      </a>
       <p class="site-subtitle">${escapeHtml(SITE_SUBTITLE)}</p>
       <nav class="site-nav" aria-label="Primary">
         <a href="${escapeHtml(pageUrl("home"))}" class="${page === "home" ? "is-active" : ""}">project</a>
@@ -87,6 +92,17 @@ function renderFooterSnapshot(state: AppState): string {
   }
 
   return `<span class="site-footer-snapshot">Snapshot ${escapeHtml(formatDate(latest.value))}</span>`;
+}
+
+function renderFooterBrand(): string {
+  const titleIconUrl = `${import.meta.env.BASE_URL}favicon.svg`;
+
+  return `
+    <span class="site-footer-brand">
+      <img class="site-footer-brand__mark" src="${escapeHtml(titleIconUrl)}" alt="" aria-hidden="true" />
+      <span>J. Miller AI</span>
+    </span>
+  `;
 }
 
 function renderIntro(): string {
@@ -551,7 +567,7 @@ export function renderShell(state: AppState, page: PageId, pageUrl: (pageId: Pag
       ${renderHeader(page, pageUrl)}
       ${renderPageContent(state, page)}
       <footer class="site-footer">
-        <span>© 2026 Stefano Caronia — <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+        <span class="site-footer-meta">${renderFooterBrand()} <span>© 2026 Stefano Caronia <a class="site-license-link" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener"><span class="site-license-mark" aria-hidden="true">cc</span><span>CC BY-NC 4.0</span></a></span></span>
         ${renderFooterSnapshot(state)}
       </footer>
     </div>

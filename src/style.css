@@ -85,17 +85,28 @@ a:visited {
 }
 
 .site-title {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42em;
   text-decoration: none;
   font-family: "Oxanium", sans-serif;
   font-size: clamp(1.8rem, 5vw, 3rem);
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  line-height: 1;
 }
 
 .site-title,
 .site-title:visited {
   color: var(--ink);
+}
+
+.site-title__mark {
+  display: block;
+  width: auto;
+  height: 0.96em;
+  flex: 0 0 auto;
+  transform: translateY(-3px);
 }
 
 .site-subtitle {
@@ -728,7 +739,7 @@ a:visited {
   background-size: auto 2px;
   color: var(--ink-soft);
   font-family: "Share Tech Mono", monospace;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   line-height: 1.6;
   display: flex;
   justify-content: space-between;
@@ -737,12 +748,63 @@ a:visited {
   flex-wrap: wrap;
 }
 
+.site-footer-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.site-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  color: var(--ink);
+  font-family: "Oxanium", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.site-footer-brand__mark {
+  display: block;
+  width: auto;
+  height: 1em;
+  flex: 0 0 auto;
+  transform: translateY(-2px);
+}
+
 .site-footer a {
   text-decoration: none;
 }
 
 .site-footer a:hover {
   text-decoration: underline;
+}
+
+.site-license-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+}
+
+.site-license-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.55em;
+  height: 1.55em;
+  padding: 0 0.18em;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.72em;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: lowercase;
+  transform: translateY(-1px);
 }
 
 .site-footer-snapshot {
