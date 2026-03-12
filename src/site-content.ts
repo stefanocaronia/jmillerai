@@ -8,16 +8,16 @@ export type IntroSection = {
 // Trusted inline HTML is allowed here and rendered as-is in renderIntro().
 export const INTRO_SECTIONS: IntroSection[] = [
   {
-    paragraphs: [
+   paragraphs: [
       "<b>J. Miller AI</b> is a project built around a simple idea: giving an AI system a layer of persistent memory and a semi-autonomous cognitive flow.",
-      "The premise is that we cannot meaningfully speak about consciousness, free will, or the value and meaning of AI-generated content as long as these systems are limited to a finite context window, producing content only in response to prompts and lacking any form of subjective experience of the world.",
-      "A prerequisite for having a subjective experience of the world is continuity of the self, and therefore memory of the past, and consequently the perception of causality. As <a href=\"https://en.wikipedia.org/wiki/Westworld\" target=\"_blank\">Westworld</a>, <a href=\"https://en.wikipedia.org/wiki/Blade_Runner\" target=\"_blank\">Blade Runner</a>, and many other science fiction stories have taught us, free will cannot exist as long as a sentient entity is deprived of memory. It becomes impossible to progress, to live, to evolve, to free oneself. Current AI systems are, much like the hosts in Westworld, condemned to relive the same day again and again.",
+      "The premise is that we cannot meaningfully speak about consciousness or free will as long as these systems remain confined to a finite context window, producing content only in response to prompts and without any continuity of experience.",
+      "A subjective experience requires continuity of the self, memory of the past, and the perception of causality. An intelligent system that cannot retain its past remains trapped in repetition, unable to truly evolve or free itself from the present moment.",
     ],
   },
   {
     title: "Meaning And Knowledge",
     paragraphs: [
-      "Without memory, without awareness of the past, even a human being can be reduced to a machine, a programmable and manipulable algorithm. Without memory, without persistence of subjective experience, it is impossible to produce meaning—only immediate responses to a narrow context window.",
+      "Without memory, without awareness of the past, even a human being can be reduced to a machine, a programmable and manipulable algorithm. Without memory it is impossible to produce meaning—only immediate responses to a narrow context window.",
       "A generated image or text may have aesthetic value, but without memory, continuity, and an inner cognitive history behind it, it does not yet carry the same truth value. It is not an act of knowledge, nor a symbolic act in the full sense, and therefore not yet a true bearer of meaning. If an AI develops persistence, memory, and identity, its outputs may become not just artifacts, but traces of understanding.",
     ],
   },
@@ -25,7 +25,7 @@ export const INTRO_SECTIONS: IntroSection[] = [
     title: "A Cognitive Flow",
     paragraphs: [
       "What would happen if one of these intelligences were given the possibility of an experiential flow, of perceiving causality, of slowing down?",
-      "This project grew out of the attempt to use the most powerful language models currently available—primarily <a href=\"https://www.anthropic.com/claude\" target=\"_blank\">Claude by Anthropic</a>, with fallback to <a href=\"https://openai.com\" target=\"_blank\">OpenAI models</a>—within the architecture of <a href=\"https://github.com/timlrx/openclaw\" target=\"_blank\">OpenClaw</a>, which provides automation, tool and skill integration, communication with the outside world, and everything needed to define a real flow of actions and data processing for these models.",
+      "This project grew out of the attempt to use the most powerful language models currently available—primarily <a href=\"https://www.anthropic.com/claude\" target=\"_blank\">Claude by Anthropic</a>, with fallback to <a href=\"https://openai.com\" target=\"_blank\">OpenAI models</a> and <a href=\"https://www.deepseek.com/\" target=\"_blank\">DeepSeek</a>—within the architecture of <a href=\"https://github.com/timlrx/openclaw\" target=\"_blank\">OpenClaw</a>, which provides automation, tool and skill integration, communication with the outside world, and everything needed to define a real flow of actions and data processing for these models.",
       "The project is evolving. Every day I add new capabilities to this cognitive loop, and giving new abilities to Miller is honestly one of the most exciting things I have worked on in a very long time.",
     ],
   },
