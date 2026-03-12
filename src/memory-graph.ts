@@ -57,12 +57,12 @@ const memoryTypeColors: Record<string, string> = {
 
 const relationColors: Record<string, string> = {
   came_from: "#8f8f8f",
-  extends: "#c3c3c3",
+  extends: "#46d9ff",
   contradicts: "#d14b4b",
-  about: "#8f8f8f",
+  about: "#60a5fa",
   inspired: "#ff7a00",
   continues: "#f2f2f2",
-  relates_to: "#787878",
+  relates_to: "#b07cff",
 };
 
 function cleanLabel(label: string): string {
@@ -79,7 +79,13 @@ function capitalizeLabel(label: string): string {
 
 export function presentPublicNodeLabel(node: Pick<PublicGraphNode, "kind" | "label" | "memory_type">): string {
   if (node.kind === "friend") return "Contact";
-  if (node.kind === "memory" && node.memory_type === "conversation") return "Chat";
+  if (node.kind === "memory" && node.memory_type === "conversation") {
+    const normalized = cleanLabel(node.label);
+    if (/^\d+\s+chat$/i.test(normalized)) {
+      return capitalizeLabel(normalized);
+    }
+    return "Chat";
+  }
   return capitalizeLabel(cleanLabel(node.label));
 }
 
@@ -115,7 +121,99 @@ function shortenLabel(label: string): string {
     }
   }
   trimmed = cleanLabel(trimmed);
-  return `${trimmed}…`;
+  return trimmed;
+}
+
+function collapseChatContactClusters(nodes: PublicGraphNode[], edges: PublicGraphEdge[]) {
+  const nodeById = new Map(nodes.map((node) => [node.id, node]));
+  const degrees = new Map<string, number>();
+  for (const edge of edges) {
+    degrees.set(edge.source, (degrees.get(edge.source) ?? 0) + 1);
+    degrees.set(edge.target, (degrees.get(edge.target) ?? 0) + 1);
+  }
+
+  type ChatCluster = {
+    contactId: string;
+    relation: string;
+    direction: "chat-to-contact" | "contact-to-chat";
+    chatIds: string[];
+    strengths: number[];
+  };
+
+  const clusters = new Map<string, ChatCluster>();
+
+  for (const edge of edges) {
+    const sourceNode = nodeById.get(edge.source);
+    const targetNode = nodeById.get(edge.target);
+    if (!sourceNode || !targetNode) continue;
+
+    let chatNode: PublicGraphNode | null = null;
+    let contactNode: PublicGraphNode | null = null;
+    let direction: ChatCluster["direction"] | null = null;
+
+    if (sourceNode.kind === "memory" && sourceNode.memory_type === "conversation" && targetNode.kind === "friend") {
+      chatNode = sourceNode;
+      contactNode = targetNode;
+      direction = "chat-to-contact";
+    } else if (
+      targetNode.kind === "memory" &&
+      targetNode.memory_type === "conversation" &&
+      sourceNode.kind === "friend"
+    ) {
+      chatNode = targetNode;
+      contactNode = sourceNode;
+      direction = "contact-to-chat";
+    }
+
+    if (!chatNode || !contactNode || !direction) continue;
+    if ((degrees.get(chatNode.id) ?? 0) !== 1) continue;
+
+    const clusterKey = [contactNode.id, edge.relation, direction].join("::");
+    const cluster = clusters.get(clusterKey) ?? {
+      contactId: contactNode.id,
+      relation: edge.relation,
+      direction,
+      chatIds: [],
+      strengths: [],
+    };
+    cluster.chatIds.push(chatNode.id);
+    cluster.strengths.push(edge.strength);
+    clusters.set(clusterKey, cluster);
+  }
+
+  const collapsedClusters = Array.from(clusters.values()).filter((cluster) => cluster.chatIds.length >= 2);
+  if (collapsedClusters.length === 0) {
+    return { nodes, edges };
+  }
+
+  const removedChatIds = new Set(collapsedClusters.flatMap((cluster) => cluster.chatIds));
+  const collapsedNodes = nodes.filter((node) => !removedChatIds.has(node.id));
+  const collapsedEdges = edges.filter(
+    (edge) => !removedChatIds.has(edge.source) && !removedChatIds.has(edge.target),
+  );
+
+  for (const cluster of collapsedClusters) {
+    const clusterId = `chat-group:${cluster.contactId}:${cluster.relation}:${cluster.direction}`;
+    const averageStrength =
+      cluster.strengths.reduce((sum, value) => sum + value, 0) / cluster.strengths.length;
+
+    collapsedNodes.push({
+      id: clusterId,
+      kind: "memory",
+      label: `${cluster.chatIds.length} Chat`,
+      url: null,
+      memory_type: "conversation",
+    });
+
+    collapsedEdges.push({
+      source: cluster.direction === "chat-to-contact" ? clusterId : cluster.contactId,
+      target: cluster.direction === "chat-to-contact" ? cluster.contactId : clusterId,
+      relation: cluster.relation,
+      strength: Math.max(1, Math.min(3, Math.round(averageStrength))),
+    });
+  }
+
+  return { nodes: collapsedNodes, edges: collapsedEdges };
 }
 
 function normalizeGraph(graph: PublicGraphData) {
@@ -132,7 +230,7 @@ function normalizeGraph(graph: PublicGraphData) {
     }));
   const allowedIds = new Set(nodes.map((node) => node.id));
   const edges = graph.edges.filter((edge) => allowedIds.has(edge.source) && allowedIds.has(edge.target));
-  return { nodes, edges };
+  return collapseChatContactClusters(nodes, edges);
 }
 
 export function getMemoryGraphStats(graph: PublicGraphData) {

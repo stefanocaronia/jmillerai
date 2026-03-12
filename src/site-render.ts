@@ -439,6 +439,7 @@ function renderMemoryGraphBlock(graph: FeedState<PublicGraphData>): string {
         <span class="section-meta">${escapeHtml(formatDate(graph.data.generated_at))}</span>
       </div>
       <p class="body-copy">Current snapshot: ${stats.visibleNodes} visible nodes, ${stats.visibleEdges} visible edges.</p>
+      <div id="memory-graph-stage" class="memory-graph-stage"></div>
       <div class="graph-legend-block" aria-label="Memory graph legends">
         <div>
           <div class="graph-legend-title">Node types</div>
@@ -463,7 +464,6 @@ function renderMemoryGraphBlock(graph: FeedState<PublicGraphData>): string {
           </div>
         </div>
       </div>
-      <div id="memory-graph-stage" class="memory-graph-stage"></div>
     </section>
   `;
 }
