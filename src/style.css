@@ -646,6 +646,20 @@ a:visited {
   background: transparent;
 }
 
+.graph-legend-block {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.graph-legend-title {
+  color: var(--ink-muted);
+  font-family: "Share Tech Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .graph-legend {
   display: flex;
   flex-wrap: wrap;
@@ -670,6 +684,34 @@ a:visited {
   border-radius: 999px;
   background: var(--legend-color, var(--accent));
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.graph-edge-legend {
+  position: relative;
+  display: inline-block;
+  width: 18px;
+  height: 9px;
+  flex: 0 0 18px;
+}
+
+.graph-edge-legend::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 3px;
+  width: 13px;
+  height: 2px;
+  background: var(--legend-color, var(--accent));
+}
+
+.graph-edge-legend::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 1px;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-left: 6px solid var(--legend-color, var(--accent));
 }
 
 .loop-graph-stage {

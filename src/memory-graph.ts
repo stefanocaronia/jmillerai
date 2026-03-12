@@ -29,6 +29,12 @@ export type MemoryGraphLegendItem = {
   color: string;
 };
 
+export type MemoryGraphEdgeLegendItem = {
+  key: string;
+  label: string;
+  color: string;
+};
+
 const kindColors: Record<string, string> = {
   memory: "#f2f2f2",
   book: "#7dd3fc",
@@ -110,7 +116,11 @@ function shortenLabel(label: string): string {
 function normalizeGraph(graph: PublicGraphData) {
   const connectedNodeIds = new Set(graph.edges.flatMap((edge) => [edge.source, edge.target]));
   const nodes = graph.nodes
-    .filter((node) => connectedNodeIds.has(node.id))
+    .filter(
+      (node) =>
+        connectedNodeIds.has(node.id) &&
+        !(node.kind === "memory" && node.memory_type === "heartbeat"),
+    )
     .map((node) => ({
       ...node,
       label: presentPublicNodeLabel(node),
@@ -134,7 +144,6 @@ export function getMemoryGraphLegend(): MemoryGraphLegendItem[] {
     { key: "experience", label: "Experience", color: memoryTypeColors.experience },
     { key: "reading", label: "Reading", color: memoryTypeColors.reading },
     { key: "dream", label: "Dream", color: memoryTypeColors.dream },
-    { key: "heartbeat", label: "Heartbeat", color: memoryTypeColors.heartbeat },
     { key: "belief", label: "Belief", color: memoryTypeColors.belief },
     { key: "trade", label: "Trade", color: memoryTypeColors.trade },
     { key: "summary", label: "Summary", color: memoryTypeColors.summary },
@@ -142,6 +151,18 @@ export function getMemoryGraphLegend(): MemoryGraphLegendItem[] {
     { key: "book", label: "Book", color: kindColors.book },
     { key: "source", label: "Source", color: kindColors.source },
     { key: "blog-post", label: "Blog post", color: kindColors.blog_post },
+  ];
+}
+
+export function getMemoryGraphEdgeLegend(): MemoryGraphEdgeLegendItem[] {
+  return [
+    { key: "came_from", label: "Came from", color: relationColors.came_from },
+    { key: "extends", label: "Extends", color: relationColors.extends },
+    { key: "inspired", label: "Inspired", color: relationColors.inspired },
+    { key: "about", label: "About", color: relationColors.about },
+    { key: "continues", label: "Continues", color: relationColors.continues },
+    { key: "relates_to", label: "Relates to", color: relationColors.relates_to },
+    { key: "contradicts", label: "Contradicts", color: relationColors.contradicts },
   ];
 }
 
@@ -201,6 +222,9 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
           width: "mapData(strength, 1, 3, 1, 3)",
           "line-color": "data(edgeColor)",
           "curve-style": "bezier",
+          "target-arrow-shape": "triangle",
+          "target-arrow-color": "data(edgeColor)",
+          "arrow-scale": 0.85,
           opacity: 0.9,
         },
       },
