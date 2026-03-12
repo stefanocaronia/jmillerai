@@ -66,7 +66,7 @@ const relationColors: Record<string, string> = {
   relates_to: "#b07cff",
 };
 
-const PUBLIC_MIN_NODE_DISTANCE = 68;
+const PUBLIC_MIN_NODE_DISTANCE = 84;
 
 function cleanLabel(label: string): string {
   return label
@@ -132,7 +132,7 @@ function shortenLabel(label: string): string {
 function nodeSizeForImportance(node: PublicGraphNode): number {
   const raw = Number(node.importance ?? 5);
   const importance = Number.isFinite(raw) ? Math.max(1, Math.min(10, raw)) : 5;
-  return 12 + (importance - 1) * 1.8;
+  return 16 + (importance - 1) * 2.6;
 }
 
 function enforceNodeSpacing(cy: cytoscape.Core, minDistance: number) {
@@ -191,7 +191,7 @@ function collapseChatContactClusters(nodes: PublicGraphNode[], edges: PublicGrap
     degrees.set(edge.target, (degrees.get(edge.target) ?? 0) + 1);
   }
 
-type ChatCluster = {
+  type ChatCluster = {
     contactId: string;
     relation: string;
     direction: "chat-to-contact" | "contact-to-chat";
@@ -367,11 +367,11 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
       name: "cose",
       animate: false,
       fit: true,
-      padding: 28,
-      nodeRepulsion: 160000,
-      idealEdgeLength: 88,
-      componentSpacing: 104,
-      nodeOverlap: 20,
+      padding: 36,
+      nodeRepulsion: 240000,
+      idealEdgeLength: 112,
+      componentSpacing: 138,
+      nodeOverlap: 28,
     },
     style: [
       {
@@ -380,11 +380,11 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
           "background-color": "data(color)",
           label: "data(label)",
           color: "#f2f2f2",
-          "font-size": 9,
+          "font-size": 11,
           "text-wrap": "wrap",
-          "text-max-width": "110px",
+          "text-max-width": "144px",
           "text-valign": "bottom",
-          "text-margin-y": 8,
+          "text-margin-y": 10,
           width: "data(size)",
           height: "data(size)",
           "border-width": 0,
@@ -393,12 +393,12 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
       {
         selector: "edge",
         style: {
-          width: "mapData(strength, 1, 3, 1, 3)",
+          width: "mapData(strength, 1, 3, 2, 4.8)",
           "line-color": "data(edgeColor)",
           "curve-style": "bezier",
           "target-arrow-shape": "triangle",
           "target-arrow-color": "data(edgeColor)",
-          "arrow-scale": 0.85,
+          "arrow-scale": 1.3,
           opacity: 0.9,
         },
       },
