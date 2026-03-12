@@ -66,6 +66,17 @@ function cleanLabel(label: string): string {
     .trim();
 }
 
+function capitalizeLabel(label: string): string {
+  if (!label) return label;
+  return `${label.charAt(0).toLocaleUpperCase()}${label.slice(1)}`;
+}
+
+export function presentPublicNodeLabel(node: Pick<PublicGraphNode, "kind" | "label" | "memory_type">): string {
+  if (node.kind === "friend") return "Contact";
+  if (node.kind === "memory" && node.memory_type === "conversation") return "Conversation";
+  return capitalizeLabel(cleanLabel(node.label));
+}
+
 function shortenLabel(label: string): string {
   const maxChars = 22;
   const normalized = cleanLabel(label);
@@ -102,12 +113,7 @@ function normalizeGraph(graph: PublicGraphData) {
     .filter((node) => connectedNodeIds.has(node.id))
     .map((node) => ({
       ...node,
-      label:
-        node.kind === "friend"
-          ? "CONTACT"
-          : node.kind === "memory" && node.memory_type === "conversation"
-            ? "CONVERSATION"
-            : cleanLabel(node.label),
+      label: presentPublicNodeLabel(node),
     }));
   const allowedIds = new Set(nodes.map((node) => node.id));
   const edges = graph.edges.filter((edge) => allowedIds.has(edge.source) && allowedIds.has(edge.target));

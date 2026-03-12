@@ -1,5 +1,5 @@
 import { isLoopDebugEnabled, projectLoopGraph, type CognitiveLoopData } from "./cognitive-loop";
-import { getMemoryGraphLegend, getMemoryGraphStats, type PublicGraphData } from "./memory-graph";
+import { getMemoryGraphLegend, getMemoryGraphStats, presentPublicNodeLabel, type PublicGraphData } from "./memory-graph";
 import { CONTACT_SECTIONS, INTRO_SECTIONS, SITE_SUBTITLE } from "./site-content";
 import type { AppState, BlogFeedData, BlogFeedKind, BookData, FeedState, PageId, ReadingFeedData, StatusData, ThinkingFeedData } from "./site-types";
 import { escapeHtml, formatDate, parseDate, summarizeText } from "./site-utils";
@@ -394,7 +394,7 @@ function renderLastMemories(graph: FeedState<PublicGraphData>): string {
         ${memories.map((node) => `
           <li class="node-list-item">
             <span class="kind-badge${badgeClass(node.memory_type ?? node.kind)}">${escapeHtml(node.memory_type ?? node.kind)}</span>
-            <span class="node-list-label">${escapeHtml(node.label)}</span>
+            <span class="node-list-label">${escapeHtml(presentPublicNodeLabel(node))}</span>
           </li>
         `).join("")}
       </ul>
