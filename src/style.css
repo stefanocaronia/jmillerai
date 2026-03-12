@@ -530,7 +530,8 @@ a:visited {
   color: var(--memory-dream);
 }
 
-.kind-badge--conversation {
+.kind-badge--conversation,
+.kind-badge--chat {
   border-color: var(--memory-conversation);
   color: var(--memory-conversation);
 }
@@ -641,7 +642,7 @@ a:visited {
 }
 
 .memory-graph-stage {
-  min-height: 520px;
+  min-height: 650px;
   margin-top: 14px;
   background: transparent;
 }

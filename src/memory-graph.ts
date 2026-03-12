@@ -79,8 +79,13 @@ function capitalizeLabel(label: string): string {
 
 export function presentPublicNodeLabel(node: Pick<PublicGraphNode, "kind" | "label" | "memory_type">): string {
   if (node.kind === "friend") return "Contact";
-  if (node.kind === "memory" && node.memory_type === "conversation") return "Conversation";
+  if (node.kind === "memory" && node.memory_type === "conversation") return "Chat";
   return capitalizeLabel(cleanLabel(node.label));
+}
+
+export function presentPublicMemoryTypeLabel(memoryType: string | null | undefined): string {
+  if (!memoryType) return "memory";
+  return memoryType === "conversation" ? "chat" : memoryType;
 }
 
 function shortenLabel(label: string): string {
@@ -144,6 +149,7 @@ export function getMemoryGraphLegend(): MemoryGraphLegendItem[] {
     { key: "experience", label: "Experience", color: memoryTypeColors.experience },
     { key: "reading", label: "Reading", color: memoryTypeColors.reading },
     { key: "dream", label: "Dream", color: memoryTypeColors.dream },
+    { key: "chat", label: "Chat", color: memoryTypeColors.conversation },
     { key: "belief", label: "Belief", color: memoryTypeColors.belief },
     { key: "trade", label: "Trade", color: memoryTypeColors.trade },
     { key: "summary", label: "Summary", color: memoryTypeColors.summary },

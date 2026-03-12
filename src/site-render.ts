@@ -3,6 +3,7 @@ import {
   getMemoryGraphEdgeLegend,
   getMemoryGraphLegend,
   getMemoryGraphStats,
+  presentPublicMemoryTypeLabel,
   presentPublicNodeLabel,
   type PublicGraphData,
 } from "./memory-graph";
@@ -387,7 +388,7 @@ function renderLastMemories(graph: FeedState<PublicGraphData>): string {
       const rightTime = parseDate(right.timestamp) ?? 0;
       return rightTime - leftTime;
     })
-    .slice(0, 12);
+    .slice(0, 18);
 
   return `
     <section class="section-block">
@@ -397,12 +398,19 @@ function renderLastMemories(graph: FeedState<PublicGraphData>): string {
       </div>
       <p class="body-copy">${memories.length} public memory nodes from the latest exported graph snapshot.</p>
       <ul class="node-list">
-        ${memories.map((node) => `
-          <li class="node-list-item">
-            <span class="kind-badge${badgeClass(node.memory_type ?? node.kind)}">${escapeHtml(node.memory_type ?? node.kind)}</span>
-            <span class="node-list-label">${escapeHtml(presentPublicNodeLabel(node))}</span>
-          </li>
-        `).join("")}
+        ${memories.map((node) => {
+          const label = node.memory_type === "conversation"
+            ? "Chat with a friend contact"
+            : presentPublicNodeLabel(node);
+          const badgeLabel = presentPublicMemoryTypeLabel(node.memory_type ?? node.kind);
+
+          return `
+            <li class="node-list-item">
+              <span class="kind-badge${badgeClass(badgeLabel)}">${escapeHtml(badgeLabel)}</span>
+              <span class="node-list-label">${escapeHtml(label)}</span>
+            </li>
+          `;
+        }).join("")}
       </ul>
     </section>
   `;
