@@ -2,8 +2,7 @@ import "./style.css";
 import { mountCognitiveLoop } from "./cognitive-loop";
 import { mountMemoryGraph } from "./memory-graph";
 import { loadState } from "./site-data";
-import { applyPageMeta } from "./site-meta";
-import { renderShell, applyProgressMeters } from "./site-render";
+import { renderShell, applyProgressMeters, applySpoilerToggles } from "./site-render";
 import type { PageId } from "./site-types";
 
 const appRoot = document.querySelector<HTMLDivElement>("#app");
@@ -28,13 +27,13 @@ const feedUrl = (name: string) =>
 const pageUrl = (pageId: PageId): string => (pageId === "home" ? baseUrl : `${baseUrl}${pageId}/`);
 
 async function start() {
-  applyPageMeta(page);
   app.innerHTML = `<div class="loading">Loading public snapshots...</div>`;
   const state = await loadState(feedUrl);
   unmountGraph?.();
   unmountGraph = null;
   app.innerHTML = renderShell(state, page, pageUrl);
   applyProgressMeters(app);
+  applySpoilerToggles(app);
   if (page === "loop" && state.cognitiveLoop.data) {
     const container = document.querySelector<HTMLElement>("#cognitive-loop-stage");
     if (container) {

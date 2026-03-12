@@ -55,7 +55,8 @@ body::before {
   background-size: 100% 5px, 5px 100%;
 }
 
-a {
+a,
+a:visited {
   color: inherit;
 }
 
@@ -92,6 +93,11 @@ a {
   text-transform: uppercase;
 }
 
+.site-title,
+.site-title:visited {
+  color: var(--ink);
+}
+
 .site-subtitle {
   margin: 6px 0 0;
   color: var(--ink-muted);
@@ -113,7 +119,12 @@ a {
   color: var(--ink-soft);
 }
 
+.site-nav a:visited {
+  color: var(--ink-soft);
+}
+
 .site-nav a.is-active,
+.site-nav a.is-active:visited,
 .site-nav a:hover {
   color: var(--accent);
 }
@@ -212,6 +223,95 @@ a {
 .text-flow {
   display: grid;
   gap: 14px;
+}
+
+.intro-section {
+  display: grid;
+  gap: 12px;
+  padding-top: 12px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.18) 0 8px,
+    transparent 8px 14px
+  );
+  background-position: top left;
+  background-repeat: repeat-x;
+  background-size: auto 1px;
+}
+
+.intro-section:first-child {
+  padding-top: 0;
+  background: none;
+}
+
+.intro-section a,
+.intro-section a:visited {
+  color: var(--accent);
+}
+
+.spoiler-block {
+  display: inline;
+  margin: 0;
+}
+
+.spoiler-toggle {
+  appearance: none;
+  display: inline-block;
+  vertical-align: baseline;
+  min-width: 9ch;
+  margin: 0 0.18em;
+  border: 1px solid var(--accent);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 122, 0, 0.16) 0 3px,
+      rgba(255, 122, 0, 0.06) 3px 6px,
+      transparent 6px 9px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 122, 0, 0.12) 0 3px,
+      transparent 3px 6px,
+      rgba(255, 122, 0, 0.05) 6px 9px
+    );
+  background-size: 18px 18px, 22px 22px;
+  color: var(--accent);
+  font-family: "Share Tech Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  padding: 1px 6px;
+  cursor: pointer;
+  animation: spoiler-noise-drift 14s linear infinite;
+}
+
+.spoiler-toggle:hover {
+  background-color: rgba(255, 122, 0, 0.03);
+}
+
+.spoiler-toggle:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.spoiler-content {
+  display: inline;
+  color: var(--ink-soft);
+}
+
+.spoiler-content[hidden] {
+  display: none !important;
+}
+
+@keyframes spoiler-noise-drift {
+  from {
+    background-position: 0 0, 0 0;
+  }
+
+  to {
+    background-position: 24px 0, 0 28px;
+  }
 }
 
 .progress-meter {

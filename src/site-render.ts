@@ -1,6 +1,6 @@
 import { isLoopDebugEnabled, projectLoopGraph, type CognitiveLoopData } from "./cognitive-loop";
 import type { PublicGraphData } from "./memory-graph";
-import { CONTACT_SECTIONS, INTRO_PARAGRAPHS, SITE_SUBTITLE } from "./site-content";
+import { CONTACT_SECTIONS, INTRO_SECTIONS, SITE_SUBTITLE } from "./site-content";
 import type { AppState, BlogFeedData, BlogFeedKind, BookData, FeedState, PageId, ReadingFeedData, StatusData, ThinkingFeedData } from "./site-types";
 import { escapeHtml, formatDate, parseDate, summarizeText } from "./site-utils";
 
@@ -59,7 +59,8 @@ function renderHeader(page: PageId, pageUrl: (pageId: PageId) => string): string
       <a class="site-title" href="${escapeHtml(pageUrl("home"))}">J. Miller AI</a>
       <p class="site-subtitle">${escapeHtml(SITE_SUBTITLE)}</p>
       <nav class="site-nav" aria-label="Primary">
-        <a href="${escapeHtml(pageUrl("home"))}" class="${page === "home" ? "is-active" : ""}">traces</a>
+        <a href="${escapeHtml(pageUrl("home"))}" class="${page === "home" ? "is-active" : ""}">project</a>
+        <a href="${escapeHtml(pageUrl("traces"))}" class="${page === "traces" ? "is-active" : ""}">traces</a>
         <a href="${escapeHtml(pageUrl("loop"))}" class="${page === "loop" ? "is-active" : ""}">loop</a>
         <a href="${escapeHtml(pageUrl("memory"))}" class="${page === "memory" ? "is-active" : ""}">memory</a>
         <a href="${escapeHtml(pageUrl("contacts"))}" class="${page === "contacts" ? "is-active" : ""}">contacts</a>
@@ -92,7 +93,18 @@ function renderIntro(): string {
   return `
     <section class="section-block">
       <div class="text-flow">
-        ${INTRO_PARAGRAPHS.map((paragraph) => `<p class="body-copy">${escapeHtml(paragraph)}</p>`).join("")}
+        ${INTRO_SECTIONS.map((section) => `
+          <article class="intro-section">
+            ${section.title ? `
+              <div class="section-line">
+                <span class="section-name">${escapeHtml(section.title)}</span>
+              </div>
+            ` : ""}
+            <div class="text-flow">
+              ${section.paragraphs.map((paragraph) => `<p class="body-copy">${paragraph}</p>`).join("")}
+            </div>
+          </article>
+        `).join("")}
       </div>
     </section>
   `;
@@ -179,29 +191,6 @@ function renderReadingArchive(book: FeedState<BookData>): string {
           </li>
         `).join("")}
       </ul>
-    </section>
-  `;
-}
-
-function renderActiveThreads(status: FeedState<StatusData>): string {
-  if (!status.data) {
-    return `
-      <section class="section-block">
-        <div class="section-line">
-          <span class="section-name">Active threads</span>
-        </div>
-        ${renderFeedError(status, "status feed")}
-      </section>
-    `;
-  }
-
-  return `
-    <section class="section-block">
-      <div class="section-line">
-        <span class="section-name">Active threads</span>
-        <span class="section-meta">${escapeHtml(status.data.mode)}</span>
-      </div>
-      ${renderTagList(status.data.active_threads)}
     </section>
   `;
 }
@@ -507,13 +496,17 @@ function renderContactsPage(): string {
   `).join("");
 }
 
-function renderHomePage(state: AppState): string {
+function renderProjectPage(): string {
   return `
     ${renderIntro()}
+  `;
+}
+
+function renderTracesPage(state: AppState): string {
+  return `
     ${renderCurrentState(state.status)}
     ${renderCurrentlyReading(state.book)}
     ${renderReadingArchive(state.book)}
-    ${renderActiveThreads(state.status)}
     ${renderReadingTrace(state.readingFeed)}
     ${renderThinkingFeed(state.thinkingFeed)}
     ${renderBlog(state.signalsFeed, state.dreamsFeed)}
@@ -529,6 +522,14 @@ function renderMapPage(state: AppState): string {
 }
 
 function renderPageContent(state: AppState, page: PageId): string {
+  if (page === "home") {
+    return renderProjectPage();
+  }
+
+  if (page === "traces") {
+    return renderTracesPage(state);
+  }
+
   if (page === "loop") {
     return renderLoopPage(state.cognitiveLoop);
   }
@@ -541,7 +542,7 @@ function renderPageContent(state: AppState, page: PageId): string {
     return renderContactsPage();
   }
 
-  return renderHomePage(state);
+  return renderProjectPage();
 }
 
 export function renderShell(state: AppState, page: PageId, pageUrl: (pageId: PageId) => string): string {
@@ -562,5 +563,33 @@ export function applyProgressMeters(root: ParentNode): void {
     const raw = Number(element.dataset.progress ?? "0");
     const progress = Math.max(0, Math.min(100, Number.isFinite(raw) ? raw : 0));
     element.style.width = `${progress}%`;
+  });
+}
+
+export function applySpoilerToggles(root: ParentNode): void {
+  if (!(root instanceof HTMLElement) || root.dataset.spoilerBound === "true") {
+    return;
+  }
+
+  root.dataset.spoilerBound = "true";
+  root.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    const button = target.closest<HTMLElement>("[data-spoiler-toggle]");
+    if (!button || !root.contains(button)) {
+      return;
+    }
+
+    const wrapper = button.closest<HTMLElement>("[data-spoiler]");
+    const content = wrapper?.querySelector<HTMLElement>("[data-spoiler-content]");
+    if (!wrapper || !content) {
+      return;
+    }
+
+    button.remove();
+    content.hidden = false;
   });
 }
