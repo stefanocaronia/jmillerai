@@ -8,6 +8,7 @@ export type PublicGraphNode = {
   timestamp?: string | null;
   memory_type?: string | null;
   importance?: number | null;
+  contact_label?: string | null;
 };
 
 export type PublicGraphEdge = {
@@ -88,7 +89,7 @@ function capitalizeLabel(label: string): string {
 }
 
 export function presentPublicNodeLabel(node: Pick<PublicGraphNode, "kind" | "label" | "memory_type">): string {
-  if (node.kind === "friend") return "Contact";
+  if (node.kind === "friend") return capitalizeLabel(cleanLabel(node.label));
   if (node.kind === "memory" && node.memory_type === "conversation") {
     const normalized = cleanLabel(node.label);
     if (/^\d+\s+chat$/i.test(normalized)) {
@@ -114,8 +115,10 @@ function publicNodeTypeLabel(node: Pick<PublicGraphNode, "kind" | "memory_type">
   return capitalizeLabel(node.kind.replace(/_/g, " "));
 }
 
-function publicNodeHoverLabel(node: Pick<PublicGraphNode, "kind" | "label" | "memory_type">): string {
-  if (node.kind === "friend") return "Friend Contact";
+function publicNodeHoverLabel(node: Pick<PublicGraphNode, "kind" | "label" | "memory_type" | "contact_label">): string {
+  if (node.kind === "friend") {
+    return node.contact_label ? `Friend ${node.contact_label}` : "Friend Contact";
+  }
   if (node.kind === "memory" && node.memory_type === "conversation") {
     return capitalizeLabel(cleanLabel(node.label));
   }
