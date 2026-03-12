@@ -97,7 +97,9 @@ function shortenLabel(label: string): string {
 }
 
 function normalizeGraph(graph: PublicGraphData) {
+  const connectedNodeIds = new Set(graph.edges.flatMap((edge) => [edge.source, edge.target]));
   const nodes = graph.nodes
+    .filter((node) => connectedNodeIds.has(node.id))
     .map((node) => ({
       ...node,
       label: node.kind === "friend" ? "CONTACT" : cleanLabel(node.label),
