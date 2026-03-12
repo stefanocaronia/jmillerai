@@ -66,7 +66,7 @@ const relationColors: Record<string, string> = {
   relates_to: "#b07cff",
 };
 
-const PUBLIC_MIN_NODE_DISTANCE = 84;
+const PUBLIC_MIN_NODE_DISTANCE = 110;
 
 function cleanLabel(label: string): string {
   return label
@@ -132,14 +132,14 @@ function shortenLabel(label: string): string {
 function nodeSizeForImportance(node: PublicGraphNode): number {
   const raw = Number(node.importance ?? 5);
   const importance = Number.isFinite(raw) ? Math.max(1, Math.min(10, raw)) : 5;
-  return 16 + (importance - 1) * 2.6;
+  return 24 + (importance - 1) * 5.5;
 }
 
 function enforceNodeSpacing(cy: cytoscape.Core, minDistance: number) {
   const nodes = cy.nodes().toArray();
   if (nodes.length < 2) return;
 
-  for (let iteration = 0; iteration < 120; iteration += 1) {
+  for (let iteration = 0; iteration < 220; iteration += 1) {
     let moved = false;
 
     for (let i = 0; i < nodes.length; i += 1) {
@@ -148,6 +148,8 @@ function enforceNodeSpacing(cy: cytoscape.Core, minDistance: number) {
         const right = nodes[j];
         const leftPos = left.position();
         const rightPos = right.position();
+        const leftSize = Number(left.data("size") ?? 24);
+        const rightSize = Number(right.data("size") ?? 24);
         let dx = rightPos.x - leftPos.x;
         let dy = rightPos.y - leftPos.y;
         let distance = Math.hypot(dx, dy);
@@ -160,8 +162,9 @@ function enforceNodeSpacing(cy: cytoscape.Core, minDistance: number) {
           distance = 1;
         }
 
-        if (distance >= minDistance) continue;
-        const shift = ((minDistance - distance) / 2) * 0.55;
+        const requiredDistance = minDistance + ((leftSize + rightSize) / 2) * 0.8;
+        if (distance >= requiredDistance) continue;
+        const shift = ((requiredDistance - distance) / 2) * 0.72;
         const nx = dx / distance;
         const ny = dy / distance;
 
@@ -180,7 +183,7 @@ function enforceNodeSpacing(cy: cytoscape.Core, minDistance: number) {
     if (!moved) break;
   }
 
-  cy.fit(undefined, 30);
+  cy.fit(undefined, 44);
 }
 
 function collapseChatContactClusters(nodes: PublicGraphNode[], edges: PublicGraphEdge[]) {
@@ -367,11 +370,11 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
       name: "cose",
       animate: false,
       fit: true,
-      padding: 36,
-      nodeRepulsion: 240000,
-      idealEdgeLength: 112,
-      componentSpacing: 138,
-      nodeOverlap: 28,
+      padding: 48,
+      nodeRepulsion: 480000,
+      idealEdgeLength: 150,
+      componentSpacing: 220,
+      nodeOverlap: 40,
     },
     style: [
       {
@@ -380,11 +383,11 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
           "background-color": "data(color)",
           label: "data(label)",
           color: "#f2f2f2",
-          "font-size": 11,
+          "font-size": 14,
           "text-wrap": "wrap",
-          "text-max-width": "144px",
+          "text-max-width": "220px",
           "text-valign": "bottom",
-          "text-margin-y": 10,
+          "text-margin-y": 14,
           width: "data(size)",
           height: "data(size)",
           "border-width": 0,
@@ -393,12 +396,12 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
       {
         selector: "edge",
         style: {
-          width: "mapData(strength, 1, 3, 2, 4.8)",
+          width: "mapData(strength, 1, 3, 3.2, 8)",
           "line-color": "data(edgeColor)",
           "curve-style": "bezier",
           "target-arrow-shape": "triangle",
           "target-arrow-color": "data(edgeColor)",
-          "arrow-scale": 1.3,
+          "arrow-scale": 2.3,
           opacity: 0.9,
         },
       },
