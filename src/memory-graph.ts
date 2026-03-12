@@ -23,6 +23,12 @@ export type PublicGraphData = {
   edges: PublicGraphEdge[];
 };
 
+export type MemoryGraphLegendItem = {
+  key: string;
+  label: string;
+  color: string;
+};
+
 const kindColors: Record<string, string> = {
   memory: "#f2f2f2",
   book: "#c3c3c3",
@@ -53,30 +59,77 @@ const relationColors: Record<string, string> = {
   relates_to: "#787878",
 };
 
+function cleanLabel(label: string): string {
+  return label
+    .trim()
+    .replace(/[\s,:;/.!?\-–—]+$/g, "")
+    .trim();
+}
+
 function shortenLabel(label: string): string {
   const maxChars = 22;
-  if (label.length <= maxChars) {
-    return label;
+  const normalized = cleanLabel(label);
+  if (normalized.length <= maxChars) {
+    return normalized;
   }
-  const slice = label.slice(0, maxChars + 1);
-  const boundary = Math.max(slice.lastIndexOf(" "), slice.lastIndexOf("/"));
-  const trimmed = (boundary >= 10 ? slice.slice(0, boundary) : label.slice(0, maxChars))
-    .trim()
-    .replace(/[,:;/.!?-]+$/g, "");
+  const slice = normalized.slice(0, maxChars + 1);
+  const boundary = Math.max(
+    slice.lastIndexOf(" "),
+    slice.lastIndexOf("/"),
+    slice.lastIndexOf("-"),
+    slice.lastIndexOf("–"),
+    slice.lastIndexOf("—"),
+    slice.lastIndexOf(","),
+    slice.lastIndexOf(";"),
+    slice.lastIndexOf(":"),
+  );
+  let trimmed = boundary >= 8 ? slice.slice(0, boundary) : slice;
+  if (boundary < 8) {
+    const withoutPartialWord = trimmed.replace(/[^\s/,:;.!?\-–—]+$/g, "");
+    if (cleanLabel(withoutPartialWord).length >= 8) {
+      trimmed = withoutPartialWord;
+    } else {
+      trimmed = normalized.slice(0, maxChars);
+    }
+  }
+  trimmed = cleanLabel(trimmed);
   return `${trimmed}…`;
 }
 
 function normalizeGraph(graph: PublicGraphData) {
-  const connectedNodeIds = new Set(graph.edges.flatMap((edge) => [edge.source, edge.target]));
   const nodes = graph.nodes
-    .filter((node) => connectedNodeIds.has(node.id))
     .map((node) => ({
       ...node,
-      label: node.kind === "friend" ? "Friend" : node.label,
+      label: node.kind === "friend" ? "CONTACT" : cleanLabel(node.label),
     }));
   const allowedIds = new Set(nodes.map((node) => node.id));
   const edges = graph.edges.filter((edge) => allowedIds.has(edge.source) && allowedIds.has(edge.target));
   return { nodes, edges };
+}
+
+export function getMemoryGraphStats(graph: PublicGraphData) {
+  const normalized = normalizeGraph(graph);
+  return {
+    visibleNodes: normalized.nodes.length,
+    visibleEdges: normalized.edges.length,
+  };
+}
+
+export function getMemoryGraphLegend(): MemoryGraphLegendItem[] {
+  return [
+    { key: "thinking", label: "Thinking", color: memoryTypeColors.thinking },
+    { key: "experience", label: "Experience", color: memoryTypeColors.experience },
+    { key: "reading", label: "Reading", color: memoryTypeColors.reading },
+    { key: "dream", label: "Dream", color: memoryTypeColors.dream },
+    { key: "heartbeat", label: "Heartbeat", color: memoryTypeColors.heartbeat },
+    { key: "belief", label: "Belief", color: memoryTypeColors.belief },
+    { key: "trade", label: "Trade", color: memoryTypeColors.trade },
+    { key: "summary", label: "Summary", color: memoryTypeColors.summary },
+    { key: "contact", label: "Contact", color: kindColors.friend },
+    { key: "book", label: "Book", color: kindColors.book },
+    { key: "source", label: "Source", color: kindColors.source },
+    { key: "blog-post", label: "Blog post", color: kindColors.blog_post },
+  ];
 }
 
 export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData): () => void {

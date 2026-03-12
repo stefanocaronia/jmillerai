@@ -646,6 +646,32 @@ a:visited {
   background: transparent;
 }
 
+.graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 12px;
+}
+
+.graph-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-soft);
+  font-family: "Share Tech Mono", monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.graph-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--legend-color, var(--accent));
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
 .loop-graph-stage {
   min-height: 640px;
 }

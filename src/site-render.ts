@@ -1,5 +1,5 @@
 import { isLoopDebugEnabled, projectLoopGraph, type CognitiveLoopData } from "./cognitive-loop";
-import type { PublicGraphData } from "./memory-graph";
+import { getMemoryGraphLegend, getMemoryGraphStats, type PublicGraphData } from "./memory-graph";
 import { CONTACT_SECTIONS, INTRO_SECTIONS, SITE_SUBTITLE } from "./site-content";
 import type { AppState, BlogFeedData, BlogFeedKind, BookData, FeedState, PageId, ReadingFeedData, StatusData, ThinkingFeedData } from "./site-types";
 import { escapeHtml, formatDate, parseDate, summarizeText } from "./site-utils";
@@ -414,13 +414,24 @@ function renderMemoryGraphBlock(graph: FeedState<PublicGraphData>): string {
     `;
   }
 
+  const stats = getMemoryGraphStats(graph.data);
+  const legend = getMemoryGraphLegend();
+
   return `
     <section class="section-block">
       <div class="section-line">
         <span class="section-name">Memory network</span>
         <span class="section-meta">${escapeHtml(formatDate(graph.data.generated_at))}</span>
       </div>
-      <p class="body-copy">Filtered live graph. Current snapshot: ${graph.data.nodes.length} nodes, ${graph.data.edges.length} edges.</p>
+      <p class="body-copy">Current snapshot: ${stats.visibleNodes} visible nodes, ${stats.visibleEdges} visible edges.</p>
+      <div class="graph-legend" aria-label="Memory graph legend">
+        ${legend.map((item) => `
+          <span class="graph-legend-item">
+            <span class="graph-legend-dot" style="--legend-color: ${escapeHtml(item.color)}"></span>
+            <span>${escapeHtml(item.label)}</span>
+          </span>
+        `).join("")}
+      </div>
       <div id="memory-graph-stage" class="memory-graph-stage"></div>
     </section>
   `;
