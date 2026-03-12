@@ -1,4 +1,5 @@
 import "./style.css";
+import { initializeAnalytics } from "./analytics";
 import { mountCognitiveLoop } from "./cognitive-loop";
 import { mountMemoryGraph } from "./memory-graph";
 import { loadState } from "./site-data";
@@ -27,6 +28,7 @@ const feedUrl = (name: string) =>
 const pageUrl = (pageId: PageId): string => (pageId === "home" ? baseUrl : `${baseUrl}${pageId}/`);
 
 async function start() {
+  await initializeAnalytics(import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined);
   app.innerHTML = `<div class="loading">Loading public snapshots...</div>`;
   const state = await loadState(feedUrl);
   unmountGraph?.();
