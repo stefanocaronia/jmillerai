@@ -36,6 +36,11 @@ export type MemoryGraphEdgeLegendItem = {
   color: string;
 };
 
+type NormalizedGraphNode = PublicGraphNode & {
+  displayLabel: string;
+  hoverLabel: string;
+};
+
 const kindColors: Record<string, string> = {
   memory: "#f2f2f2",
   book: "#7dd3fc",
@@ -107,6 +112,14 @@ function publicNodeTypeLabel(node: Pick<PublicGraphNode, "kind" | "memory_type">
   if (node.kind === "friend") return "Contact";
   if (node.kind === "blog_post") return "Blog post";
   return capitalizeLabel(node.kind.replace(/_/g, " "));
+}
+
+function publicNodeHoverLabel(node: Pick<PublicGraphNode, "kind" | "label" | "memory_type">): string {
+  if (node.kind === "friend") return "Friend Contact";
+  if (node.kind === "memory" && node.memory_type === "conversation") {
+    return capitalizeLabel(cleanLabel(node.label));
+  }
+  return capitalizeLabel(cleanLabel(node.label));
 }
 
 function shortenLabel(label: string): string {
@@ -200,7 +213,7 @@ function enforceNodeSpacing(cy: cytoscape.Core, minDistance: number) {
 
 function normalizeGraph(graph: PublicGraphData) {
   const connectedNodeIds = new Set(graph.edges.flatMap((edge) => [edge.source, edge.target]));
-  const nodes = graph.nodes
+  const nodes: NormalizedGraphNode[] = graph.nodes
     .filter(
       (node) =>
         connectedNodeIds.has(node.id) &&
@@ -208,7 +221,8 @@ function normalizeGraph(graph: PublicGraphData) {
     )
     .map((node) => ({
       ...node,
-      label: presentPublicNodeLabel(node),
+      displayLabel: presentPublicNodeLabel(node),
+      hoverLabel: publicNodeHoverLabel(node),
     }));
   const allowedIds = new Set(nodes.map((node) => node.id));
   const edges = graph.edges.filter((edge) => allowedIds.has(edge.source) && allowedIds.has(edge.target));
@@ -264,8 +278,8 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
       ...normalized.nodes.map((node) => ({
         data: {
           id: node.id,
-          label: shortenLabel(node.label),
-          fullLabel: capitalizeLabel(cleanLabel(node.label)),
+          label: shortenLabel(node.displayLabel),
+          fullLabel: node.hoverLabel,
           typeLabel: publicNodeTypeLabel(node),
           color:
             (node.kind === "memory" && node.memory_type
