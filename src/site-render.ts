@@ -370,21 +370,16 @@ function renderSocialFeed(feed: FeedState<SocialFeedData>, limit = 6): string {
           ? `
         <div class="stream-list">
           ${feed.data.items.slice(0, limit).map((item) => `
-            <article class="stream-item">
-              <div class="section-line">
+            <article class="stream-item social-stream-item">
+              <div class="section-line social-item-head">
                 <span class="kind-badge${badgeClass(item.action)}">${escapeHtml(item.action_label)}</span>
-                <span class="section-meta">${escapeHtml(formatDate(item.occurred_at))}</span>
+                <span class="social-item-summary">${escapeHtml(item.summary)}</span>
               </div>
-              <h3>
-                ${
-                  item.url
-                    ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${escapeHtml(item.summary)}</a>`
-                    : escapeHtml(item.summary)
-                }
-              </h3>
-              <div class="related-list">
-                ${item.origin ? `<span>origin: ${escapeHtml(item.origin)}</span>` : ""}
-                ${item.actor ? `<span>${escapeHtml(item.actor)}</span>` : ""}
+              <div class="social-item-target">
+                ${renderSocialTarget(item)}
+              </div>
+              <div class="related-list social-item-meta">
+                <span>${escapeHtml(formatDate(item.occurred_at))}</span>
               </div>
             </article>
           `).join("")}
@@ -394,6 +389,17 @@ function renderSocialFeed(feed: FeedState<SocialFeedData>, limit = 6): string {
       }
     </section>
   `;
+}
+
+function renderSocialTarget(item: SocialFeedData["items"][number]): string {
+  const targetLabel = item.origin || item.actor || null
+  if (!targetLabel) {
+    return `<span class="muted-copy">No linked target</span>`
+  }
+  if (item.url) {
+    return `<a class="social-item-link" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${escapeHtml(targetLabel)}</a>`
+  }
+  return `<span class="social-item-label">${escapeHtml(targetLabel)}</span>`
 }
 
 function renderBlogFeedBlock(kind: BlogFeedKind, feed: FeedState<BlogFeedData>): string {

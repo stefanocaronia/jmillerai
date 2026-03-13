@@ -501,6 +501,43 @@ a:visited {
   font-size: 0.74rem;
 }
 
+.social-item-head {
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.social-item-summary {
+  margin-left: auto;
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+  line-height: 1.35;
+  text-align: right;
+}
+
+.social-item-target {
+  margin-top: 10px;
+}
+
+.social-item-link,
+.social-item-label {
+  display: inline-block;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.social-item-link {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.social-item-link:hover {
+  text-decoration: underline;
+}
+
+.social-item-meta {
+  margin-top: 10px;
+}
+
 .kind-badge {
   display: inline-block;
   padding: 3px 8px;
@@ -559,6 +596,36 @@ a:visited {
 .kind-badge--summary {
   border-color: var(--memory-summary);
   color: var(--memory-summary);
+}
+
+.kind-badge--like {
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.kind-badge--post {
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.kind-badge--reply {
+  border-color: #34d399;
+  color: #34d399;
+}
+
+.kind-badge--follow {
+  border-color: #f472b6;
+  color: #f472b6;
+}
+
+.kind-badge--repost {
+  border-color: #a78bfa;
+  color: #a78bfa;
+}
+
+.kind-badge--unfollow {
+  border-color: #fb7185;
+  color: #fb7185;
 }
 
 .kind-badge-loop {
