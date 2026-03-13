@@ -484,6 +484,10 @@ a:visited {
   font-size: 1rem;
 }
 
+.social-profile-link {
+  margin-left: 0.4ch;
+}
+
 .related-list {
   display: flex;
   flex-wrap: wrap;

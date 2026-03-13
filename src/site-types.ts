@@ -27,6 +27,7 @@ export type StatusData = {
     latest_timestamp: string | null;
     strategy: string | null;
   } | null;
+  social?: SocialFeedData | null;
 };
 
 export type BookData = {
@@ -79,6 +80,24 @@ export type ThinkingFeedData = {
   }>;
 };
 
+export type SocialFeedData = {
+  schema_version?: number;
+  generated_at?: string;
+  handle: string;
+  profile_url: string;
+  latest_at: string | null;
+  items: Array<{
+    key: string;
+    action: string;
+    action_label: string;
+    origin: string | null;
+    occurred_at: string;
+    url: string | null;
+    actor: string | null;
+    summary: string;
+  }>;
+};
+
 export type BlogFeedData = {
   items: Array<{
     title: string;
@@ -98,6 +117,7 @@ export type AppState = {
   book: FeedState<BookData>;
   readingFeed: FeedState<ReadingFeedData>;
   thinkingFeed: FeedState<ThinkingFeedData>;
+  socialFeed: FeedState<SocialFeedData>;
   cognitiveLoop: FeedState<CognitiveLoopData>;
   publicGraph: FeedState<PublicGraphData>;
   signalsFeed: FeedState<BlogFeedData>;

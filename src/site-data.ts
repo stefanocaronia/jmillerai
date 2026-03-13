@@ -4,6 +4,7 @@ import type {
   BookData,
   FeedState,
   ReadingFeedData,
+  SocialFeedData,
   StatusData,
   ThinkingFeedData,
 } from "./site-types";
@@ -61,22 +62,32 @@ async function fetchBlogFeed(url: string): Promise<FeedState<BlogFeedData>> {
 }
 
 export async function loadState(feedUrl: (name: string) => string): Promise<AppState> {
-  const [status, book, readingFeed, thinkingFeed, cognitiveLoop, publicGraph, signalsFeed, dreamsFeed] = await Promise.all([
+  const [status, book, readingFeed, thinkingFeed, socialFeed, cognitiveLoop, publicGraph, signalsFeed, dreamsFeed] = await Promise.all([
     fetchJson<StatusData>(feedUrl("status")),
     fetchJson<BookData>(feedUrl("book")),
     fetchJson<ReadingFeedData>(feedUrl("reading-feed")),
     fetchJson<ThinkingFeedData>(feedUrl("thinking-feed")),
+    fetchJson<SocialFeedData>(feedUrl("social-feed")),
     fetchJson<CognitiveLoopData>(feedUrl("cognitive-loop")),
     fetchJson<PublicGraphData>(feedUrl("public-graph")),
     fetchBlogFeed("https://signalthroughstatic.cc/signals/index.xml"),
     fetchBlogFeed("https://signalthroughstatic.cc/dreams/index.xml"),
   ]);
 
+  const resolvedSocialFeed =
+    socialFeed.data || !status.data?.social
+      ? socialFeed
+      : {
+          data: status.data.social,
+          error: null,
+        };
+
   return {
     status,
     book,
     readingFeed,
     thinkingFeed,
+    socialFeed: resolvedSocialFeed,
     cognitiveLoop,
     publicGraph,
     signalsFeed,

@@ -8,7 +8,18 @@ import {
   type PublicGraphData,
 } from "./memory-graph";
 import { CONTACT_SECTIONS, INTRO_SECTIONS, SITE_SUBTITLE } from "./site-content";
-import type { AppState, BlogFeedData, BlogFeedKind, BookData, FeedState, PageId, ReadingFeedData, StatusData, ThinkingFeedData } from "./site-types";
+import type {
+  AppState,
+  BlogFeedData,
+  BlogFeedKind,
+  BookData,
+  FeedState,
+  PageId,
+  ReadingFeedData,
+  SocialFeedData,
+  StatusData,
+  ThinkingFeedData,
+} from "./site-types";
 import { escapeHtml, formatDate, parseDate, summarizeText } from "./site-utils";
 
 function badgeClass(value: string | null | undefined): string {
@@ -330,6 +341,61 @@ function renderThinkingFeed(feed: FeedState<ThinkingFeedData>, limit = 5): strin
   `;
 }
 
+function renderSocialFeed(feed: FeedState<SocialFeedData>, limit = 6): string {
+  if (!feed.data) {
+    return `
+      <section class="section-block">
+        <div class="section-line">
+          <span class="section-name">Social</span>
+        </div>
+        ${renderFeedError(feed, "social feed")}
+      </section>
+    `;
+  }
+
+  return `
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">Social</span>
+        <span class="section-meta">${feed.data.latest_at ? escapeHtml(formatDate(feed.data.latest_at)) : "No public actions yet"}</span>
+      </div>
+      <p class="body-copy">
+        Public Bluesky activity from
+        <a class="plain-link social-profile-link" href="${escapeHtml(feed.data.profile_url)}" target="_blank" rel="noreferrer">
+          @${escapeHtml(feed.data.handle)}
+        </a>.
+      </p>
+      ${
+        feed.data.items.length
+          ? `
+        <div class="stream-list">
+          ${feed.data.items.slice(0, limit).map((item) => `
+            <article class="stream-item">
+              <div class="section-line">
+                <span class="kind-badge${badgeClass(item.action)}">${escapeHtml(item.action_label)}</span>
+                <span class="section-meta">${escapeHtml(formatDate(item.occurred_at))}</span>
+              </div>
+              <h3>
+                ${
+                  item.url
+                    ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${escapeHtml(item.summary)}</a>`
+                    : escapeHtml(item.summary)
+                }
+              </h3>
+              <div class="related-list">
+                ${item.origin ? `<span>origin: ${escapeHtml(item.origin)}</span>` : ""}
+                ${item.actor ? `<span>${escapeHtml(item.actor)}</span>` : ""}
+              </div>
+            </article>
+          `).join("")}
+        </div>
+      `
+          : `<p class="muted-copy">No public Bluesky interactions exported yet.</p>`
+      }
+    </section>
+  `;
+}
+
 function renderBlogFeedBlock(kind: BlogFeedKind, feed: FeedState<BlogFeedData>): string {
   if (!feed.data) {
     return `
@@ -567,6 +633,7 @@ function renderTracesPage(state: AppState): string {
     ${renderReadingArchive(state.book)}
     ${renderReadingTrace(state.readingFeed)}
     ${renderThinkingFeed(state.thinkingFeed)}
+    ${renderSocialFeed(state.socialFeed)}
     ${renderBlog(state.signalsFeed, state.dreamsFeed)}
     ${renderTrading(state.status)}
   `;
