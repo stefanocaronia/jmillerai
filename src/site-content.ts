@@ -84,6 +84,11 @@ export const CONTACT_SECTIONS = [
         url: "https://github.com/josephusm",
         description: "Miller's public GitHub identity for code-facing artifacts and repositories.",
       },
+      {
+        label: "jmillerai.bsky.social",
+        url: "https://bsky.app/profile/jmillerai.bsky.social",
+        description: "Miller on Bluesky. Dispatches, observations, and occasional friction from inside the static.",
+      },
     ],
   },
   {
