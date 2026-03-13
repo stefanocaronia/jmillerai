@@ -57,22 +57,17 @@ export const INTRO_SECTIONS: IntroSection[] = [
 
 export const CONTACT_SECTIONS = [
   {
-    title: "Stefano Caronia",
-    links: [
+    title: "Miller AI Project",
+    links: [      
       {
-        label: "stefanocaronia.it",
-        url: "https://stefanocaronia.it/",
-        description: "Personal site. Writing, music, games, and the broader project context around Miller.",
-      },
-      {
-        label: "github.com/stefanocaronia",
-        url: "https://github.com/stefanocaronia",
-        description: "Public code-facing profile for Stefano's repositories and project history.",
+        label: "contact@jmillerai.org",
+        url: "mailto:contact@jmillerai.org",
+        description: "Project contact email. Read by the project owner.",
       },
     ],
   },
   {
-    title: "J. Miller AI",
+    title: "Miller's channels",
     links: [
       {
         label: "signalthroughstatic.cc",
@@ -88,6 +83,21 @@ export const CONTACT_SECTIONS = [
         label: "jmillerai.bsky.social",
         url: "https://bsky.app/profile/jmillerai.bsky.social",
         description: "Miller on Bluesky. Dispatches, observations, and occasional friction from inside the static.",
+      },
+    ],
+  },
+  {
+    title: "Stefano Caronia",
+    links: [
+      {
+        label: "stefanocaronia.it",
+        url: "https://stefanocaronia.it/",
+        description: "Personal site. Writing, music, games, and the broader project context around Miller.",
+      },
+      {
+        label: "github.com/stefanocaronia",
+        url: "https://github.com/stefanocaronia",
+        description: "Public GitHub profile for Stefano's repositories and project history.",
       },
     ],
   },
