@@ -372,14 +372,14 @@ function renderSocialFeed(feed: FeedState<SocialFeedData>, limit = 6): string {
           ${feed.data.items.slice(0, limit).map((item) => `
             <article class="stream-item social-stream-item">
               <div class="section-line social-item-head">
-                <span class="kind-badge${badgeClass(item.action)}">${escapeHtml(item.action_label)}</span>
-                <span class="social-item-summary">${escapeHtml(item.summary)}</span>
+                <div class="social-item-head-main">
+                  <span class="kind-badge${badgeClass(item.action)}">${escapeHtml(item.action_label)}</span>
+                  <span class="social-item-summary">${escapeHtml(item.summary)}</span>
+                </div>
+                <span class="section-meta">${escapeHtml(formatDate(item.occurred_at))}</span>
               </div>
               <div class="social-item-target">
                 ${renderSocialTarget(item)}
-              </div>
-              <div class="related-list social-item-meta">
-                <span>${escapeHtml(formatDate(item.occurred_at))}</span>
               </div>
             </article>
           `).join("")}
