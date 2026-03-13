@@ -392,6 +392,9 @@ function renderSocialFeed(feed: FeedState<SocialFeedData>, limit = 6): string {
 }
 
 function renderSocialTarget(item: SocialFeedData["items"][number]): string {
+  if (item.action === "post" && item.content) {
+    return `<span class="social-item-label">${escapeHtml(item.content)}</span>`
+  }
   const targetLabel = item.origin || item.actor || null
   if (!targetLabel) {
     return `<span class="muted-copy">No linked target</span>`

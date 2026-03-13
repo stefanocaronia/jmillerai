@@ -94,6 +94,7 @@ export type SocialFeedData = {
     occurred_at: string;
     url: string | null;
     actor: string | null;
+    content?: string | null;
     summary: string;
   }>;
 };
