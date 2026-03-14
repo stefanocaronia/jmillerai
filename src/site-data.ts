@@ -3,6 +3,7 @@ import type {
   BlogFeedData,
   BookData,
   FeedState,
+  ProjectsFeedData,
   ReadingFeedData,
   SocialFeedData,
   StatusData,
@@ -62,12 +63,13 @@ async function fetchBlogFeed(url: string): Promise<FeedState<BlogFeedData>> {
 }
 
 export async function loadState(feedUrl: (name: string) => string): Promise<AppState> {
-  const [status, book, readingFeed, thinkingFeed, socialFeed, cognitiveLoop, publicGraph, signalsFeed, dreamsFeed] = await Promise.all([
+  const [status, book, readingFeed, thinkingFeed, socialFeed, projectsFeed, cognitiveLoop, publicGraph, signalsFeed, dreamsFeed] = await Promise.all([
     fetchJson<StatusData>(feedUrl("status")),
     fetchJson<BookData>(feedUrl("book")),
     fetchJson<ReadingFeedData>(feedUrl("reading-feed")),
     fetchJson<ThinkingFeedData>(feedUrl("thinking-feed")),
     fetchJson<SocialFeedData>(feedUrl("social-feed")),
+    fetchJson<ProjectsFeedData>(feedUrl("projects")),
     fetchJson<CognitiveLoopData>(feedUrl("cognitive-loop")),
     fetchJson<PublicGraphData>(feedUrl("public-graph")),
     fetchBlogFeed("https://signalthroughstatic.cc/signals/index.xml"),
@@ -88,6 +90,7 @@ export async function loadState(feedUrl: (name: string) => string): Promise<AppS
     readingFeed,
     thinkingFeed,
     socialFeed: resolvedSocialFeed,
+    projectsFeed,
     cognitiveLoop,
     publicGraph,
     signalsFeed,

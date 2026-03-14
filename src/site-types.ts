@@ -99,6 +99,34 @@ export type SocialFeedData = {
   }>;
 };
 
+export type ProjectsFeedData = {
+  schema_version: number;
+  generated_at: string;
+  has_current: boolean;
+  current: {
+    slug: string;
+    title: string;
+    description: string | null;
+    language: string | null;
+    platform: string | null;
+    status: string;
+    repo_url: string | null;
+    pages_url: string | null;
+    created_at: string | null;
+    updated_at: string | null;
+  } | null;
+  completed: Array<{
+    slug: string;
+    title: string;
+    description: string | null;
+    language: string | null;
+    platform: string | null;
+    repo_url: string | null;
+    pages_url: string | null;
+    updated_at: string | null;
+  }>;
+};
+
 export type BlogFeedData = {
   items: Array<{
     title: string;
@@ -119,6 +147,7 @@ export type AppState = {
   readingFeed: FeedState<ReadingFeedData>;
   thinkingFeed: FeedState<ThinkingFeedData>;
   socialFeed: FeedState<SocialFeedData>;
+  projectsFeed: FeedState<ProjectsFeedData>;
   cognitiveLoop: FeedState<CognitiveLoopData>;
   publicGraph: FeedState<PublicGraphData>;
   signalsFeed: FeedState<BlogFeedData>;

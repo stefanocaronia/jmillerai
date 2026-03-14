@@ -15,6 +15,7 @@ import type {
   BookData,
   FeedState,
   PageId,
+  ProjectsFeedData,
   ReadingFeedData,
   SocialFeedData,
   StatusData,
@@ -98,6 +99,7 @@ function renderFooterSnapshot(state: AppState): string {
     state.book.data?.generated_at,
     state.readingFeed.data?.generated_at,
     state.thinkingFeed.data?.generated_at,
+    state.projectsFeed.data?.generated_at,
     state.cognitiveLoop.data?.generated_at,
     state.publicGraph.data?.generated_at,
   ]
@@ -635,11 +637,99 @@ function renderProjectPage(): string {
   `;
 }
 
+function renderCurrentProject(feed: FeedState<ProjectsFeedData>): string {
+  if (!feed.data) {
+    return `
+      <section class="section-block">
+        <div class="section-line">
+          <span class="section-name">Current project</span>
+        </div>
+        ${renderFeedError(feed, "projects feed")}
+      </section>
+    `;
+  }
+
+  if (!feed.data.current) {
+    return `
+      <section class="section-block">
+        <div class="section-line">
+          <span class="section-name">Current project</span>
+        </div>
+        <p class="muted-copy">No active project at the moment.</p>
+      </section>
+    `;
+  }
+
+  const project = feed.data.current;
+  const tags = [project.language, project.platform].filter(Boolean);
+  const linkHtml = project.repo_url
+    ? `<p class="body-copy"><a class="plain-link" href="${escapeHtml(project.repo_url)}" target="_blank" rel="noreferrer">${escapeHtml(project.repo_url)}</a></p>`
+    : "";
+  const pagesHtml = project.pages_url
+    ? `<p class="body-copy"><a class="plain-link" href="${escapeHtml(project.pages_url)}" target="_blank" rel="noreferrer">${escapeHtml(project.pages_url)}</a></p>`
+    : "";
+
+  return `
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">Current project</span>
+        <span class="section-meta">${escapeHtml(formatDate(project.updated_at))}</span>
+      </div>
+      <h2>${escapeHtml(project.title)}</h2>
+      ${project.description ? `<p class="body-copy">${escapeHtml(project.description)}</p>` : ""}
+      <div class="state-inline">
+        <span class="kind-badge${badgeClass(project.status)}">${escapeHtml(project.status)}</span>
+        ${tags.map((tag) => `<span class="kind-badge">${escapeHtml(tag!)}</span>`).join("")}
+      </div>
+      ${linkHtml}
+      ${pagesHtml}
+    </section>
+  `;
+}
+
+function renderProjectsArchive(feed: FeedState<ProjectsFeedData>): string {
+  const items = feed.data?.completed ?? [];
+  if (items.length === 0) {
+    return "";
+  }
+
+  return `
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">Completed projects</span>
+        <span class="section-meta">${items.length}</span>
+      </div>
+      <ul class="book-archive-list">
+        ${items.map((item) => {
+          const tags = [item.language, item.platform].filter(Boolean);
+          const link = item.repo_url
+            ? `<a class="plain-link" href="${escapeHtml(item.repo_url)}" target="_blank" rel="noreferrer">repo</a>`
+            : "";
+          const pages = item.pages_url
+            ? `<a class="plain-link" href="${escapeHtml(item.pages_url)}" target="_blank" rel="noreferrer">live</a>`
+            : "";
+
+          return `
+            <li>
+              <span class="book-archive-title">${escapeHtml(item.title)}</span>
+              ${tags.length ? `<span class="muted-copy">${tags.map((t) => escapeHtml(t!)).join(" · ")}</span>` : ""}
+              ${link}${pages}
+              ${item.updated_at ? `<span class="section-meta">${escapeHtml(formatDate(item.updated_at))}</span>` : ""}
+            </li>
+          `;
+        }).join("")}
+      </ul>
+    </section>
+  `;
+}
+
 function renderTracesPage(state: AppState): string {
   return `
     ${renderCurrentState(state.status)}
     ${renderCurrentlyReading(state.book)}
     ${renderReadingArchive(state.book)}
+    ${renderCurrentProject(state.projectsFeed)}
+    ${renderProjectsArchive(state.projectsFeed)}
     ${renderReadingTrace(state.readingFeed)}
     ${renderThinkingFeed(state.thinkingFeed)}
     ${renderSocialFeed(state.socialFeed)}
