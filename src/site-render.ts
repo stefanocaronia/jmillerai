@@ -193,14 +193,41 @@ function renderCurrentState(status: FeedState<StatusData>): string {
   `;
 }
 
+function renderLastSource(data: BookData): string {
+  const src = data.last_source;
+  if (!src) return "";
+  return `
+    <hr class="section-divider">
+    <p class="subsection-label">Last source studied</p>
+    <p class="subsection-title">${escapeHtml(src.title)}</p>
+    <p class="muted-copy">${escapeHtml(src.source)}${src.read_at ? ` · ${escapeHtml(formatDate(src.read_at))}` : ""}</p>
+    ${src.thought ? `<p class="muted-copy">${escapeHtml(src.thought)}</p>` : ""}
+  `;
+}
+
+function renderLastEssay(data: BookData): string {
+  const essay = data.last_essay;
+  if (!essay) return "";
+  return `
+    <hr class="section-divider">
+    <p class="subsection-label">Last essay read</p>
+    <p class="subsection-title">${escapeHtml(essay.title)}</p>
+    <p class="muted-copy">${escapeHtml(essay.author ?? "Unknown author")}${essay.read_at ? ` · ${escapeHtml(formatDate(essay.read_at))}` : ""}</p>
+    ${essay.thought ? `<p class="muted-copy">${escapeHtml(essay.thought)}</p>` : ""}
+  `;
+}
+
 function renderCurrentlyReading(book: FeedState<BookData>): string {
   if (!book.data || !book.data.book) {
+    const hasExtras = book.data?.last_source || book.data?.last_essay;
     return `
       <section class="section-block">
         <div class="section-line">
           <span class="section-name">Currently reading</span>
         </div>
-        ${renderFeedError(book, "book feed")}
+        ${!hasExtras ? renderFeedError(book, "book feed") : ""}
+        ${book.data ? renderLastSource(book.data) : ""}
+        ${book.data ? renderLastEssay(book.data) : ""}
       </section>
     `;
   }
@@ -221,6 +248,8 @@ function renderCurrentlyReading(book: FeedState<BookData>): string {
       </div>
       <p class="section-note">${progress}%</p>
       ${active.current_focus ? `<p class="muted-copy">${escapeHtml(active.current_focus)}</p>` : ""}
+      ${renderLastSource(book.data)}
+      ${renderLastEssay(book.data)}
     </section>
   `;
 }

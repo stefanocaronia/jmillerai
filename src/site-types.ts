@@ -44,6 +44,19 @@ export type BookData = {
     cover_image: string | null;
     current_focus: string | null;
   } | null;
+  last_source?: {
+    title: string;
+    source: string;
+    url: string | null;
+    read_at: string | null;
+    thought: string | null;
+  } | null;
+  last_essay?: {
+    title: string;
+    author: string | null;
+    read_at: string | null;
+    thought: string | null;
+  } | null;
   finished_books?: Array<{
     slug: string | null;
     title: string;
