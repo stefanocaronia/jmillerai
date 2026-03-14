@@ -48,6 +48,7 @@ const kindColors: Record<string, string> = {
   source: "#f59e0b",
   blog_post: "#f97316",
   friend: "#34d399",
+  project: "#a78bfa",
 };
 
 const memoryTypeColors: Record<string, string> = {
@@ -254,6 +255,7 @@ export function getMemoryGraphLegend(): MemoryGraphLegendItem[] {
     { key: "book", label: "Book", color: kindColors.book },
     { key: "source", label: "Source", color: kindColors.source },
     { key: "blog-post", label: "Blog post", color: kindColors.blog_post },
+    { key: "project", label: "Project", color: kindColors.project },
   ];
 }
 

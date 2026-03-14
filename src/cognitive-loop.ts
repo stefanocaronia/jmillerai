@@ -75,6 +75,7 @@ export const graphPositions: Record<string, GraphPosition> = {
   blog: { x: 645, y: 461 },
   social: { x: 483, y: 108 },
   trading: { x: 300, y: 140 },
+  developer: { x: 700, y: 320 },
 };
 
 export const graphEdgeCurves: Record<string, GraphCurveConfig> = {
@@ -96,6 +97,9 @@ export const graphEdgeCurves: Record<string, GraphCurveConfig> = {
   "memory-hub::trading": { distance: 26, weight: 0.4 },
   "reading::thinking": { distance: -50, weight: 0.5 },
   "social::thinking": { distance: 34, weight: 0.45 },
+  "developer::memory-hub": { distance: 38, weight: 0.5 },
+  "developer::thinking": { distance: 38, weight: 0.5 },
+  "blog::developer": { distance: -38, weight: 0.5 },
 };
 
 declare global {
