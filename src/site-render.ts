@@ -23,6 +23,19 @@ import type {
 } from "./site-types";
 import { escapeHtml, formatDate, parseDate, summarizeText } from "./site-utils";
 
+function formatDetail(raw: string): string {
+  const safe = raw
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+  return safe
+    .replace(/\\n/g, "\n")
+    .replace(/\n{2,}/g, "\n")
+    .replace(/^(Collisione|Nesso|Shift(?:\s+da\s+[^:]+)?|Nota|Legame|Origine|Traccia|Risultato):/gm,
+      '<span class="detail-label">$1:</span>')
+    .replace(/#(\d+)/g, '<span class="detail-ref">#$1</span>');
+}
+
 function shortUrl(url: string): string {
   try {
     const u = new URL(url);
@@ -194,7 +207,7 @@ function renderCurrentState(status: FeedState<StatusData>): string {
       <p class="muted-copy">Latest snapshot from Miller's cognitive loop.</p>
       ${(() => { const lm = status.data.last_mode ?? status.data.mode; return lm && lm !== "idle" ? `<div class="state-inline"><span class="kind-badge${badgeClass(lm)}">${escapeHtml(lm)}</span></div>` : ""; })()}
       <h2 class="state-title">${escapeHtml(status.data.headline)}</h2>
-      ${status.data.detail ? `<p class="body-copy">${escapeHtml(status.data.detail)}</p>` : ""}
+      ${status.data.detail ? `<p class="state-detail">${formatDetail(status.data.detail)}</p>` : ""}
       ${renderTagList(status.data.active_threads)}
     </section>
   `;

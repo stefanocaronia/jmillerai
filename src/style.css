@@ -253,7 +253,30 @@ a:visited {
 }
 
 .state-title {
+  font-size: 1.1rem !important;
   text-transform: none !important;
+}
+
+.state-title::first-letter {
+  text-transform: uppercase;
+}
+
+.state-detail {
+  color: var(--ink-soft);
+  line-height: 1.4;
+  white-space: pre-line;
+}
+
+.state-detail .detail-label {
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.state-detail .detail-ref {
+  font-family: "Share Tech Mono", monospace;
+  color: var(--ink);
+  font-size: 0.9em;
 }
 
 .stream-item h3 {
@@ -269,7 +292,7 @@ a:visited {
 
 .text-flow {
   display: grid;
-  gap: 14px;
+  gap: 6px;
 }
 
 .intro-section {
@@ -286,9 +309,10 @@ a:visited {
   background-size: auto 1px;
 }
 
-.intro-section:first-child {
+.intro-section:first-of-type {
   padding-top: 0;
   background: none;
+  gap: 8px;
 }
 
 .intro-section a,
@@ -418,7 +442,7 @@ a:visited {
 }
 
 .tag-list li {
-  color: var(--ink-soft);
+  color: #a89050;
   font-family: "Share Tech Mono", monospace;
   font-size: 0.8rem;
 }
