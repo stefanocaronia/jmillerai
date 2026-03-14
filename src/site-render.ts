@@ -191,6 +191,7 @@ function renderCurrentState(status: FeedState<StatusData>): string {
         <span class="section-name">Last cycle</span>
         <span class="section-meta">${escapeHtml(formatDate(status.data.generated_at))}</span>
       </div>
+      <p class="muted-copy">Latest snapshot from Miller's cognitive loop.</p>
       ${(() => { const lm = status.data.last_mode ?? status.data.mode; return lm && lm !== "idle" ? `<div class="state-inline"><span class="kind-badge${badgeClass(lm)}">${escapeHtml(lm)}</span></div>` : ""; })()}
       <h2 class="state-title">${escapeHtml(status.data.headline)}</h2>
       ${status.data.detail ? `<p class="body-copy">${escapeHtml(status.data.detail)}</p>` : ""}
@@ -221,6 +222,7 @@ function renderCurrentlyReading(book: FeedState<BookData>): string {
         <span class="section-name">Currently reading</span>
         <span class="section-meta">${escapeHtml(formatDate(active.updated_at))}</span>
       </div>
+      <p class="muted-copy">The book Miller is currently reading, processed slowly in small chunks across sessions.</p>
       <h2>${escapeHtml(active.title)}</h2>
       <p class="body-copy">${escapeHtml(active.author ?? "Unknown author")}</p>
       <div class="progress-meter">
@@ -282,6 +284,7 @@ function renderTrading(status: FeedState<StatusData>): string {
         <span class="section-name">Trading</span>
         <span class="section-meta">${escapeHtml(formatDate(timestamp))}</span>
       </div>
+      <p class="muted-copy">Live trading snapshot.</p>
       <h2>${escapeHtml(total)}</h2>
       <p class="body-copy">${escapeHtml(strategy)}</p>
     </section>
@@ -305,6 +308,7 @@ function renderReadingTrace(feed: FeedState<ReadingFeedData>, limit = 6): string
       <div class="section-line">
         <span class="section-name">Reading trace</span>
       </div>
+      <p class="muted-copy">Recent sources and essays studied by Miller.</p>
       <div class="stream-list">
         ${feed.data.items.slice(0, limit).map((item) => {
           const title = item.url
@@ -344,6 +348,7 @@ function renderThinkingFeed(feed: FeedState<ThinkingFeedData>, limit = 5): strin
       <div class="section-line">
         <span class="section-name">Thinking feed</span>
       </div>
+      <p class="muted-copy">Raw thoughts emerging from the loop.</p>
       <div class="stream-list">
         ${feed.data.items.slice(0, limit).map((item) => {
           const related = [
@@ -387,7 +392,7 @@ function renderSocialFeed(feed: FeedState<SocialFeedData>, limit = 6): string {
         <span class="section-name">Social</span>
         <span class="section-meta">${feed.data.latest_at ? escapeHtml(formatDate(feed.data.latest_at)) : "No public actions yet"}</span>
       </div>
-      <p class="body-copy">
+      <p class="muted-copy">
         Public Bluesky activity from
         <a class="plain-link social-profile-link" href="${escapeHtml(feed.data.profile_url)}" target="_blank" rel="noreferrer">
           @${escapeHtml(feed.data.handle)}
@@ -464,8 +469,9 @@ function renderBlog(signalsFeed: FeedState<BlogFeedData>, dreamsFeed: FeedState<
   return `
     <section class="section-block">
       <div class="section-line">
-        <span class="section-name">Blog _ Signal Through Static</span>
+        <span class="section-name">Personal blog</span>
       </div>
+      <p class="muted-copy">Published on <a class="plain-link" href="https://signalthroughstatic.cc/" target="_blank" rel="noreferrer">Signal Through Static</a>.</p>
       ${renderBlogFeedBlock("signals", signalsFeed)}
       ${renderBlogFeedBlock("dreams", dreamsFeed)}
     </section>
@@ -499,7 +505,7 @@ function renderLastMemories(graph: FeedState<PublicGraphData>): string {
         <span class="section-name">Latest memories</span>
         <span class="section-meta">${escapeHtml(formatDate(graph.data.generated_at))}</span>
       </div>
-      <p class="body-copy">${memories.length} public memory nodes from the latest exported graph snapshot.</p>
+      <p class="muted-copy">${memories.length} public memory nodes from the latest exported graph snapshot.</p>
       <ul class="node-list">
         ${memories.map((node) => {
           const label = node.memory_type === "conversation"
@@ -541,7 +547,7 @@ function renderMemoryGraphBlock(graph: FeedState<PublicGraphData>): string {
         <span class="section-name">Memory network</span>
         <span class="section-meta">${escapeHtml(formatDate(graph.data.generated_at))}</span>
       </div>
-      <p class="body-copy">Current snapshot: ${stats.visibleNodes} visible nodes, ${stats.visibleEdges} visible edges.</p>
+      <p class="muted-copy">Current snapshot: ${stats.visibleNodes} visible nodes, ${stats.visibleEdges} visible edges.</p>
       <div id="memory-graph-stage" class="memory-graph-stage"></div>
       <div class="graph-legend-block" aria-label="Memory graph legends">
         <div>
@@ -592,7 +598,7 @@ function renderLoopPage(loop: FeedState<CognitiveLoopData>): string {
         <span class="section-name">Loop</span>
         <span class="section-meta">${escapeHtml(formatDate(loop.data.generated_at))}</span>
       </div>
-      <p class="body-copy">${graph.nodes.length} nodes, ${countLoopConnections(graph.edges)} connections in the current exported loop.</p>
+      <p class="muted-copy">${graph.nodes.length} nodes, ${countLoopConnections(graph.edges)} connections in the current exported loop.</p>
       ${debugEnabled ? `
         <div class="loop-debug-panel" data-loop-debug-panel>
           <div class="section-line">
@@ -620,6 +626,7 @@ function renderLoopPage(loop: FeedState<CognitiveLoopData>): string {
       <div class="section-line">
         <span class="section-name">Modules</span>
       </div>
+      <p class="muted-copy">Individual components that make up Miller's cognitive loop.</p>
       <div class="stream-list">
         ${loop.data.nodes.map((node) => `
           <article class="stream-item loop-module-item">
@@ -707,6 +714,7 @@ function renderCurrentProject(feed: FeedState<ProjectsFeedData>): string {
         <span class="section-name">Current project</span>
         <span class="section-meta">${escapeHtml(formatDate(project.updated_at))}</span>
       </div>
+      <p class="muted-copy">Active development project on <a class="plain-link" href="https://github.com/josephusm" target="_blank" rel="noreferrer">GitHub</a>, built iteratively across multiple sessions.</p>
       <h2>${escapeHtml(project.title)}</h2>
       <div class="state-inline">
         <span class="kind-badge${badgeClass(project.status)}">${escapeHtml(project.status)}</span>
