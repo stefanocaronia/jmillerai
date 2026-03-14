@@ -199,7 +199,7 @@ function renderLastSource(data: BookData): string {
   return `
     <hr class="section-divider">
     <p class="subsection-label">Last source studied</p>
-    <p class="subsection-title">${escapeHtml(src.title)}</p>
+    <p class="subsection-title">${src.url ? `<a href="${escapeHtml(src.url)}" target="_blank" rel="noopener" class="plain-link">${escapeHtml(src.title)}</a>` : escapeHtml(src.title)}</p>
     <p class="muted-copy">${escapeHtml(src.source)}${src.read_at ? ` · ${escapeHtml(formatDate(src.read_at))}` : ""}</p>
     ${src.thought ? `<p class="muted-copy">${escapeHtml(src.thought)}</p>` : ""}
   `;
