@@ -44,7 +44,7 @@ type NormalizedGraphNode = PublicGraphNode & {
 
 const kindColors: Record<string, string> = {
   memory: "#f2f2f2",
-  book: "#7dd3fc",
+  book: "#e5e5e5",
   source: "#f59e0b",
   blog_post: "#f97316",
   friend: "#34d399",
@@ -57,7 +57,7 @@ const memoryTypeColors: Record<string, string> = {
   reading: "#f4e409",
   dream: "#b07cff",
   conversation: "#ff5ea8",
-  heartbeat: "#ff7a00",
+  heartbeat: "#ef4444",
   belief: "#6ee7b7",
   trade: "#60a5fa",
   summary: "#f9a8d4",

@@ -49,11 +49,12 @@ type ProjectedLoopEdge = {
 };
 
 const kindColors: Record<string, string> = {
-  control: "#ff7a00",
+  control: "#ef4444",
   state: "#f2f2f2",
   module: "#46d9ff",
   input: "#ff5ea8",
   output: "#ff6b4a",
+  surface: "#ff6b4a",
   operation: "#8f8f8f",
 };
 

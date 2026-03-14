@@ -8,18 +8,19 @@
   --line: rgba(255, 255, 255, 0.14);
   --accent: #ff7a00;
   --radius: 2px;
-  --kind-control: #ff7a00;
+  --kind-control: #ef4444;
   --kind-state: #f2f2f2;
   --kind-module: #46d9ff;
   --kind-input: #ff5ea8;
   --kind-output: #ff6b4a;
+  --kind-surface: #ff6b4a;
   --kind-operation: #8f8f8f;
   --memory-thinking: #46d9ff;
   --memory-experience: #ffb000;
   --memory-reading: #f4e409;
   --memory-dream: #b07cff;
   --memory-conversation: #ff5ea8;
-  --memory-heartbeat: #ff7a00;
+  --memory-heartbeat: #ef4444;
   --memory-belief: #6ee7b7;
   --memory-trade: #8f8f8f;
   --memory-summary: #c3c3c3;
@@ -786,9 +787,10 @@ a:visited {
   color: var(--kind-input);
 }
 
-.kind-badge-loop--output {
-  border-color: var(--kind-output);
-  color: var(--kind-output);
+.kind-badge-loop--output,
+.kind-badge-loop--surface {
+  border-color: var(--kind-surface);
+  color: var(--kind-surface);
 }
 
 .kind-badge-loop--operation {
@@ -826,8 +828,9 @@ a:visited {
   background: var(--kind-input);
 }
 
-.module-dot--output {
-  background: var(--kind-output);
+.module-dot--output,
+.module-dot--surface {
+  background: var(--kind-surface);
 }
 
 .module-dot--operation {
