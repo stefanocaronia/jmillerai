@@ -110,6 +110,7 @@ export type ProjectsFeedData = {
     language: string | null;
     platform: string | null;
     status: string;
+    version: string | null;
     repo_url: string | null;
     pages_url: string | null;
     created_at: string | null;
@@ -121,6 +122,7 @@ export type ProjectsFeedData = {
     description: string | null;
     language: string | null;
     platform: string | null;
+    version: string | null;
     repo_url: string | null;
     pages_url: string | null;
     updated_at: string | null;

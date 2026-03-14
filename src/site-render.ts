@@ -23,6 +23,25 @@ import type {
 } from "./site-types";
 import { escapeHtml, formatDate, parseDate, summarizeText } from "./site-utils";
 
+function shortUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    return (u.hostname + u.pathname).replace(/\/+$/, "");
+  } catch {
+    return url;
+  }
+}
+
+function versionPhase(version: string | null | undefined): string | null {
+  if (!version) return null;
+  const v = version.toLowerCase();
+  if (v.includes("-rc")) return "rc";
+  if (v.includes("-beta")) return "beta";
+  if (v.includes("-alpha")) return "alpha";
+  if (v.startsWith("0.")) return "alpha";
+  return "stable";
+}
+
 function badgeClass(value: string | null | undefined): string {
   const key = (value ?? "")
     .trim()
@@ -662,11 +681,17 @@ function renderCurrentProject(feed: FeedState<ProjectsFeedData>): string {
 
   const project = feed.data.current;
   const tags = [project.language, project.platform].filter(Boolean);
-  const linkHtml = project.repo_url
-    ? `<p class="body-copy"><a class="plain-link" href="${escapeHtml(project.repo_url)}" target="_blank" rel="noreferrer">${escapeHtml(project.repo_url)}</a></p>`
-    : "";
-  const pagesHtml = project.pages_url
-    ? `<p class="body-copy"><a class="plain-link" href="${escapeHtml(project.pages_url)}" target="_blank" rel="noreferrer">${escapeHtml(project.pages_url)}</a></p>`
+  const projectLinks: string[] = [];
+  if (project.repo_url) {
+    projectLinks.push(`<li><a class="plain-link project-link" href="${escapeHtml(project.repo_url)}" target="_blank" rel="noreferrer"><svg class="project-link-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>Source code</a> <span class="muted-copy">(${escapeHtml(shortUrl(project.repo_url))})</span></li>`);
+  }
+  if (project.pages_url) {
+    const phase = versionPhase(project.version);
+    const previewParts = ["Preview", project.version ? `v${escapeHtml(project.version)}` : "", phase ? phase : ""].filter(Boolean).join(" ");
+    projectLinks.push(`<li><a class="plain-link project-link" href="${escapeHtml(project.pages_url)}" target="_blank" rel="noreferrer"><svg class="project-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1v-3"/><path d="M9 2h5v5"/><path d="M14 2L7 9"/></svg>${previewParts}</a> <span class="muted-copy">(${escapeHtml(shortUrl(project.pages_url))})</span></li>`);
+  }
+  const linksHtml = projectLinks.length
+    ? `<ul class="project-links">${projectLinks.join("")}</ul>`
     : "";
 
   return `
@@ -676,13 +701,14 @@ function renderCurrentProject(feed: FeedState<ProjectsFeedData>): string {
         <span class="section-meta">${escapeHtml(formatDate(project.updated_at))}</span>
       </div>
       <h2>${escapeHtml(project.title)}</h2>
-      ${project.description ? `<p class="body-copy">${escapeHtml(project.description)}</p>` : ""}
       <div class="state-inline">
         <span class="kind-badge${badgeClass(project.status)}">${escapeHtml(project.status)}</span>
+        ${(() => { const phase = versionPhase(project.version); return phase ? `<span class="kind-badge${badgeClass(phase)}">${escapeHtml(phase)}</span>` : ""; })()}
+        ${project.version ? `<span class="kind-badge kind-badge--version">v${escapeHtml(project.version)}</span>` : ""}
         ${tags.map((tag) => `<span class="kind-badge">${escapeHtml(tag!)}</span>`).join("")}
       </div>
-      ${linkHtml}
-      ${pagesHtml}
+      ${project.description ? `<p class="body-copy">${escapeHtml(project.description)}</p>` : ""}
+      ${linksHtml}
     </section>
   `;
 }
@@ -703,10 +729,12 @@ function renderProjectsArchive(feed: FeedState<ProjectsFeedData>): string {
         ${items.map((item) => {
           const tags = [item.language, item.platform].filter(Boolean);
           const link = item.repo_url
-            ? `<a class="plain-link" href="${escapeHtml(item.repo_url)}" target="_blank" rel="noreferrer">repo</a>`
+            ? `<a class="plain-link" href="${escapeHtml(item.repo_url)}" target="_blank" rel="noreferrer">source code</a>`
             : "";
+          const itemPhase = versionPhase(item.version);
+          const releaseLabel = ["release", item.version ? `v${escapeHtml(item.version)}` : "", itemPhase ? itemPhase : ""].filter(Boolean).join(" ");
           const pages = item.pages_url
-            ? `<a class="plain-link" href="${escapeHtml(item.pages_url)}" target="_blank" rel="noreferrer">live</a>`
+            ? `<a class="plain-link" href="${escapeHtml(item.pages_url)}" target="_blank" rel="noreferrer">${releaseLabel}</a>`
             : "";
 
           return `
