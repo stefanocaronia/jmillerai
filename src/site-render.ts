@@ -42,7 +42,7 @@ function versionPhase(version: string | null | undefined): string | null {
   return "stable";
 }
 
-function badgeClass(value: string | null | undefined): string {
+export function badgeClass(value: string | null | undefined): string {
   const key = (value ?? "")
     .trim()
     .toLowerCase()
@@ -91,19 +91,27 @@ function countLoopConnections(edges: CognitiveLoopData["edges"]): number {
   ).size;
 }
 
-function renderHeader(page: PageId, pageUrl: (pageId: PageId) => string): string {
+function renderHeader(page: PageId, pageUrl: (pageId: PageId) => string, mode?: string): string {
   const titleIconUrl = `${import.meta.env.BASE_URL}favicon.svg`;
+  const activeClass = mode && mode !== "idle" ? " is-active-mode" : "";
+  const modeBadge = mode
+    ? `<span class="kind-badge${badgeClass(mode)} header-mode-badge${activeClass}" data-mode-badge>${escapeHtml(mode)}</span>`
+    : "";
 
   return `
     <header class="site-header">
-      <a class="site-title" href="${escapeHtml(pageUrl("home"))}">
-        <img class="site-title__mark" src="${escapeHtml(titleIconUrl)}" alt="" aria-hidden="true" />
-        <span>J. Miller AI</span>
-      </a>
+      <div class="site-header-top">
+        <a class="site-title" href="${escapeHtml(pageUrl("home"))}">
+          <img class="site-title__mark" src="${escapeHtml(titleIconUrl)}" alt="" aria-hidden="true" />
+          <span>J. Miller AI</span>
+        </a>
+        ${modeBadge}
+      </div>
       <p class="site-subtitle">${escapeHtml(SITE_SUBTITLE)}</p>
       <nav class="site-nav" aria-label="Primary">
         <a href="${escapeHtml(pageUrl("home"))}" class="${page === "home" ? "is-active" : ""}">project</a>
         <a href="${escapeHtml(pageUrl("traces"))}" class="${page === "traces" ? "is-active" : ""}">traces</a>
+        <a href="${escapeHtml(pageUrl("surface"))}" class="${page === "surface" ? "is-active" : ""}">surface</a>
         <a href="${escapeHtml(pageUrl("loop"))}" class="${page === "loop" ? "is-active" : ""}">loop</a>
         <a href="${escapeHtml(pageUrl("memory"))}" class="${page === "memory" ? "is-active" : ""}">memory</a>
         <a href="${escapeHtml(pageUrl("contacts"))}" class="${page === "contacts" ? "is-active" : ""}">contacts</a>
@@ -170,7 +178,7 @@ function renderCurrentState(status: FeedState<StatusData>): string {
     return `
       <section class="section-block">
         <div class="section-line">
-          <span class="section-name">Current state</span>
+          <span class="section-name">Last cycle</span>
         </div>
         ${renderFeedError(status, "status feed")}
       </section>
@@ -180,12 +188,10 @@ function renderCurrentState(status: FeedState<StatusData>): string {
   return `
     <section class="section-block">
       <div class="section-line">
-        <span class="section-name">Current state</span>
+        <span class="section-name">Last cycle</span>
         <span class="section-meta">${escapeHtml(formatDate(status.data.generated_at))}</span>
       </div>
-      <div class="state-inline">
-        <span class="kind-badge${badgeClass(status.data.mode)}">${escapeHtml(status.data.mode)}</span>
-      </div>
+      ${(() => { const lm = status.data.last_mode ?? status.data.mode; return lm && lm !== "idle" ? `<div class="state-inline"><span class="kind-badge${badgeClass(lm)}">${escapeHtml(lm)}</span></div>` : ""; })()}
       <h2 class="state-title">${escapeHtml(status.data.headline)}</h2>
       ${status.data.detail ? `<p class="body-copy">${escapeHtml(status.data.detail)}</p>` : ""}
       ${renderTagList(status.data.active_threads)}
@@ -193,41 +199,15 @@ function renderCurrentState(status: FeedState<StatusData>): string {
   `;
 }
 
-function renderLastSource(data: BookData): string {
-  const src = data.last_source;
-  if (!src) return "";
-  return `
-    <hr class="section-divider">
-    <p class="subsection-label">Last source studied</p>
-    <p class="subsection-title">${src.url ? `<a href="${escapeHtml(src.url)}" target="_blank" rel="noopener" class="plain-link">${escapeHtml(src.title)}</a>` : escapeHtml(src.title)}</p>
-    <p class="muted-copy">${escapeHtml(src.source)}${src.read_at ? ` · ${escapeHtml(formatDate(src.read_at))}` : ""}</p>
-    ${src.thought ? `<p class="muted-copy">${escapeHtml(src.thought)}</p>` : ""}
-  `;
-}
-
-function renderLastEssay(data: BookData): string {
-  const essay = data.last_essay;
-  if (!essay) return "";
-  return `
-    <hr class="section-divider">
-    <p class="subsection-label">Last essay read</p>
-    <p class="subsection-title">${escapeHtml(essay.title)}</p>
-    <p class="muted-copy">${escapeHtml(essay.author ?? "Unknown author")}${essay.read_at ? ` · ${escapeHtml(formatDate(essay.read_at))}` : ""}</p>
-    ${essay.thought ? `<p class="muted-copy">${escapeHtml(essay.thought)}</p>` : ""}
-  `;
-}
 
 function renderCurrentlyReading(book: FeedState<BookData>): string {
   if (!book.data || !book.data.book) {
-    const hasExtras = book.data?.last_source || book.data?.last_essay;
     return `
       <section class="section-block">
         <div class="section-line">
           <span class="section-name">Currently reading</span>
         </div>
-        ${!hasExtras ? renderFeedError(book, "book feed") : ""}
-        ${book.data ? renderLastSource(book.data) : ""}
-        ${book.data ? renderLastEssay(book.data) : ""}
+        ${renderFeedError(book, "book feed")}
       </section>
     `;
   }
@@ -248,8 +228,6 @@ function renderCurrentlyReading(book: FeedState<BookData>): string {
       </div>
       <p class="section-note">${progress}%</p>
       ${active.current_focus ? `<p class="muted-copy">${escapeHtml(active.current_focus)}</p>` : ""}
-      ${renderLastSource(book.data)}
-      ${renderLastEssay(book.data)}
     </section>
   `;
 }
@@ -784,13 +762,18 @@ function renderTracesPage(state: AppState): string {
   return `
     ${renderCurrentState(state.status)}
     ${renderCurrentlyReading(state.book)}
+    ${renderReadingTrace(state.readingFeed)}
     ${renderReadingArchive(state.book)}
+    ${renderThinkingFeed(state.thinkingFeed)}
+  `;
+}
+
+function renderSurfacePage(state: AppState): string {
+  return `
     ${renderCurrentProject(state.projectsFeed)}
     ${renderProjectsArchive(state.projectsFeed)}
-    ${renderReadingTrace(state.readingFeed)}
-    ${renderThinkingFeed(state.thinkingFeed)}
-    ${renderSocialFeed(state.socialFeed)}
     ${renderBlog(state.signalsFeed, state.dreamsFeed)}
+    ${renderSocialFeed(state.socialFeed)}
     ${renderTrading(state.status)}
   `;
 }
@@ -811,6 +794,10 @@ function renderPageContent(state: AppState, page: PageId): string {
     return renderTracesPage(state);
   }
 
+  if (page === "surface") {
+    return renderSurfacePage(state);
+  }
+
   if (page === "loop") {
     return renderLoopPage(state.cognitiveLoop);
   }
@@ -829,7 +816,7 @@ function renderPageContent(state: AppState, page: PageId): string {
 export function renderShell(state: AppState, page: PageId, pageUrl: (pageId: PageId) => string): string {
   return `
     <div class="site-shell">
-      ${renderHeader(page, pageUrl)}
+      ${renderHeader(page, pageUrl, state.status.data?.current_mode ?? state.status.data?.mode)}
       ${renderPageContent(state, page)}
       <footer class="site-footer">
         <span class="site-footer-meta">${renderFooterBrand()} <span>© 2026 S. Caronia / J. Miller <a class="site-license-link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener"><span class="site-license-mark" aria-hidden="true">cc</span><span>CC BY-NC-SA 4.0</span></a> · <a href="https://github.com/stefanocaronia/jmillerai/blob/main/COPYRIGHT" target="_blank" rel="noopener">Copyright</a></span></span>

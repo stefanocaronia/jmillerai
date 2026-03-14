@@ -3,8 +3,8 @@ import { initializeConsentBanner } from "./consent";
 import { mountCognitiveLoop } from "./cognitive-loop";
 import { mountMemoryGraph } from "./memory-graph";
 import { loadState } from "./site-data";
-import { renderShell, applyProgressMeters, applySpoilerToggles } from "./site-render";
-import type { PageId } from "./site-types";
+import { renderShell, applyProgressMeters, applySpoilerToggles, badgeClass } from "./site-render";
+import type { PageId, StatusData } from "./site-types";
 
 const appRoot = document.querySelector<HTMLDivElement>("#app");
 
@@ -50,4 +50,26 @@ async function start() {
   }
 }
 
-void start();
+const STATUS_POLL_INTERVAL = 60_000;
+
+async function pollStatus() {
+  try {
+    const url = feedUrl("status");
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return;
+    const data = (await res.json()) as StatusData;
+    const badge = document.querySelector<HTMLElement>("[data-mode-badge]");
+    if (!badge) return;
+    const newMode = data.current_mode ?? data.mode;
+    if (badge.textContent === newMode) return;
+    badge.textContent = newMode;
+    const activeClass = newMode !== "idle" ? " is-active-mode" : "";
+    badge.className = `kind-badge${badgeClass(newMode)} header-mode-badge${activeClass}`;
+  } catch {
+    // silent fail
+  }
+}
+
+void start().then(() => {
+  setInterval(pollStatus, STATUS_POLL_INTERVAL);
+});

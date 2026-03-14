@@ -84,6 +84,26 @@ a:visited {
   margin-bottom: 28px;
 }
 
+.site-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.header-mode-badge {
+  flex-shrink: 0;
+}
+
+.header-mode-badge.is-active-mode {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
 .site-title {
   display: inline-flex;
   align-items: center;
@@ -341,7 +361,7 @@ a:visited {
 
 .section-divider {
   border: none;
-  height: 0;
+  height: 1px;
   margin: 20px 0 16px;
   padding-top: 0;
   background-image: repeating-linear-gradient(
@@ -654,6 +674,21 @@ a:visited {
 .kind-badge--summary {
   border-color: var(--memory-summary);
   color: var(--memory-summary);
+}
+
+.kind-badge--idle {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.kind-badge--developer {
+  border-color: #fb923c;
+  color: #fb923c;
+}
+
+.kind-badge--blog {
+  border-color: #38bdf8;
+  color: #38bdf8;
 }
 
 .kind-badge--like {

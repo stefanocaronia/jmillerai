@@ -1,13 +1,15 @@
 import type { CognitiveLoopData } from "./cognitive-loop";
 import type { PublicGraphData } from "./memory-graph";
 
-export type PageId = "home" | "traces" | "loop" | "memory" | "contacts";
-export type Mode = "reading" | "thinking" | "dreaming" | "writing" | "idle";
+export type PageId = "home" | "traces" | "surface" | "loop" | "memory" | "contacts";
+export type Mode = string;
 
 export type StatusData = {
   schema_version: number;
   generated_at: string;
   mode: Mode;
+  last_mode: Mode | null;
+  current_mode: Mode | null;
   headline: string;
   detail?: string | null;
   active_threads: string[];
