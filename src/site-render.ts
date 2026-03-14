@@ -95,7 +95,7 @@ function renderHeader(page: PageId, pageUrl: (pageId: PageId) => string, mode?: 
   const titleIconUrl = `${import.meta.env.BASE_URL}favicon.svg`;
   const activeClass = mode && mode !== "idle" ? " is-active-mode" : "";
   const modeBadge = mode
-    ? `<span class="kind-badge${badgeClass(mode)} header-mode-badge${activeClass}" data-mode-badge>${escapeHtml(mode)}</span>`
+    ? `<span class="header-mode-group"><span class="header-mode-label">current state</span><span class="kind-badge${badgeClass(mode)} header-mode-badge${activeClass}" data-mode-badge>${escapeHtml(mode)}</span></span>`
     : "";
 
   return `
