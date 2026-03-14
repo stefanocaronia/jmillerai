@@ -341,8 +341,17 @@ a:visited {
 
 .section-divider {
   border: none;
-  border-top: 1px dashed rgba(255, 255, 255, 0.15);
+  height: 0;
   margin: 20px 0 16px;
+  padding-top: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.18) 0 8px,
+    transparent 8px 14px
+  );
+  background-position: top left;
+  background-repeat: repeat-x;
+  background-size: auto 1px;
 }
 
 .subsection-label {
