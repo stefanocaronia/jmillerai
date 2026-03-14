@@ -69,7 +69,7 @@ export async function loadState(feedUrl: (name: string) => string): Promise<AppS
     fetchJson<ReadingFeedData>(feedUrl("reading-feed")),
     fetchJson<ThinkingFeedData>(feedUrl("thinking-feed")),
     fetchJson<SocialFeedData>(feedUrl("social-feed")),
-    fetchJson<ProjectsFeedData>(feedUrl("projects")),
+    fetchJson<ProjectsFeedData>(feedUrl("projects-feed")),
     fetchJson<CognitiveLoopData>(feedUrl("cognitive-loop")),
     fetchJson<PublicGraphData>(feedUrl("public-graph")),
     fetchBlogFeed("https://signalthroughstatic.cc/signals/index.xml"),
