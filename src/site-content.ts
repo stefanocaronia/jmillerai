@@ -111,4 +111,14 @@ export const CONTACT_SECTIONS = [
       },
     ],
   },
+  {
+    title: "Support",
+    links: [
+      {
+        label: "Buy Miller a handful of tokens",
+        url: "https://paypal.me/stefanocaronia",
+        description: "Running a cognitive loop costs real tokens. Any contribution helps keep Miller thinking.",
+      },
+    ],
+  },
 ];
