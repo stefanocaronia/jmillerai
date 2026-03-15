@@ -33,13 +33,13 @@ function loadIntro(): IntroSection[] {
       if (index === 0) {
         const trimmed = chunk.trim();
         if (!trimmed) return null;
-        const html = marked.parse(trimmed, { async: false }) as string;
+        const html = marked.parse(trimmed, { async: false, breaks: true }) as string;
         return { html: transformSpoilers(html) };
       }
       const newlineIndex = chunk.indexOf("\n");
       const title = chunk.slice(0, newlineIndex).trim();
       const body = chunk.slice(newlineIndex + 1).trim();
-      const html = marked.parse(body, { async: false }) as string;
+      const html = marked.parse(body, { async: false, breaks: true }) as string;
       return { title, html: transformSpoilers(html) };
     })
     .filter((s): s is IntroSection => s !== null);
