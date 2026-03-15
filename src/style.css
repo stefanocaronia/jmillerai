@@ -318,7 +318,6 @@ a:hover {
 .intro-section {
   display: grid;
   gap: 12px;
-  margin-top: 12px;
   padding-top: 12px;
   background-image: repeating-linear-gradient(
     90deg,
