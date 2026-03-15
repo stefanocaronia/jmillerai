@@ -8,6 +8,7 @@ import {
   type PublicGraphData,
 } from "./memory-graph";
 import { CONTACT_SECTIONS, INTRO_SECTIONS, SITE_SUBTITLE } from "./site-content";
+import devlogPosts from "virtual:devlog-posts";
 import type {
   AppState,
   BlogFeedData,
@@ -127,6 +128,7 @@ function renderHeader(page: PageId, pageUrl: (pageId: PageId) => string, mode?: 
         <a href="${escapeHtml(pageUrl("surface"))}" class="${page === "surface" ? "is-active" : ""}">surface</a>
         <a href="${escapeHtml(pageUrl("loop"))}" class="${page === "loop" ? "is-active" : ""}">loop</a>
         <a href="${escapeHtml(pageUrl("memory"))}" class="${page === "memory" ? "is-active" : ""}">memory</a>
+        <a href="${escapeHtml(pageUrl("devlog"))}" class="${page === "devlog" ? "is-active" : ""}">devlog</a>
         <a href="${escapeHtml(pageUrl("contacts"))}" class="${page === "contacts" ? "is-active" : ""}">contacts</a>
       </nav>
     </header>
@@ -806,7 +808,84 @@ function renderMapPage(state: AppState): string {
   `;
 }
 
-function renderPageContent(state: AppState, page: PageId): string {
+const DEVLOG_PAGE_SIZE = 10;
+
+function renderDevlogSinglePost(slug: string): string {
+  const post = devlogPosts.find((p) => p.slug === slug);
+  if (!post) return renderDevlogArchive();
+  const timeMeta = post.time ? `, ${escapeHtml(post.time)}` : "";
+  return `
+    <article class="section-block" id="${escapeHtml(post.slug)}">
+      <div class="section-line">
+        <span class="section-name">${escapeHtml(post.title)}</span>
+        <span class="section-meta">${escapeHtml(formatDate(post.date, false))}${timeMeta}</span>
+      </div>
+      <div class="devlog-body body-copy">${post.html}</div>
+    </article>
+    <div class="devlog-more-wrap devlog-single-back">
+      <a class="devlog-more" href="${import.meta.env.BASE_URL}devlog/">&larr; all entries</a>
+    </div>
+  `;
+}
+
+function renderDevlogArchive(): string {
+  if (devlogPosts.length === 0) {
+    return `
+      <section class="section-block">
+        <div class="section-line">
+          <span class="section-name">Devlog</span>
+        </div>
+        <p class="muted-copy">No entries yet.</p>
+      </section>
+    `;
+  }
+
+  const [latest, ...older] = devlogPosts;
+  const listLimit = DEVLOG_PAGE_SIZE;
+
+  return `
+    <article class="section-block" id="${escapeHtml(latest.slug)}">
+      <div class="section-line">
+        <span class="section-name">${escapeHtml(latest.title)}</span>
+        <span class="section-meta">${escapeHtml(formatDate(latest.date, false))}${latest.time ? `, ${escapeHtml(latest.time)}` : ""}</span>
+      </div>
+      <div class="devlog-body body-copy">${latest.html}</div>
+    </article>
+    ${older.length ? `
+      <section class="section-block">
+        <div class="section-line">
+          <span class="section-name">Archive</span>
+          <span class="section-meta">${devlogPosts.length} ${devlogPosts.length === 1 ? "entry" : "entries"}</span>
+        </div>
+        <ul class="devlog-archive">
+          ${older.map((post, i) => {
+            const excerpt = post.html.replace(/<[^>]*>/g, "").trim();
+            const firstLine = summarizeText(excerpt, 140);
+            return `
+            <li class="devlog-archive-item${i >= listLimit ? " devlog-hidden" : ""}" data-devlog-slug="${escapeHtml(post.slug)}">
+              <div class="devlog-archive-head">
+                <a class="devlog-archive-link" href="#${escapeHtml(post.slug)}">${escapeHtml(post.title)}</a>
+                <span class="section-meta">${escapeHtml(formatDate(post.date, false))}</span>
+              </div>
+              <p class="muted-copy">${escapeHtml(firstLine)}</p>
+            </li>`;
+          }).join("")}
+        </ul>
+        ${older.length > listLimit ? `
+          <div class="devlog-more-wrap">
+            <button type="button" class="devlog-more" data-devlog-more>show more</button>
+          </div>
+        ` : ""}
+      </section>
+    ` : ""}
+  `;
+}
+
+function renderDevlogPage(slug?: string): string {
+  return slug ? renderDevlogSinglePost(slug) : renderDevlogArchive();
+}
+
+function renderPageContent(state: AppState, page: PageId, devlogSlug?: string): string {
   if (page === "home") {
     return renderProjectPage();
   }
@@ -827,6 +906,10 @@ function renderPageContent(state: AppState, page: PageId): string {
     return renderMapPage(state);
   }
 
+  if (page === "devlog") {
+    return renderDevlogPage(devlogSlug);
+  }
+
   if (page === "contacts") {
     return renderContactsPage();
   }
@@ -834,11 +917,11 @@ function renderPageContent(state: AppState, page: PageId): string {
   return renderProjectPage();
 }
 
-export function renderShell(state: AppState, page: PageId, pageUrl: (pageId: PageId) => string): string {
+export function renderShell(state: AppState, page: PageId, pageUrl: (pageId: PageId) => string, devlogSlug?: string): string {
   return `
     <div class="site-shell">
       ${renderHeader(page, pageUrl, state.status.data?.current_mode ?? state.status.data?.mode)}
-      ${renderPageContent(state, page)}
+      ${renderPageContent(state, page, devlogSlug)}
       <footer class="site-footer">
         <span class="site-footer-meta">${renderFooterBrand()} <span>© 2026 S. Caronia / J. Miller <a class="site-license-link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener"><span class="site-license-mark" aria-hidden="true">cc</span><span>CC BY-NC-SA 4.0</span></a> · <a href="https://github.com/stefanocaronia/jmillerai/blob/main/COPYRIGHT" target="_blank" rel="noopener">Copyright</a></span></span>
         ${renderFooterSnapshot(state)}

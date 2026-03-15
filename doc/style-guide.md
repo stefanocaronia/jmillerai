@@ -146,14 +146,30 @@ section.section-block
 
 ## Links
 
-- Default link color: `--ink` (white), no underline
-- Hover: underline
-- `plain-link`: inherits color, underline on hover
-- External links: always `target="_blank" rel="noreferrer"`
+Global rule: all links have **no underline** by default, **underline on hover**.
+
+| Context | Color | Underline | Hover |
+|---|---|---|---|
+| Default (`a`) | `inherit` | none | underline |
+| Landing page links (`.intro-section a`) | `--accent` | none | underline |
+| Inline content links (`.body-copy a`, `.muted-copy a`, `.devlog-body a`) | `inherit` | **yes** (always) | underline |
+| Heading links (`.stream-item h3 a`, `.devlog-archive-link`) | `--ink` | none | underline |
+| Navigation (`.site-nav a`) | `--ink-soft` | none | **no underline**, color → `--accent` |
+| Site title (`.site-title`) | `--ink` | none | none |
+
+### Affordance strategy
+
+- **Landing page** (`.intro-section`): `--accent` (orange) color distinguishes links from `--ink-soft` text
+- **Inline content** (`.body-copy`, `.muted-copy`, `.devlog-body`): underline distinguishes links, color stays inherited to preserve the dimmed/muted tone
+- **Headings and titles**: context (font, size, position) is the affordance; underline only appears on hover
+
+### External links
+
+Always use `target="_blank" rel="noreferrer"`.
 
 ### Project links
 
-- Bulleted list (`ul.project-links`) with inline SVG icons
+- Bulleted list (`ul.project-links`) with disc markers
 - Source code: GitHub octocat icon
 - Preview/Release: external-link icon
 - Short URL in parentheses after the link (`muted-copy`)

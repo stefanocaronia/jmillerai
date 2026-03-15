@@ -1,9 +1,13 @@
-const timeFormat = new Intl.DateTimeFormat("en-GB", {
+const dateTimeFormat = new Intl.DateTimeFormat("en-GB", {
   dateStyle: "medium",
   timeStyle: "short",
 });
 
-export function formatDate(value: string | null | undefined): string {
+const dateOnlyFormat = new Intl.DateTimeFormat("en-GB", {
+  dateStyle: "medium",
+});
+
+export function formatDate(value: string | null | undefined, includeTime = true): string {
   if (!value) {
     return "Unknown";
   }
@@ -13,7 +17,7 @@ export function formatDate(value: string | null | undefined): string {
     return value;
   }
 
-  return timeFormat.format(date);
+  return includeTime ? dateTimeFormat.format(date) : dateOnlyFormat.format(date);
 }
 
 export function parseDate(value: string | null | undefined): number | null {

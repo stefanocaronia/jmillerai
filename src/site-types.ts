@@ -1,7 +1,7 @@
 import type { CognitiveLoopData } from "./cognitive-loop";
 import type { PublicGraphData } from "./memory-graph";
 
-export type PageId = "home" | "traces" | "surface" | "loop" | "memory" | "contacts";
+export type PageId = "home" | "traces" | "surface" | "loop" | "memory" | "contacts" | "devlog";
 export type Mode = string;
 
 export type StatusData = {
