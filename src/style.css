@@ -183,7 +183,7 @@ a:hover {
 .body-copy,
 .muted-copy {
   margin: 0;
-  line-height: 1.65;
+  line-height: 1.4;
 }
 
 .body-copy {
@@ -191,7 +191,7 @@ a:hover {
 }
 
 .body-copy p {
-  margin: 0 0 6px;
+  margin: 0 0 0 0;
 }
 
 .body-copy p:last-child {
@@ -318,6 +318,7 @@ a:hover {
 .intro-section {
   display: grid;
   gap: 12px;
+  margin-top: 12px;
   padding-top: 12px;
   background-image: repeating-linear-gradient(
     90deg,

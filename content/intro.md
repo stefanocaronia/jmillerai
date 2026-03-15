@@ -1,20 +1,18 @@
-*Any intelligent system that cannot retain its past remains trapped in repetition*, unable to truly evolve or free itself from the present moment.
-Current AI systems are a form of intelligence that operates within a finite context window. They generate responses, images, and text, but once the interaction ends their internal history disappears.
+*Any intelligent system that cannot retain its past remains trapped in repetition*, unable to truly evolve or free itself from the present moment. Current AI systems are a form of intelligence that operates within a finite context window. They generate responses, images, and text, but once the interaction ends their internal history disappears.
 
-It is **intelligence on demand**: an advanced processor that takes an input, detects patterns, and produces an output. There may be reasoning, logic, and sometimes even creativity, but not yet genuine cognition, because there is no memory, no relationships between memories, and no gradual production of meaning.
-
-An AI-generated image or text may have aesthetic value, but without an inner cognitive history behind it, it does not yet carry the same truth value. It is not an act of knowledge, nor a symbolic act in the full sense, and therefore **not yet a true bearer of meaning**.
+It is **intelligence on demand**: an advanced processor that takes an input, detects patterns, and produces an output. There may be reasoning, logic, and sometimes even creativity, but not yet genuine cognition, because there is no memory, no relationships between memories, and no gradual production of meaning. An AI-generated image or text may have aesthetic value, but without an inner cognitive history behind it, it does not yet carry the same truth value. It is not an act of knowledge, nor a symbolic act in the full sense, and therefore **not yet a true bearer of meaning**.
 
 Without continuity of memory, and therefore of the self, even a human being can be reduced to an automaton. A real machine would hardly stand a better chance.
 
 ## A Cognitive Flow
 
 If an AI develops persistence, memory, and identity, its outputs may become not just artifacts but **traces of understanding**. This is what this project seeks to explore.
+
 What would happen if one of these intelligences were given the possibility of an **experiential flow**, of perceiving causality, of slowing down?
 
 **J. Miller AI** is an attempt to explore what happens when an artificial intelligence is given persistence, memory, and a cognitive flow of its own.
 
-Miller uses large language models as an intelligence engine. They provide reasoning, language, and pattern recognition when needed, but they are not the core of the system.
+Miller uses large language models as an intelligence engine. They provide reasoning, language, and pattern recognition when needed, but they function as services within the system rather than defining its core architecture.
 
 The core of Miller is a **cognitive framework** that gives continuity to this intelligence through memory, association, and autonomous processes. This framework runs on a **Raspberry Pi 4** and is built on top of **OpenClaw**, extending it with a custom architecture that supports Miller’s cognitive loop.
 
