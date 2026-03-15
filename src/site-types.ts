@@ -10,8 +10,11 @@ export type StatusData = {
   last_mode: Mode | null;
   current_mode: Mode | null;
   headline: string;
+  headline_en?: string | null;
   detail?: string | null;
+  detail_en?: string | null;
   active_threads: string[];
+  active_threads_en?: string[] | null;
   current_book: {
     title: string;
     author: string | null;
@@ -38,12 +41,14 @@ export type BookData = {
   book: {
     slug: string;
     title: string;
+    title_en?: string | null;
     author: string | null;
     progress_percent: number;
     started_at: string | null;
     updated_at: string | null;
     cover_image: string | null;
     current_focus: string | null;
+    current_focus_en?: string | null;
   } | null;
   last_source?: {
     title: string;
@@ -51,12 +56,15 @@ export type BookData = {
     url: string | null;
     read_at: string | null;
     thought: string | null;
+    thought_en?: string | null;
   } | null;
   last_essay?: {
     title: string;
+    title_en?: string | null;
     author: string | null;
     read_at: string | null;
     thought: string | null;
+    thought_en?: string | null;
   } | null;
   finished_books?: Array<{
     slug: string | null;
@@ -76,6 +84,7 @@ export type ReadingFeedData = {
     url: string | null;
     read_at: string;
     why_it_mattered: string | null;
+    why_it_mattered_en?: string | null;
   }>;
 };
 
@@ -85,7 +94,9 @@ export type ThinkingFeedData = {
   items: Array<{
     key: string;
     title: string;
+    title_en?: string | null;
     summary: string;
+    summary_en?: string | null;
     importance: number;
     created_at: string;
     related_books: Array<{ title: string; author: string | null; url: string | null }>;
@@ -110,6 +121,7 @@ export type SocialFeedData = {
     actor: string | null;
     content?: string | null;
     summary: string;
+    summary_en?: string | null;
   }>;
 };
 
@@ -120,7 +132,9 @@ export type ProjectsFeedData = {
   current: {
     slug: string;
     title: string;
+    title_en?: string | null;
     description: string | null;
+    description_en?: string | null;
     language: string | null;
     platform: string | null;
     status: string;

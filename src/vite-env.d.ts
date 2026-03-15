@@ -11,3 +11,12 @@ declare module "virtual:devlog-posts" {
   const posts: DevlogPost[];
   export default posts;
 }
+
+declare module "virtual:intro-sections" {
+  interface IntroSection {
+    title?: string;
+    html: string;
+  }
+  const sections: IntroSection[];
+  export default sections;
+}

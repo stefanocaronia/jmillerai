@@ -38,6 +38,11 @@ export function escapeHtml(value: string): string {
     .replaceAll("'", "&#039;");
 }
 
+/** Prefer English (_en) field if available, fallback to original */
+export function en<T extends string | null | undefined>(original: T, english?: T | null): T {
+  return (english != null && english !== "" ? english : original) as T;
+}
+
 export function summarizeText(text: string, maxLength = 220): string {
   const normalized = text.trim().replace(/\s+/g, " ");
   if (normalized.length <= maxLength && /[.!?]$/.test(normalized)) {

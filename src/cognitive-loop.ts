@@ -3,8 +3,10 @@ import cytoscape, { type Core } from "cytoscape";
 export type CognitiveLoopNode = {
   id: string;
   label: string;
+  label_en?: string | null;
   kind: string;
   summary: string;
+  summary_en?: string | null;
   notes: string[];
 };
 

@@ -190,6 +190,14 @@ a:hover {
   color: var(--ink-soft);
 }
 
+.body-copy p {
+  margin: 0 0 6px;
+}
+
+.body-copy p:last-child {
+  margin-bottom: 0;
+}
+
 .muted-copy {
   color: var(--ink-muted);
 }

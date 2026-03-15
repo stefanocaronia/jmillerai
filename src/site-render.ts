@@ -7,7 +7,8 @@ import {
   presentPublicNodeLabel,
   type PublicGraphData,
 } from "./memory-graph";
-import { CONTACT_SECTIONS, INTRO_SECTIONS, SITE_SUBTITLE } from "./site-content";
+import { CONTACT_SECTIONS, SITE_SUBTITLE } from "./site-content";
+import introSections from "virtual:intro-sections";
 import devlogPosts from "virtual:devlog-posts";
 import type {
   AppState,
@@ -22,7 +23,7 @@ import type {
   StatusData,
   ThinkingFeedData,
 } from "./site-types";
-import { escapeHtml, formatDate, parseDate, summarizeText } from "./site-utils";
+import { en, escapeHtml, formatDate, parseDate, summarizeText } from "./site-utils";
 
 function formatDetail(raw: string): string {
   const safe = raw
@@ -76,10 +77,7 @@ function renderFeedError<T>(feed: FeedState<T>, label: string): string {
 }
 
 function renderTagList(items: string[]): string {
-  if (items.length === 0) {
-    return `<p class="muted-copy">No active threads.</p>`;
-  }
-
+  if (items.length === 0) return "";
   return `
     <ul class="tag-list">
       ${items.map((item) => `<li>#${escapeHtml(item)}</li>`).join("")}
@@ -170,15 +168,15 @@ function renderIntro(): string {
   return `
     <section class="section-block">
       <div class="text-flow">
-        ${INTRO_SECTIONS.map((section) => `
+        ${introSections.map((section) => `
           <article class="intro-section">
             ${section.title ? `
               <div class="section-line">
                 <span class="section-name">${escapeHtml(section.title)}</span>
               </div>
             ` : ""}
-            <div class="text-flow">
-              ${section.paragraphs.map((paragraph) => `<p class="body-copy">${paragraph}</p>`).join("")}
+            <div class="text-flow body-copy">
+              ${section.html}
             </div>
           </article>
         `).join("")}
@@ -207,9 +205,13 @@ function renderCurrentState(status: FeedState<StatusData>): string {
       </div>
       <p class="muted-copy">Latest snapshot from Miller's cognitive loop.</p>
       ${(() => { const lm = status.data.last_mode ?? "idle"; return lm && lm !== "idle" ? `<div class="state-inline"><span class="kind-badge${badgeClass(lm)}">${escapeHtml(lm)}</span></div>` : ""; })()}
-      <h2 class="state-title">${escapeHtml(status.data.headline)}</h2>
-      ${status.data.detail ? `<p class="state-detail">${formatDetail(status.data.detail)}</p>` : ""}
-      ${renderTagList(status.data.active_threads)}
+      <h2 class="state-title">${escapeHtml(en(status.data.headline, status.data.headline_en))}</h2>
+      ${(() => { const d = en(status.data.detail, status.data.detail_en); return d ? `<p class="state-detail">${formatDetail(d)}</p>` : ""; })()}
+      ${(() => { const threads = status.data.active_threads_en?.length ? status.data.active_threads_en : status.data.active_threads; return threads.length > 0 ? `
+        <hr class="section-divider" />
+        <span class="subsection-label">Active threads</span>
+        ${renderTagList(threads)}
+      ` : ""; })()}
     </section>
   `;
 }
@@ -237,13 +239,13 @@ function renderCurrentlyReading(book: FeedState<BookData>): string {
         <span class="section-meta">${escapeHtml(formatDate(active.updated_at))}</span>
       </div>
       <p class="muted-copy">The book Miller is currently reading, processed slowly in small chunks across sessions.</p>
-      <h2>${escapeHtml(active.title)}</h2>
+      <h2>${escapeHtml(en(active.title, active.title_en))}</h2>
       <p class="body-copy">${escapeHtml(active.author ?? "Unknown author")}</p>
       <div class="progress-meter">
         <span class="progress-meter-fill" data-progress="${escapeHtml(progress)}"></span>
       </div>
       <p class="section-note">${progress}%</p>
-      ${active.current_focus ? `<p class="muted-copy">${escapeHtml(active.current_focus)}</p>` : ""}
+      ${(() => { const f = en(active.current_focus, active.current_focus_en); return f ? `<p class="muted-copy">${escapeHtml(f)}</p>` : ""; })()}
     </section>
   `;
 }
@@ -336,7 +338,7 @@ function renderReadingTrace(feed: FeedState<ReadingFeedData>, limit = 6): string
                 <span class="section-meta">${escapeHtml(formatDate(item.read_at))}</span>
               </div>
               <h3>${title}</h3>
-              ${item.why_it_mattered ? `<p class="muted-copy">${escapeHtml(item.why_it_mattered)}</p>` : ""}
+              ${(() => { const w = en(item.why_it_mattered, item.why_it_mattered_en); return w ? `<p class="muted-copy">${escapeHtml(w)}</p>` : ""; })()}
             </article>
           `;
         }).join("")}
@@ -377,8 +379,8 @@ function renderThinkingFeed(feed: FeedState<ThinkingFeedData>, limit = 5): strin
                 <span class="section-name section-name-small">importance ${item.importance}</span>
                 <span class="section-meta">${escapeHtml(formatDate(item.created_at))}</span>
               </div>
-              <h3>${escapeHtml(item.title)}</h3>
-              <p class="body-copy">${escapeHtml(summarizeText(item.summary))}</p>
+              <h3>${escapeHtml(en(item.title, item.title_en))}</h3>
+              <p class="body-copy">${escapeHtml(summarizeText(en(item.summary, item.summary_en)))}</p>
               ${renderRelatedList(related)}
             </article>
           `;
@@ -421,7 +423,7 @@ function renderSocialFeed(feed: FeedState<SocialFeedData>, limit = 6): string {
               <div class="section-line social-item-head">
                 <div class="social-item-head-main">
                   <span class="kind-badge${badgeClass(item.action)}">${escapeHtml(item.action_label)}</span>
-                  <span class="social-item-summary">${escapeHtml(item.summary)}</span>
+                  <span class="social-item-summary">${escapeHtml(en(item.summary, item.summary_en))}</span>
                 </div>
                 <span class="section-meta">${escapeHtml(formatDate(item.occurred_at))}</span>
               </div>
@@ -649,7 +651,7 @@ function renderLoopPage(loop: FeedState<CognitiveLoopData>): string {
                 ${(() => { const mode = nodePublicMode(node); return mode ? `<span class="kind-badge${badgeClass(mode)}">${escapeHtml(mode)}</span>` : `<span class="kind-badge">${escapeHtml(node.label)}</span>`; })()}
               </div>
             </div>
-            <p class="body-copy loop-state-desc">${escapeHtml(node.summary)}</p>
+            <p class="body-copy loop-state-desc">${escapeHtml(en(node.summary, node.summary_en))}</p>
           </article>
         `).join("")}
       </div>
@@ -726,14 +728,14 @@ function renderCurrentProject(feed: FeedState<ProjectsFeedData>): string {
         <span class="section-meta">${escapeHtml(formatDate(project.updated_at))}</span>
       </div>
       <p class="muted-copy">Active development project on <a class="plain-link" href="https://github.com/josephusm" target="_blank" rel="noreferrer">GitHub</a>, built iteratively across multiple sessions.</p>
-      <h2>${escapeHtml(project.title)}</h2>
+      <h2>${escapeHtml(en(project.title, project.title_en))}</h2>
       <div class="state-inline">
         <span class="kind-badge${badgeClass(project.status)}">${escapeHtml(project.status)}</span>
         ${(() => { const phase = versionPhase(project.version); return phase ? `<span class="kind-badge${badgeClass(phase)}">${escapeHtml(phase)}</span>` : ""; })()}
         ${project.version ? `<span class="kind-badge kind-badge--version">v${escapeHtml(project.version)}</span>` : ""}
         ${tags.map((tag) => `<span class="kind-badge">${escapeHtml(tag!)}</span>`).join("")}
       </div>
-      ${project.description ? `<p class="body-copy">${escapeHtml(project.description)}</p>` : ""}
+      ${(() => { const desc = en(project.description, project.description_en); return desc ? `<p class="body-copy">${escapeHtml(desc)}</p>` : ""; })()}
       ${linksHtml}
     </section>
   `;

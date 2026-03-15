@@ -1,10 +1,11 @@
 import { resolve } from "node:path";
 import { defineConfig } from "vite";
 import devlogPlugin from "./vite-plugin-devlog";
+import introPlugin from "./vite-plugin-intro";
 
 export default defineConfig({
   base: "/",
-  plugins: [devlogPlugin()],
+  plugins: [devlogPlugin(), introPlugin()],
   build: {
     rollupOptions: {
       input: {
