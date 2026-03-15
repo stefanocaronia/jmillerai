@@ -649,7 +649,7 @@ function renderLoopPage(loop: FeedState<CognitiveLoopData>): string {
                 ${(() => { const mode = nodePublicMode(node); return mode ? `<span class="kind-badge${badgeClass(mode)}">${escapeHtml(mode)}</span>` : `<span class="kind-badge">${escapeHtml(node.label)}</span>`; })()}
               </div>
             </div>
-            <p class="muted-copy loop-state-desc">${escapeHtml(node.summary)}</p>
+            <p class="body-copy loop-state-desc">${escapeHtml(node.summary)}</p>
           </article>
         `).join("")}
       </div>
