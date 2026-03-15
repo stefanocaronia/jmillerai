@@ -376,7 +376,8 @@ function graphLabel(node: CognitiveLoopNode): string {
     return "MEMORY";
   }
 
-  return node.id in modeColors ? node.id.toUpperCase() : shortenLabel(node.label);
+  const id = resolveNodeId(node.id);
+  return id in modeColors ? id.toUpperCase() : shortenLabel(node.label);
 }
 
 export function projectLoopGraph(loop: CognitiveLoopData): {
