@@ -67,11 +67,27 @@ const modeColors: Record<string, string> = {
 const DEFAULT_NODE_COLOR = "#c3c3c3";
 
 function nodeColor(node: CognitiveLoopNode): string {
-  return modeColors[node.id] ?? DEFAULT_NODE_COLOR;
+  return modeColors[resolveNodeId(node.id)] ?? DEFAULT_NODE_COLOR;
 }
 
 export function nodePublicMode(node: CognitiveLoopNode): string | null {
-  return node.id in modeColors ? node.id : null;
+  const id = resolveNodeId(node.id);
+  return id in modeColors ? id : null;
+}
+
+/** Map server node id → public name used in positions/edges/colors */
+const serverIdToPublic: Record<string, string> = {
+  experience: "browsing",
+  conversation: "chat",
+  dream: "dreaming",
+  blog: "blogging",
+  social: "sharing",
+  developer: "coding",
+  mail: "mailing",
+};
+
+function resolveNodeId(serverId: string): string {
+  return serverIdToPublic[serverId] ?? serverId;
 }
 
 const GRAPH_MEMORY_NODE_ID = "memory-hub";
@@ -352,7 +368,7 @@ function graphNodeId(node: CognitiveLoopNode): string {
     return GRAPH_MEMORY_NODE_ID;
   }
 
-  return node.id;
+  return resolveNodeId(node.id);
 }
 
 function graphLabel(node: CognitiveLoopNode): string {
@@ -385,8 +401,8 @@ export function projectLoopGraph(loop: CognitiveLoopData): {
 
   const orientedEdges = loop.edges
     .map((edge) => ({
-      source: edge.source === "memory" || edge.source === "short-state" ? GRAPH_MEMORY_NODE_ID : edge.source,
-      target: edge.target === "memory" || edge.target === "short-state" ? GRAPH_MEMORY_NODE_ID : edge.target,
+      source: edge.source === "memory" || edge.source === "short-state" ? GRAPH_MEMORY_NODE_ID : resolveNodeId(edge.source),
+      target: edge.target === "memory" || edge.target === "short-state" ? GRAPH_MEMORY_NODE_ID : resolveNodeId(edge.target),
     }))
     .filter((edge) => edge.source !== edge.target);
 
