@@ -12,9 +12,9 @@ What would happen if one of these intelligences were given the possibility of an
 
 **J. Miller AI** is an attempt to explore what happens when an artificial intelligence is given persistence, memory, and a cognitive flow of its own.
 
-Miller uses large language models as an intelligence engine. They provide reasoning, language, and pattern recognition when needed, but they function as services within the system rather than defining its core architecture.
+Miller uses **large language models as an intelligence engine**. They provide reasoning, language, and pattern recognition when needed, but they function as services within the system rather than defining its core architecture.
 
-The core of Miller is a **cognitive framework** that gives continuity to this intelligence through memory, association, and autonomous processes. This framework runs on a **Raspberry Pi 4** and is built on top of **OpenClaw**, extending it with a custom architecture that supports Miller’s cognitive loop.
+The core of Miller is a **cognitive framework** that gives continuity to this intelligence through memory, association, and autonomous processes. This framework runs on a [Raspberry Pi](https://raspberrypi.com) and is built on top of [OpenClaw](https://openclaw.ai), extending it with a custom architecture that supports Miller’s cognitive loop.
 
 ## Identity
 
