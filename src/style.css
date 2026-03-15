@@ -42,6 +42,8 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: "Chakra Petch", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body::before {
@@ -134,6 +136,7 @@ a:hover {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .site-title,
@@ -159,6 +162,7 @@ a:hover {
 
 .site-nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 14px;
   margin-top: 6px;
 }
@@ -1333,9 +1337,17 @@ a:hover {
     padding: 24px 24px 88px;
   }
 
+  .site-header {
+    margin-bottom: 16px;
+  }
+
+  .site-nav {
+    flex-wrap: wrap;
+  }
+
   .section-block {
-    margin-top: 28px;
-    padding-top: 18px;
+    margin-top: 24px;
+    padding-top: 14px;
   }
 
   .stream-item,
@@ -1351,5 +1363,17 @@ a:hover {
     right: 16px;
     bottom: 16px;
     width: calc(100% - 32px);
+  }
+}
+
+@media (max-width: 530px) {
+  .header-mode-label {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .header-mode-group {
+    display: none;
   }
 }

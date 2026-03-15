@@ -107,10 +107,9 @@ function countLoopConnections(edges: CognitiveLoopData["edges"]): number {
 
 function renderHeader(page: PageId, pageUrl: (pageId: PageId) => string, mode?: string): string {
   const titleIconUrl = `${import.meta.env.BASE_URL}favicon.svg`;
-  const activeClass = mode && mode !== "idle" ? " is-active-mode" : "";
-  const modeBadge = mode
-    ? `<span class="header-mode-group"><span class="header-mode-label">current state</span><span class="kind-badge${badgeClass(mode)} header-mode-badge${activeClass}" data-mode-badge>${escapeHtml(mode)}</span></span>`
-    : "";
+  const effectiveMode = mode || "idle";
+  const activeClass = effectiveMode !== "idle" ? " is-active-mode" : "";
+  const modeBadge = `<span class="header-mode-group"><span class="header-mode-label">current state</span><span class="kind-badge${badgeClass(effectiveMode)} header-mode-badge${activeClass}" data-mode-badge>${escapeHtml(effectiveMode)}</span></span>`;
 
   return `
     <header class="site-header">

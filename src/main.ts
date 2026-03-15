@@ -102,7 +102,7 @@ function applyDevlogBehavior(root: HTMLElement): void {
   });
 }
 
-const STATUS_POLL_INTERVAL = 60_000;
+const STATUS_POLL_INTERVAL = 5_000;
 
 async function pollStatus() {
   try {
