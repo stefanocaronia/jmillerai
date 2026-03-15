@@ -48,22 +48,8 @@ type ProjectedLoopEdge = {
   curveWeight: number;
 };
 
-/** Map internal node id → public mode name */
-const nodeToPublicMode: Record<string, string> = {
-  reading: "reading",
-  thinking: "thinking",
-  experience: "browsing",
-  dream: "dreaming",
-  heartbeat: "heartbeat",
-  trading: "trading",
-  blog: "blogging",
-  mail: "mailing",
-  developer: "coding",
-  social: "sharing",
-  conversation: "chat",
-};
-
-/** Public mode → display color (matches kind-badge--* in CSS) */
+/** Node id → display color (matches kind-badge--* in CSS).
+ *  Node IDs now match public mode names directly (source of truth: modes.yaml). */
 const modeColors: Record<string, string> = {
   reading: "#f4e409",
   thinking: "#46d9ff",
@@ -81,12 +67,11 @@ const modeColors: Record<string, string> = {
 const DEFAULT_NODE_COLOR = "#c3c3c3";
 
 function nodeColor(node: CognitiveLoopNode): string {
-  const mode = nodeToPublicMode[node.id];
-  return mode ? (modeColors[mode] ?? DEFAULT_NODE_COLOR) : DEFAULT_NODE_COLOR;
+  return modeColors[node.id] ?? DEFAULT_NODE_COLOR;
 }
 
 export function nodePublicMode(node: CognitiveLoopNode): string | null {
-  return nodeToPublicMode[node.id] ?? null;
+  return node.id in modeColors ? node.id : null;
 }
 
 const GRAPH_MEMORY_NODE_ID = "memory-hub";
@@ -97,41 +82,41 @@ const DISABLED_DEBUG_VALUES = new Set(["0", "false", "off", "no"]);
 
 export const graphPositions: Record<string, GraphPosition> = {
   heartbeat: { x: 416, y: 1 },
-  experience: { x: 256, y: 132 },
-  conversation: { x: 141, y: 334 },
-  mail: { x: 230, y: 465 },
+  browsing: { x: 256, y: 132 },
+  chat: { x: 141, y: 334 },
+  mailing: { x: 230, y: 465 },
   [GRAPH_MEMORY_NODE_ID]: { x: 390, y: 294 },
   thinking: { x: 672, y: 132 },
   reading: { x: 549, y: 363 },
-  dream: { x: 381, y: 518 },
-  blog: { x: 645, y: 461 },
-  social: { x: 480, y: 116 },
+  dreaming: { x: 381, y: 518 },
+  blogging: { x: 645, y: 461 },
+  sharing: { x: 480, y: 116 },
   trading: { x: 144, y: 143 },
-  developer: { x: 542, y: 253 },
+  coding: { x: 542, y: 253 },
 };
 
 export const graphEdgeCurves: Record<string, GraphCurveConfig> = {
-  "blog::developer": { distance: -38, weight: 0.50 },
-  "blog::dream": { distance: 38, weight: 0.50 },
-  "blog::reading": { distance: 38, weight: 0.50 },
-  "blog::thinking": { distance: -98, weight: 0.50 },
-  "conversation::memory-hub": { distance: -8, weight: 0.50 },
-  "developer::memory-hub": { distance: 38, weight: 0.50 },
-  "developer::thinking": { distance: 38, weight: 0.50 },
-  "dream::memory-hub": { distance: 8, weight: 0.50 },
-  "experience::heartbeat": { distance: 56, weight: 0.50 },
-  "experience::memory-hub": { distance: -50, weight: 0.50 },
-  "experience::social": { distance: -74, weight: 0.40 },
+  "blogging::coding": { distance: -38, weight: 0.50 },
+  "blogging::dreaming": { distance: 38, weight: 0.50 },
+  "blogging::reading": { distance: 38, weight: 0.50 },
+  "blogging::thinking": { distance: -98, weight: 0.50 },
+  "chat::memory-hub": { distance: -8, weight: 0.50 },
+  "coding::memory-hub": { distance: 38, weight: 0.50 },
+  "coding::thinking": { distance: 38, weight: 0.50 },
+  "dreaming::memory-hub": { distance: 8, weight: 0.50 },
+  "browsing::heartbeat": { distance: 56, weight: 0.50 },
+  "browsing::memory-hub": { distance: -50, weight: 0.50 },
+  "browsing::sharing": { distance: -74, weight: 0.40 },
   "heartbeat::memory-hub": { distance: 8, weight: 0.50 },
   "heartbeat::thinking": { distance: -44, weight: 0.55 },
   "heartbeat::trading": { distance: 86, weight: 0.50 },
-  "mail::memory-hub": { distance: 8, weight: 0.50 },
+  "mailing::memory-hub": { distance: 8, weight: 0.50 },
   "memory-hub::reading": { distance: 26, weight: 0.50 },
-  "memory-hub::social": { distance: -8, weight: 0.42 },
+  "memory-hub::sharing": { distance: -8, weight: 0.42 },
   "memory-hub::thinking": { distance: -62, weight: 0.50 },
   "memory-hub::trading": { distance: 86, weight: 0.40 },
   "reading::thinking": { distance: -50, weight: 0.50 },
-  "social::thinking": { distance: 34, weight: 0.45 },
+  "sharing::thinking": { distance: 34, weight: 0.45 },
 };
 
 declare global {
@@ -375,8 +360,7 @@ function graphLabel(node: CognitiveLoopNode): string {
     return "MEMORY";
   }
 
-  const mode = nodeToPublicMode[node.id];
-  return mode ? mode.toUpperCase() : shortenLabel(node.label);
+  return node.id in modeColors ? node.id.toUpperCase() : shortenLabel(node.label);
 }
 
 export function projectLoopGraph(loop: CognitiveLoopData): {

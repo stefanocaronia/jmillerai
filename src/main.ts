@@ -112,7 +112,7 @@ async function pollStatus() {
     const data = (await res.json()) as StatusData;
     const badge = document.querySelector<HTMLElement>("[data-mode-badge]");
     if (!badge) return;
-    const newMode = data.current_mode ?? data.mode;
+    const newMode = data.current_mode ?? "idle";
     if (badge.textContent === newMode) return;
     badge.textContent = newMode;
     const activeClass = newMode !== "idle" ? " is-active-mode" : "";

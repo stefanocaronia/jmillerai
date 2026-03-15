@@ -206,7 +206,7 @@ function renderCurrentState(status: FeedState<StatusData>): string {
         <span class="section-meta">${escapeHtml(formatDate(status.data.generated_at))}</span>
       </div>
       <p class="muted-copy">Latest snapshot from Miller's cognitive loop.</p>
-      ${(() => { const lm = status.data.last_mode ?? status.data.mode; return lm && lm !== "idle" ? `<div class="state-inline"><span class="kind-badge${badgeClass(lm)}">${escapeHtml(lm)}</span></div>` : ""; })()}
+      ${(() => { const lm = status.data.last_mode ?? "idle"; return lm && lm !== "idle" ? `<div class="state-inline"><span class="kind-badge${badgeClass(lm)}">${escapeHtml(lm)}</span></div>` : ""; })()}
       <h2 class="state-title">${escapeHtml(status.data.headline)}</h2>
       ${status.data.detail ? `<p class="state-detail">${formatDetail(status.data.detail)}</p>` : ""}
       ${renderTagList(status.data.active_threads)}
@@ -916,7 +916,7 @@ function renderPageContent(state: AppState, page: PageId, devlogSlug?: string): 
 export function renderShell(state: AppState, page: PageId, pageUrl: (pageId: PageId) => string, devlogSlug?: string): string {
   return `
     <div class="site-shell">
-      ${renderHeader(page, pageUrl, state.status.data?.current_mode ?? state.status.data?.mode)}
+      ${renderHeader(page, pageUrl, state.status.data?.current_mode ?? "idle")}
       ${renderPageContent(state, page, devlogSlug)}
       <footer class="site-footer">
         <span class="site-footer-meta">${renderFooterBrand()} <span>© 2026 S. Caronia / J. Miller <a class="site-license-link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener"><span class="site-license-mark" aria-hidden="true">cc</span><span>CC BY-NC-SA 4.0</span></a> · <a href="https://github.com/stefanocaronia/jmillerai/blob/main/COPYRIGHT" target="_blank" rel="noopener">Copyright</a></span></span>
