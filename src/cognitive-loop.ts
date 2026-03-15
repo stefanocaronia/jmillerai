@@ -48,15 +48,46 @@ type ProjectedLoopEdge = {
   curveWeight: number;
 };
 
-const kindColors: Record<string, string> = {
-  control: "#ef4444",
-  state: "#f2f2f2",
-  module: "#46d9ff",
-  input: "#ff5ea8",
-  output: "#ff6b4a",
-  surface: "#ff6b4a",
-  operation: "#8f8f8f",
+/** Map internal node id → public mode name */
+const nodeToPublicMode: Record<string, string> = {
+  reading: "reading",
+  thinking: "thinking",
+  experience: "browsing",
+  dream: "dreaming",
+  heartbeat: "heartbeat",
+  trading: "trading",
+  blog: "blogging",
+  mail: "mailing",
+  developer: "coding",
+  social: "sharing",
+  conversation: "chat",
 };
+
+/** Public mode → display color (matches kind-badge--* in CSS) */
+const modeColors: Record<string, string> = {
+  reading: "#f4e409",
+  thinking: "#46d9ff",
+  browsing: "#ffb000",
+  dreaming: "#b07cff",
+  heartbeat: "#ef4444",
+  trading: "#8f8f8f",
+  blogging: "#f472b6",
+  mailing: "#a78bfa",
+  coding: "#34d399",
+  sharing: "#ff5ea8",
+  chat: "#6ee7b7",
+};
+
+const DEFAULT_NODE_COLOR = "#c3c3c3";
+
+function nodeColor(node: CognitiveLoopNode): string {
+  const mode = nodeToPublicMode[node.id];
+  return mode ? (modeColors[mode] ?? DEFAULT_NODE_COLOR) : DEFAULT_NODE_COLOR;
+}
+
+export function nodePublicMode(node: CognitiveLoopNode): string | null {
+  return nodeToPublicMode[node.id] ?? null;
+}
 
 const GRAPH_MEMORY_NODE_ID = "memory-hub";
 const DEFAULT_NODE_POSITION: GraphPosition = { x: 420, y: 260 };
@@ -344,7 +375,8 @@ function graphLabel(node: CognitiveLoopNode): string {
     return "MEMORY";
   }
 
-  return shortenLabel(node.label);
+  const mode = nodeToPublicMode[node.id];
+  return mode ? mode.toUpperCase() : shortenLabel(node.label);
 }
 
 export function projectLoopGraph(loop: CognitiveLoopData): {
@@ -362,7 +394,7 @@ export function projectLoopGraph(loop: CognitiveLoopData): {
     nodeMap.set(id, {
       id,
       label: graphLabel(node),
-      color: kindColors[node.kind] || "#c3c3c3",
+      color: nodeColor(node),
       position: graphPositions[id] ?? DEFAULT_NODE_POSITION,
     });
   }

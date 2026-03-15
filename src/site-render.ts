@@ -1,4 +1,4 @@
-import { isLoopDebugEnabled, projectLoopGraph, type CognitiveLoopData } from "./cognitive-loop";
+import { isLoopDebugEnabled, nodePublicMode, projectLoopGraph, type CognitiveLoopData } from "./cognitive-loop";
 import {
   getMemoryGraphEdgeLegend,
   getMemoryGraphLegend,
@@ -638,21 +638,18 @@ function renderLoopPage(loop: FeedState<CognitiveLoopData>): string {
     </section>
     <section class="section-block">
       <div class="section-line">
-        <span class="section-name">Modules</span>
+        <span class="section-name">States</span>
       </div>
-      <p class="muted-copy">Individual components that make up Miller's cognitive loop.</p>
+      <p class="muted-copy">Active states that make up Miller's cognitive loop.</p>
       <div class="stream-list">
-        ${loop.data.nodes.map((node) => `
+        ${loop.data.nodes.filter((node) => node.id !== "memory" && node.id !== "short-state").map((node) => `
           <article class="stream-item loop-module-item">
             <div class="section-line">
               <div class="module-meta">
-                <span class="module-dot module-dot--${escapeHtml(node.kind)}" aria-hidden="true"></span>
-                <span class="kind-badge kind-badge-loop kind-badge-loop--${escapeHtml(node.kind)}">${escapeHtml(node.kind)}</span>
+                ${(() => { const mode = nodePublicMode(node); return mode ? `<span class="kind-badge${badgeClass(mode)}">${escapeHtml(mode)}</span>` : `<span class="kind-badge">${escapeHtml(node.label)}</span>`; })()}
               </div>
             </div>
-            <h3 class="loop-module-title">${escapeHtml(node.label)}</h3>
-            <p class="body-copy">${escapeHtml(node.summary)}</p>
-            ${node.notes.length > 0 ? `<ul class="note-list">${node.notes.map((note) => `<li>${escapeHtml(note)}</li>`).join("")}</ul>` : ""}
+            <p class="muted-copy loop-state-desc">${escapeHtml(node.summary)}</p>
           </article>
         `).join("")}
       </div>

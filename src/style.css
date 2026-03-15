@@ -8,13 +8,6 @@
   --line: rgba(255, 255, 255, 0.14);
   --accent: #ff7a00;
   --radius: 2px;
-  --kind-control: #ef4444;
-  --kind-state: #f2f2f2;
-  --kind-module: #46d9ff;
-  --kind-input: #ff5ea8;
-  --kind-output: #ff6b4a;
-  --kind-surface: #ff6b4a;
-  --kind-operation: #8f8f8f;
   --memory-thinking: #46d9ff;
   --memory-experience: #ffb000;
   --memory-reading: #f4e409;
@@ -804,7 +797,7 @@ a:hover {
   color: var(--memory-thinking);
 }
 
-.kind-badge--experience {
+.kind-badge--browsing {
   border-color: var(--memory-experience);
   color: var(--memory-experience);
 }
@@ -820,10 +813,9 @@ a:hover {
   color: var(--memory-dream);
 }
 
-.kind-badge--conversation,
 .kind-badge--chat {
-  border-color: var(--memory-conversation);
-  color: var(--memory-conversation);
+  border-color: #6ee7b7;
+  color: #6ee7b7;
 }
 
 .kind-badge--heartbeat {
@@ -852,14 +844,29 @@ a:hover {
   color: rgba(255, 255, 255, 0.25);
 }
 
-.kind-badge--developer {
-  border-color: #fb923c;
-  color: #fb923c;
+.kind-badge--coding {
+  border-color: #34d399;
+  color: #34d399;
 }
 
-.kind-badge--blog {
-  border-color: #38bdf8;
-  color: #38bdf8;
+.kind-badge--sharing {
+  border-color: #ff5ea8;
+  color: #ff5ea8;
+}
+
+.kind-badge--blogging {
+  border-color: #f472b6;
+  color: #f472b6;
+}
+
+.kind-badge--mailing {
+  border-color: #a78bfa;
+  color: #a78bfa;
+}
+
+.kind-badge--maintenance {
+  border-color: var(--ink-muted);
+  color: var(--ink-muted);
 }
 
 .kind-badge--like {
@@ -932,41 +939,6 @@ a:hover {
   color: #34d399;
 }
 
-.kind-badge-loop {
-  border-color: var(--line);
-  color: var(--ink-soft);
-}
-
-.kind-badge-loop--control {
-  border-color: var(--kind-control);
-  color: var(--kind-control);
-}
-
-.kind-badge-loop--state {
-  border-color: var(--kind-state);
-  color: var(--kind-state);
-}
-
-.kind-badge-loop--module {
-  border-color: var(--kind-module);
-  color: var(--kind-module);
-}
-
-.kind-badge-loop--input {
-  border-color: var(--kind-input);
-  color: var(--kind-input);
-}
-
-.kind-badge-loop--output,
-.kind-badge-loop--surface {
-  border-color: var(--kind-surface);
-  color: var(--kind-surface);
-}
-
-.kind-badge-loop--operation {
-  border-color: var(--kind-operation);
-  color: var(--kind-operation);
-}
 
 .module-meta {
   display: inline-flex;
@@ -974,38 +946,6 @@ a:hover {
   gap: 10px;
 }
 
-.module-dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  flex: 0 0 10px;
-}
-
-.module-dot--control {
-  background: var(--kind-control);
-}
-
-.module-dot--state {
-  background: var(--kind-state);
-}
-
-.module-dot--module {
-  background: var(--kind-module);
-}
-
-.module-dot--input {
-  background: var(--kind-input);
-}
-
-.module-dot--output,
-.module-dot--surface {
-  background: var(--kind-surface);
-}
-
-.module-dot--operation {
-  background: var(--kind-operation);
-}
 
 .node-list-item {
   display: flex;
@@ -1170,8 +1110,8 @@ a:hover {
   outline-offset: 2px;
 }
 
-.loop-module-title {
-  text-transform: uppercase;
+.loop-state-desc {
+  margin-top: 8px;
 }
 
 .blog-block {
