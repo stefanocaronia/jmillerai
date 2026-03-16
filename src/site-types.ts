@@ -143,6 +143,14 @@ export type ProjectsFeedData = {
     pages_url: string | null;
     created_at: string | null;
     updated_at: string | null;
+    recent_activity?: Array<{
+      type: string;
+      message?: string;
+      title?: string;
+      sha_short?: string;
+      number?: number;
+      date: string;
+    }>;
   } | null;
   completed: Array<{
     slug: string;

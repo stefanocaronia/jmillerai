@@ -678,6 +678,35 @@ a:hover {
   flex-shrink: 0;
 }
 
+.recent-activity {
+  margin-top: 16px;
+}
+
+.recent-activity .stream-item > .muted-copy {
+  margin-top: 8px;
+}
+
+.activity-type-badge {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  border: 1px solid var(--ink-muted);
+  color: var(--ink-muted);
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.activity-type--commit {
+  border-color: var(--accent-phase, rgba(255, 255, 255, 0.25));
+  color: var(--accent-phase, rgba(255, 255, 255, 0.6));
+}
+
+.activity-type--issue_closed {
+  border-color: rgba(160, 120, 255, 0.4);
+  color: rgba(160, 120, 255, 0.7);
+}
+
 .contact-list {
   list-style: none;
   margin: 14px 0 0;

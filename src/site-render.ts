@@ -721,6 +721,33 @@ function renderCurrentProject(feed: FeedState<ProjectsFeedData>): string {
     ? `<ul class="project-links">${projectLinks.join("")}</ul>`
     : "";
 
+  const activityHtml = (() => {
+    const items = project.recent_activity;
+    if (!items || items.length === 0) return "";
+    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+    return `
+      <div class="recent-activity">
+        <hr class="section-divider" />
+        <span class="subsection-label">Recent activity</span>
+        <div class="stream-list">
+          ${items.map((item) => {
+            const dateStr = formatDate(item.date);
+            const typeLabel = item.type === "issue_closed" ? "issue closed" : item.type;
+            const text = item.type === "issue_closed"
+              ? `#${item.number ?? ""} ${escapeHtml(capitalize(item.title ?? ""))}`
+              : escapeHtml(capitalize(item.message ?? item.title ?? ""));
+            return `<article class="stream-item">
+              <div class="section-line">
+                <span class="activity-type-badge activity-type--${escapeHtml(item.type)}">${escapeHtml(typeLabel)}</span>
+                <span class="section-meta">${escapeHtml(dateStr)}</span>
+              </div>
+              <p class="muted-copy">${text}</p>
+            </article>`;
+          }).join("")}
+        </div>
+      </div>`;
+  })();
+
   return `
     <section class="section-block">
       <div class="section-line">
@@ -737,6 +764,7 @@ function renderCurrentProject(feed: FeedState<ProjectsFeedData>): string {
       </div>
       ${(() => { const desc = en(project.description, project.description_en); return desc ? `<p class="body-copy">${escapeHtml(desc)}</p>` : ""; })()}
       ${linksHtml}
+      ${activityHtml}
     </section>
   `;
 }
