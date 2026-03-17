@@ -402,8 +402,9 @@ function renderThinkingFeed(feed: FeedState<ThinkingFeedData>, limit = 5): strin
                 ...(item.related_posts ?? []).map((p) => ({ label: p.title })),
               ].slice(0, 4);
 
-          const tags = item.tags?.length
-            ? `<ul class="tag-list">${item.tags.map((t) => `<li>#${escapeHtml(t)}</li>`).join("")}</ul>`
+          const tagSource = item.tags_en?.length ? item.tags_en : item.tags;
+          const tags = tagSource?.length
+            ? `<ul class="tag-list">${tagSource.map((t) => `<li>#${escapeHtml(t)}</li>`).join("")}</ul>`
             : "";
 
           return `

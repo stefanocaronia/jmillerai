@@ -110,6 +110,7 @@ export type ThinkingFeedData = {
     originality?: number | null;
     solidity?: number | null;
     tags?: string[];
+    tags_en?: string[] | null;
     created_at: string;
     related?: Array<{ kind: string; label: string; label_en?: string | null; relation: string }>;
     related_books?: Array<{ title: string; author: string | null; url: string | null }>;
