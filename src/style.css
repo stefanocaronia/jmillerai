@@ -295,12 +295,8 @@ a:hover {
 
 .detail-ref {
   font-family: "Share Tech Mono", monospace;
-  color: var(--ink-soft);
+  color: #a89050;
   font-size: 0.9em;
-}
-
-.muted-copy .detail-ref {
-  color: #9a9a9a;
 }
 
 .stream-item h3 {
