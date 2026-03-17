@@ -946,7 +946,7 @@ function renderDevlogArchive(): string {
   return `
     <article class="section-block" id="${escapeHtml(latest.slug)}">
       <div class="section-line">
-        <span class="section-name">${escapeHtml(latest.title)}</span>
+        <a class="section-name devlog-permalink" href="#${escapeHtml(latest.slug)}">${escapeHtml(latest.title)}</a>
         <span class="section-meta">${escapeHtml(formatDate(latest.date, false))}${latest.time ? `, ${escapeHtml(latest.time)}` : ""}</span>
       </div>
       <div class="devlog-body body-copy">${latest.html}</div>

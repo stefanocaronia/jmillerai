@@ -425,6 +425,16 @@ a:hover {
   text-decoration: underline;
 }
 
+.devlog-permalink,
+.devlog-permalink:visited {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.devlog-permalink:hover {
+  text-decoration: underline;
+}
+
 .devlog-body {
   margin-top: 10px;
   line-height: 1.6;

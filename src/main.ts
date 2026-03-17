@@ -100,6 +100,19 @@ function applyDevlogBehavior(root: HTMLElement): void {
       }
     });
   });
+
+  // Featured post permalink
+  const permalink = root.querySelector<HTMLAnchorElement>(".devlog-permalink");
+  if (permalink) {
+    permalink.addEventListener("click", (e) => {
+      e.preventDefault();
+      const hash = permalink.getAttribute("href");
+      if (hash) {
+        location.hash = hash.slice(1);
+        location.reload();
+      }
+    });
+  }
 }
 
 const STATUS_POLL_INTERVAL = 5_000;
