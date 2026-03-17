@@ -70,6 +70,17 @@ async function start() {
   if (page === "devlog") {
     applyDevlogBehavior(app);
   }
+
+  app.addEventListener("click", (e) => {
+    const toggle = (e.target as HTMLElement).closest<HTMLElement>(".expand-toggle");
+    if (!toggle) return;
+    e.preventDefault();
+    const rest = toggle.nextElementSibling as HTMLElement | null;
+    if (rest) {
+      rest.hidden = false;
+      toggle.remove();
+    }
+  });
 }
 
 function applyDevlogBehavior(root: HTMLElement): void {

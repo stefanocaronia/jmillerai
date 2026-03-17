@@ -23,7 +23,14 @@ import type {
   StatusData,
   ThinkingFeedData,
 } from "./site-types";
-import { en, escapeHtml, formatDate, parseDate, summarizeText } from "./site-utils";
+import { en, escapeHtml, formatDate, parseDate, truncateText } from "./site-utils";
+
+function renderExpandable(text: string, maxLength = 220, cssClass = "body-copy", richFormat = false): string {
+  const fmt = richFormat ? formatDetail : escapeHtml;
+  const t = truncateText(text, maxLength);
+  if (!t) return `<p class="${cssClass}">${fmt(text)}</p>`;
+  return `<p class="${cssClass}">${fmt(t.short)} <a class="expand-toggle" href="javascript:void(0)">[...]</a><span class="expand-rest" hidden> ${fmt(t.rest)}</span></p>`;
+}
 
 function formatDetail(raw: string): string {
   const safe = raw
@@ -85,14 +92,23 @@ function renderTagList(items: string[]): string {
   `;
 }
 
-function renderRelatedList(items: string[]): string {
+function renderRelatedList(items: Array<{ kind?: string; label: string }>, opts?: { small?: boolean; heading?: boolean }): string {
   if (items.length === 0) {
     return "";
   }
 
+  const small = opts?.small ?? false;
+  const heading = opts?.heading ?? false;
+  const badgeSizeClass = small ? " kind-badge--sm" : "";
+
   return `
+    ${heading ? `<hr class="section-divider" /><span class="subsection-label">Related</span>` : ""}
     <div class="related-list">
-      ${items.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}
+      ${items.map((item) => {
+        const badge = item.kind ? `<span class="kind-badge${badgeSizeClass} kind-badge--${escapeHtml(item.kind)}">${escapeHtml(item.kind)}</span> ` : "";
+        const label = item.label.charAt(0).toUpperCase() + item.label.slice(1);
+        return `<span>${badge}${escapeHtml(label)}</span>`;
+      }).join("")}
     </div>
   `;
 }
@@ -206,12 +222,13 @@ function renderCurrentState(status: FeedState<StatusData>): string {
       <p class="muted-copy">Latest snapshot from Miller's cognitive loop.</p>
       ${(() => { const lm = status.data.last_mode ?? "idle"; return lm && lm !== "idle" ? `<div class="state-inline"><span class="kind-badge${badgeClass(lm)}">${escapeHtml(lm)}</span></div>` : ""; })()}
       <h2 class="state-title">${escapeHtml(en(status.data.headline, status.data.headline_en))}</h2>
-      ${(() => { const d = en(status.data.detail, status.data.detail_en); return d ? `<p class="state-detail">${formatDetail(d)}</p>` : ""; })()}
+      ${(() => { const d = en(status.data.detail, status.data.detail_en); return d ? renderExpandable(d, 300, "state-detail", true) : ""; })()}
       ${(() => { const threads = status.data.active_threads_en?.length ? status.data.active_threads_en : status.data.active_threads; return threads.length > 0 ? `
         <hr class="section-divider" />
         <span class="subsection-label">Active threads</span>
         ${renderTagList(threads)}
       ` : ""; })()}
+      ${(() => { const rel = status.data.related ?? []; return rel.length > 0 ? renderRelatedList(rel.map((r) => ({ kind: r.kind, label: r.label })).slice(0, 6), { small: true, heading: true }) : ""; })()}
     </section>
   `;
 }
@@ -245,7 +262,7 @@ function renderCurrentlyReading(book: FeedState<BookData>): string {
         <span class="progress-meter-fill" data-progress="${escapeHtml(progress)}"></span>
       </div>
       <p class="section-note">${progress}%</p>
-      ${(() => { const f = en(active.current_focus, active.current_focus_en); return f ? `<p class="muted-copy">${escapeHtml(f)}</p>` : ""; })()}
+      ${(() => { const f = en(active.current_focus, active.current_focus_en); return f ? renderExpandable(f, 200, "muted-copy") : ""; })()}
     </section>
   `;
 }
@@ -367,21 +384,38 @@ function renderThinkingFeed(feed: FeedState<ThinkingFeedData>, limit = 5): strin
       <p class="muted-copy">Raw thoughts emerging from the loop.</p>
       <div class="stream-list">
         ${feed.data.items.slice(0, limit).map((item) => {
-          const related = [
-            ...item.related_books.map((book) => book.title),
-            ...item.related_sources.map((source) => source.name),
-            ...item.related_posts.map((post) => post.title),
-          ].slice(0, 4);
+          const metrics = [
+            { label: "Importance", value: item.importance, max: 10, cls: "metric-bar--importance" },
+            { label: "Originality", value: item.originality, max: 5, cls: "metric-bar--originality" },
+            { label: "Solidity", value: item.solidity ?? 0, max: 5, cls: "metric-bar--solidity" },
+          ];
+          const bars = metrics
+            .filter((m) => m.value != null)
+            .map((m) => { const pct = m.value! / m.max; return `<span class="metric-bar ${m.cls}" title="${m.label}: ${m.value}/${m.max}" style="opacity:${(0.25 + pct * 0.75).toFixed(2)}"></span>`; })
+            .join("");
+
+          const relatedItems = item.related?.length
+            ? item.related.map((r) => ({ kind: r.kind, label: r.label })).slice(0, 4)
+            : [
+                ...(item.related_books ?? []).map((b) => ({ kind: "book" as const, label: b.title })),
+                ...(item.related_sources ?? []).map((s) => ({ label: s.name })),
+                ...(item.related_posts ?? []).map((p) => ({ label: p.title })),
+              ].slice(0, 4);
+
+          const tags = item.tags?.length
+            ? `<ul class="tag-list">${item.tags.map((t) => `<li>#${escapeHtml(t)}</li>`).join("")}</ul>`
+            : "";
 
           return `
             <article class="stream-item">
               <div class="section-line">
-                <span class="section-name section-name-small">importance ${item.importance}</span>
+                <span class="metric-bars">${bars}</span>
                 <span class="section-meta">${escapeHtml(formatDate(item.created_at))}</span>
               </div>
               <h3>${escapeHtml(en(item.title, item.title_en))}</h3>
-              <p class="body-copy">${escapeHtml(summarizeText(en(item.summary, item.summary_en)))}</p>
-              ${renderRelatedList(related)}
+              ${renderExpandable(en(item.content ?? item.summary, item.content_en ?? item.summary_en) ?? "", 320, "muted-copy", true)}
+              ${renderRelatedList(relatedItems, { small: true })}
+              ${tags}
             </article>
           `;
         }).join("")}
@@ -473,7 +507,7 @@ function renderBlogFeedBlock(kind: BlogFeedKind, feed: FeedState<BlogFeedData>):
               <span class="section-meta">${escapeHtml(formatDate(item.published_at))}</span>
             </div>
             <h3><a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${escapeHtml(item.title)}</a></h3>
-            <p class="muted-copy">${escapeHtml(summarizeText(item.excerpt, 190))}</p>
+            ${renderExpandable(item.excerpt, 190, "muted-copy")}
           </article>
         `).join("")}
       </div>
@@ -960,14 +994,13 @@ function renderDevlogArchive(): string {
         <ul class="devlog-archive">
           ${older.map((post, i) => {
             const excerpt = post.html.replace(/<[^>]*>/g, "").trim();
-            const firstLine = summarizeText(excerpt, 140);
             return `
             <li class="devlog-archive-item${i >= listLimit ? " devlog-hidden" : ""}" data-devlog-slug="${escapeHtml(post.slug)}">
               <div class="devlog-archive-head">
                 <a class="devlog-archive-link" href="#${escapeHtml(post.slug)}">${escapeHtml(post.title)}</a>
                 <span class="section-meta">${escapeHtml(formatDate(post.date, false))}</span>
               </div>
-              <p class="muted-copy">${escapeHtml(firstLine)}</p>
+              ${renderExpandable(excerpt, 140, "muted-copy")}
             </li>`;
           }).join("")}
         </ul>

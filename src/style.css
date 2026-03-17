@@ -287,16 +287,20 @@ a:hover {
   white-space: pre-line;
 }
 
-.state-detail .detail-label {
+.detail-label {
   color: var(--ink-soft);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-.state-detail .detail-ref {
+.detail-ref {
   font-family: "Share Tech Mono", monospace;
-  color: var(--ink);
+  color: var(--ink-soft);
   font-size: 0.9em;
+}
+
+.muted-copy .detail-ref {
+  color: #9a9a9a;
 }
 
 .stream-item h3 {
@@ -551,7 +555,7 @@ a:hover {
 .section-divider {
   border: none;
   height: 1px;
-  margin: 20px 0 16px;
+  margin: 20px 0 0px;
   padding-top: 0;
   background-image: repeating-linear-gradient(
     90deg,
@@ -781,6 +785,33 @@ a:hover {
   margin-left: 0.4ch;
 }
 
+.metric-bars {
+  display: flex;
+  gap: 3px;
+  align-items: stretch;
+  height: 0.76rem;
+}
+
+.metric-bar {
+  width: 16px;
+  border-radius: 1px;
+  opacity: 0.85;
+}
+
+.metric-bar--importance,
+.metric-bar--originality,
+.metric-bar--solidity { background: #45a5b6; }
+
+.expand-toggle {
+  color: var(--ink-soft);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.expand-toggle:hover {
+  color: var(--accent);
+}
+
 .related-list {
   display: flex;
   flex-wrap: wrap;
@@ -788,7 +819,7 @@ a:hover {
   margin-top: 10px;
 }
 
-.related-list span {
+.related-list span:not(.kind-badge) {
   color: var(--ink-soft);
   font-family: "Share Tech Mono", monospace;
   font-size: 0.74rem;
@@ -840,12 +871,18 @@ a:hover {
   text-transform: uppercase;
 }
 
+.kind-badge--sm {
+  padding: 1px 5px;
+  font-size: 0.64rem !important;
+}
+
 .kind-badge--thinking {
   border-color: var(--memory-thinking);
   color: var(--memory-thinking);
 }
 
-.kind-badge--browsing {
+.kind-badge--browsing,
+.kind-badge--experience {
   border-color: var(--memory-experience);
   color: var(--memory-experience);
 }

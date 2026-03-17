@@ -55,3 +55,14 @@ export function summarizeText(text: string, maxLength = 220): string {
   return `${trimmed} [...]`;
 }
 
+export function truncateText(text: string, maxLength = 220): { short: string; rest: string } | null {
+  const normalized = text.trim().replace(/\s+/g, " ");
+  if (normalized.length <= maxLength && /[.!?]$/.test(normalized)) {
+    return null;
+  }
+  const slice = normalized.slice(0, maxLength + 1);
+  const boundary = slice.lastIndexOf(" ");
+  const trimmed = (boundary > 0 ? slice.slice(0, boundary) : slice).trim().replace(/[.,;:!?-]+$/, "");
+  return { short: trimmed, rest: normalized.slice(trimmed.length).trim() };
+}
+
