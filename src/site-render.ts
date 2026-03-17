@@ -124,7 +124,7 @@ function renderHeader(page: PageId, pageUrl: (pageId: PageId) => string, mode?: 
         <a href="${escapeHtml(pageUrl("traces"))}" class="${page === "traces" ? "is-active" : ""}">traces</a>
         <a href="${escapeHtml(pageUrl("surface"))}" class="${page === "surface" ? "is-active" : ""}">surface</a>
         <a href="${escapeHtml(pageUrl("loop"))}" class="${page === "loop" ? "is-active" : ""}">loop</a>
-        <a href="${escapeHtml(pageUrl("memory"))}" class="${page === "memory" ? "is-active" : ""}">memory</a>
+        <a href="${escapeHtml(pageUrl("mind"))}" class="${page === "mind" ? "is-active" : ""}">mind</a>
         <a href="${escapeHtml(pageUrl("devlog"))}" class="${page === "devlog" ? "is-active" : ""}">devlog</a>
         <a href="${escapeHtml(pageUrl("contacts"))}" class="${page === "contacts" ? "is-active" : ""}">contacts</a>
       </nav>
@@ -827,8 +827,82 @@ function renderSurfacePage(state: AppState): string {
   `;
 }
 
+function renderCognitionRadar(status: FeedState<StatusData>): string {
+  const cog = status.data?.cognition;
+  if (!cog) return "";
+
+  const axes: Array<{ key: string; label: string; value: number }> = [
+    { key: "criticality", label: "Criticality", value: cog.criticality },
+    { key: "exploration", label: "Exploration", value: cog.exploration },
+    { key: "grounding", label: "Grounding", value: cog.grounding },
+    { key: "novelty", label: "Novelty", value: cog.novelty },
+  ];
+
+  const cx = 230, cy = 175, r = 120;
+  const n = axes.length;
+  const angleOffset = -Math.PI / 2;
+
+  function polarX(i: number, scale: number): number {
+    return cx + r * scale * Math.cos(angleOffset + (2 * Math.PI * i) / n);
+  }
+  function polarY(i: number, scale: number): number {
+    return cy + r * scale * Math.sin(angleOffset + (2 * Math.PI * i) / n);
+  }
+
+  const rings = [0.25, 0.5, 0.75, 1.0];
+  const gridLines = rings.map((s) => {
+    const pts = axes.map((_, i) => `${polarX(i, s)},${polarY(i, s)}`).join(" ");
+    return `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
+  }).join("");
+
+  const spokes = axes.map((_, i) =>
+    `<line x1="${cx}" y1="${cy}" x2="${polarX(i, 1)}" y2="${polarY(i, 1)}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`
+  ).join("");
+
+  const dataPoints = axes.map((a, i) => `${polarX(i, a.value)},${polarY(i, a.value)}`).join(" ");
+  const dataShape = `<polygon points="${dataPoints}" fill="rgba(255,122,0,0.15)" stroke="var(--accent)" stroke-width="1.5"/>`;
+
+  const dots = axes.map((a, i) =>
+    `<circle cx="${polarX(i, a.value)}" cy="${polarY(i, a.value)}" r="3" fill="var(--accent)"/>`
+  ).join("");
+
+  const labels = axes.map((a, i) => {
+    const lx = polarX(i, 1.22);
+    const ly = polarY(i, 1.22);
+    const anchor = i === 0 || i === 2 ? "middle" : i === 1 ? "start" : "end";
+    return `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="central" fill="var(--ink-muted)" font-family="Share Tech Mono, monospace" font-size="10" letter-spacing="0.06em" text-transform="uppercase">${escapeHtml(a.label)}</text>`;
+  }).join("");
+
+  const values = axes.map((a, i) => {
+    const vx = polarX(i, a.value + 0.14);
+    const vy = polarY(i, a.value + 0.14);
+    const anchor = i === 0 || i === 2 ? "middle" : i === 1 ? "start" : "end";
+    return `<text x="${vx}" y="${vy}" text-anchor="${anchor}" dominant-baseline="central" fill="var(--accent)" font-family="Share Tech Mono, monospace" font-size="9" letter-spacing="0.04em">${a.value.toFixed(2)}</text>`;
+  }).join("");
+
+  return `
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">Cognition</span>
+      </div>
+      <p class="muted-copy">Current cognitive parameter tuning.</p>
+      <div class="cognition-radar-wrap">
+        <svg class="cognition-radar" viewBox="0 0 460 360" xmlns="http://www.w3.org/2000/svg">
+          ${gridLines}
+          ${spokes}
+          ${dataShape}
+          ${dots}
+          ${labels}
+          ${values}
+        </svg>
+      </div>
+    </section>
+  `;
+}
+
 function renderMapPage(state: AppState): string {
   return `
+    ${renderCognitionRadar(state.status)}
     ${renderMemoryGraphBlock(state.publicGraph)}
     ${renderLastMemories(state.publicGraph)}
   `;
@@ -928,7 +1002,7 @@ function renderPageContent(state: AppState, page: PageId, devlogSlug?: string): 
     return renderLoopPage(state.cognitiveLoop);
   }
 
-  if (page === "memory") {
+  if (page === "mind") {
     return renderMapPage(state);
   }
 

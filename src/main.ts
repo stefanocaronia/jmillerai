@@ -59,7 +59,7 @@ async function start() {
         unmountGraph = mountCognitiveLoop(container, state.cognitiveLoop.data);
       }
     }
-    if (page === "memory" && state.publicGraph.data) {
+    if (page === "mind" && state.publicGraph.data) {
       const container = document.querySelector<HTMLElement>("#memory-graph-stage");
       if (container) {
         unmountGraph = mountMemoryGraph(container, state.publicGraph.data);

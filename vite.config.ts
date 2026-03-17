@@ -13,7 +13,7 @@ export default defineConfig({
         traces: resolve(__dirname, "traces/index.html"),
         surface: resolve(__dirname, "surface/index.html"),
         loop: resolve(__dirname, "loop/index.html"),
-        memory: resolve(__dirname, "memory/index.html"),
+        mind: resolve(__dirname, "mind/index.html"),
         contacts: resolve(__dirname, "contacts/index.html"),
         devlog: resolve(__dirname, "devlog/index.html"),
       },

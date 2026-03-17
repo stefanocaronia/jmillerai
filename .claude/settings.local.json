@@ -8,7 +8,9 @@
       "Bash(npm install:*)",
       "Bash(npx tsc:*)",
       "Bash(npx vite:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(find /f/www/jmillerai/src -type f \\\\\\(-name *.ts -o -name *.js -o -name *.json -o -name *.md \\\\\\))",
+      "Bash(ls -la /f/www/jmillerai/src/*.ts)"
     ]
   }
 }

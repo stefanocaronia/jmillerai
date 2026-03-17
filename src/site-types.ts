@@ -1,7 +1,7 @@
 import type { CognitiveLoopData } from "./cognitive-loop";
 import type { PublicGraphData } from "./memory-graph";
 
-export type PageId = "home" | "traces" | "surface" | "loop" | "memory" | "contacts" | "devlog";
+export type PageId = "home" | "traces" | "surface" | "loop" | "mind" | "contacts" | "devlog";
 export type Mode = string;
 
 export type StatusData = {
@@ -32,6 +32,12 @@ export type StatusData = {
     strategy: string | null;
   } | null;
   social?: SocialFeedData | null;
+  cognition?: {
+    criticality: number;
+    exploration: number;
+    grounding: number;
+    novelty: number;
+  } | null;
 };
 
 export type BookData = {
