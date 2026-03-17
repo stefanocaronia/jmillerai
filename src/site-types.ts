@@ -32,7 +32,7 @@ export type StatusData = {
     strategy: string | null;
   } | null;
   social?: SocialFeedData | null;
-  related?: Array<{ kind: string; label: string; relation: string }>;
+  related?: Array<{ kind: string; label: string; label_en?: string | null; relation: string }>;
   cognition?: {
     criticality: number;
     exploration: number;
@@ -111,7 +111,7 @@ export type ThinkingFeedData = {
     solidity?: number | null;
     tags?: string[];
     created_at: string;
-    related?: Array<{ kind: string; label: string; relation: string }>;
+    related?: Array<{ kind: string; label: string; label_en?: string | null; relation: string }>;
     related_books?: Array<{ title: string; author: string | null; url: string | null }>;
     related_sources?: Array<{ name: string; url: string | null }>;
     related_posts?: Array<{ title: string; url: string | null }>;

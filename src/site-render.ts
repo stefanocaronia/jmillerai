@@ -228,7 +228,7 @@ function renderCurrentState(status: FeedState<StatusData>): string {
         <span class="subsection-label">Active threads</span>
         ${renderTagList(threads)}
       ` : ""; })()}
-      ${(() => { const rel = status.data.related ?? []; return rel.length > 0 ? renderRelatedList(rel.map((r) => ({ kind: r.kind, label: r.label })).slice(0, 6), { small: true, heading: true }) : ""; })()}
+      ${(() => { const rel = status.data.related ?? []; return rel.length > 0 ? renderRelatedList(rel.map((r) => ({ kind: r.kind, label: en(r.label, r.label_en) })).slice(0, 6), { small: true, heading: true }) : ""; })()}
     </section>
   `;
 }
@@ -395,7 +395,7 @@ function renderThinkingFeed(feed: FeedState<ThinkingFeedData>, limit = 5): strin
             .join("");
 
           const relatedItems = item.related?.length
-            ? item.related.map((r) => ({ kind: r.kind, label: r.label })).slice(0, 4)
+            ? item.related.map((r) => ({ kind: r.kind, label: en(r.label, r.label_en) })).slice(0, 4)
             : [
                 ...(item.related_books ?? []).map((b) => ({ kind: "book" as const, label: b.title })),
                 ...(item.related_sources ?? []).map((s) => ({ label: s.name })),
