@@ -722,7 +722,7 @@ function renderCurrentProject(feed: FeedState<ProjectsFeedData>): string {
     : "";
 
   const activityHtml = (() => {
-    const items = project.recent_activity;
+    const items = project.recent_activity?.slice(0, 3);
     if (!items || items.length === 0) return "";
     const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
     return `
