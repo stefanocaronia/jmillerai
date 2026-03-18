@@ -55,6 +55,51 @@ export function summarizeText(text: string, maxLength = 220): string {
   return `${trimmed} [...]`;
 }
 
+/**
+ * Returns a brief English verdict and a 5-dot quality rating
+ * for a thinking-feed item based on its three metrics.
+ *
+ * importance 1-10, originality 1-5 (nullable), solidity 0-5
+ */
+export function rateThought(
+  importance: number,
+  originality: number | null | undefined,
+  solidity: number | null | undefined,
+): { verdict: string; dots: string } {
+  const imp = importance ?? 0;
+  const ori = originality ?? 0;
+  const sol = solidity ?? 0;
+
+  // --- composite score 0-1 (importance weighs most) ---
+  const score = imp / 10 * 0.5 + ori / 5 * 0.25 + sol / 5 * 0.25;
+  const filled = Math.max(1, Math.min(5, Math.round(score * 5)));
+  const dots = "★".repeat(filled) + "☆".repeat(5 - filled);
+
+  // --- verbal verdict ---
+  const parts: string[] = [];
+
+  // importance
+  if (imp >= 8) parts.push("Key insight");
+  else if (imp >= 6) parts.push("Noteworthy");
+  else parts.push("Minor note");
+
+  // originality
+  if (ori >= 4) parts.push("fresh angle");
+  else if (ori <= 1) parts.push("well-trodden ground");
+
+  // solidity
+  if (sol >= 4) parts.push("well-grounded");
+  else if (sol >= 2) parts.push("needs testing");
+  else parts.push("raw speculation");
+
+  // combine: "Key insight — fresh angle, well-grounded"
+  const verdict = parts.length > 1
+    ? `${parts[0]} — ${parts.slice(1).join(", ")}`
+    : parts[0];
+
+  return { verdict, dots };
+}
+
 export function truncateText(text: string, maxLength = 220): { short: string; rest: string } | null {
   const normalized = text.trim().replace(/\s+/g, " ");
   if (normalized.length <= maxLength && /[.!?]$/.test(normalized)) {

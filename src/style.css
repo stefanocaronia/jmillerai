@@ -783,20 +783,37 @@ a:hover {
 
 .metric-bars {
   display: flex;
-  gap: 3px;
-  align-items: stretch;
+  gap: 2px;
+  align-items: center;
   height: 0.76rem;
 }
 
 .metric-bar {
-  width: 16px;
+  height: 100%;
   border-radius: 1px;
-  opacity: 0.85;
+  min-width: 3px;
 }
 
-.metric-bar--importance,
-.metric-bar--originality,
-.metric-bar--solidity { background: #45a5b6; }
+.metric-bar--importance { background: #45a5b6; }
+.metric-bar--originality { background: #b68a45; }
+.metric-bar--solidity { background: #7b45b6; }
+
+.metric-dots {
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  color: #4a9;
+  margin-left: 6px;
+  cursor: default;
+}
+
+.thought-verdict {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 0.68rem;
+  color: #4a9;
+  opacity: 0.5;
+  margin-left: 6px;
+  letter-spacing: 0.04em;
+}
 
 .expand-toggle {
   color: var(--ink-soft);

@@ -23,7 +23,7 @@ import type {
   StatusData,
   ThinkingFeedData,
 } from "./site-types";
-import { en, escapeHtml, formatDate, parseDate, truncateText } from "./site-utils";
+import { en, escapeHtml, formatDate, parseDate, rateThought, truncateText } from "./site-utils";
 
 function renderExpandable(text: string, maxLength = 220, cssClass = "body-copy", richFormat = false): string {
   const fmt = richFormat ? formatDetail : escapeHtml;
@@ -391,8 +391,10 @@ function renderThinkingFeed(feed: FeedState<ThinkingFeedData>, limit = 5): strin
           ];
           const bars = metrics
             .filter((m) => m.value != null)
-            .map((m) => { const pct = m.value! / m.max; return `<span class="metric-bar ${m.cls}" title="${m.label}: ${m.value}/${m.max}" style="opacity:${(0.25 + pct * 0.75).toFixed(2)}"></span>`; })
+            .map((m) => { const pct = m.value! / m.max; const w = Math.round(3 + pct * 21); return `<span class="metric-bar ${m.cls}" title="${m.label}: ${m.value}/${m.max}" style="width:${w}px"></span>`; })
             .join("");
+
+          const { verdict, dots } = rateThought(item.importance, item.originality, item.solidity);
 
           const relatedItems = item.related?.length
             ? item.related.map((r) => ({ kind: r.kind, label: en(r.label, r.label_en) })).slice(0, 4)
@@ -410,7 +412,7 @@ function renderThinkingFeed(feed: FeedState<ThinkingFeedData>, limit = 5): strin
           return `
             <article class="stream-item">
               <div class="section-line">
-                <span class="metric-bars">${bars}</span>
+                <span class="metric-bars">${bars}<span class="metric-dots">${dots}</span><span class="thought-verdict">${escapeHtml(verdict)}</span></span>
                 <span class="section-meta">${escapeHtml(formatDate(item.created_at))}</span>
               </div>
               <h3>${escapeHtml(en(item.title, item.title_en))}</h3>
