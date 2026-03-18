@@ -799,10 +799,12 @@ a:hover {
 .metric-bar--solidity { background: #7b45b6; }
 
 .metric-dots {
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   letter-spacing: 2px;
   color: #4a9;
   margin-left: 6px;
+  position: relative;
+  top: -1px;
   cursor: default;
 }
 

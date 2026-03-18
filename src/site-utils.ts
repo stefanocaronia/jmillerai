@@ -73,7 +73,7 @@ export function rateThought(
   // --- composite score 0-1 (importance weighs most) ---
   const score = imp / 10 * 0.5 + ori / 5 * 0.25 + sol / 5 * 0.25;
   const filled = Math.max(1, Math.min(5, Math.round(score * 5)));
-  const dots = "★".repeat(filled) + "☆".repeat(5 - filled);
+  const dots = "★".repeat(filled);
 
   // --- verbal verdict ---
   const parts: string[] = [];
