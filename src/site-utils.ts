@@ -59,7 +59,7 @@ export function summarizeText(text: string, maxLength = 220): string {
  * Returns a brief English verdict and a 5-dot quality rating
  * for a thinking-feed item based on its three metrics.
  *
- * importance 1-10, originality 1-5 (nullable), solidity 0-5
+ * importance 0-10, originality 0-5 (nullable), solidity 0-5
  */
 export function rateThought(
   importance: number,
@@ -85,7 +85,7 @@ export function rateThought(
 
   // originality
   if (ori >= 4) parts.push("fresh angle");
-  else if (ori <= 1) parts.push("well-trodden ground");
+  else if (ori <= 0) parts.push("well-trodden ground");
 
   // solidity
   if (sol >= 4) parts.push("well-grounded");
