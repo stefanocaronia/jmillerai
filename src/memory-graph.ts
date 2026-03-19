@@ -4,6 +4,7 @@ export type PublicGraphNode = {
   id: string;
   kind: string;
   label: string;
+  label_en?: string | null;
   url: string | null;
   timestamp?: string | null;
   memory_type?: string | null;

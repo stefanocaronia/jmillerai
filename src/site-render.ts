@@ -563,7 +563,10 @@ function renderLastMemories(graph: FeedState<PublicGraphData>): string {
         ${memories.map((node) => {
           const label = node.memory_type === "conversation"
             ? (node.contact_label ? `Chat with a friend: ${node.contact_label}` : "Chat with a friend")
-            : presentPublicNodeLabel(node);
+            : presentPublicNodeLabel({
+              ...node,
+              label: en(node.label, node.label_en),
+            });
           const badgeLabel = presentPublicMemoryTypeLabel(node.memory_type ?? node.kind);
 
           return `
