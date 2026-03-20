@@ -334,7 +334,7 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
       {
         selector: "edge",
         style: {
-          width: "mapData(strength, 1, 3, 5.8, 13)",
+          width: 5,
           "line-color": "data(edgeColor)",
           "curve-style": "bezier",
           "target-arrow-shape": "triangle",
@@ -346,6 +346,15 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
     ],
   });
   enforceNodeSpacing(cy, PUBLIC_MIN_NODE_DISTANCE);
+
+  // Exponential easing: only strong edges are clearly visible
+  cy.edges().forEach((edge) => {
+    const s = edge.data("strength") as number;
+    // normalize 1..3 → 0..1, then apply cubic easing
+    const t = Math.max(0, Math.min(1, s / 10));
+    const opacity = 0.25 + t * t * 0.65;
+    edge.style("opacity", opacity);
+  });
 
   const showTooltip = (x: number, y: number, typeLabel: string, fullLabel: string, typeColor: string) => {
     tooltip.innerHTML = `
