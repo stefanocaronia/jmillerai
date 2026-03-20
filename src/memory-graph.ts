@@ -9,6 +9,7 @@ export type PublicGraphNode = {
   url: string | null;
   timestamp?: string | null;
   memory_type?: string | null;
+  weight?: number | null;
   importance?: number | null;
   contact_label?: string | null;
 };
@@ -46,6 +47,14 @@ type NormalizedGraphNode = PublicGraphNode & {
 
 
 const PUBLIC_MIN_NODE_DISTANCE = 190;
+const defaultNodeWeights: Record<string, number> = {
+  friend: 15,
+  project: 16,
+  book: 13,
+  source: 12,
+  blog_post: 13,
+  essay: 13,
+};
 
 function cleanLabel(label: string): string {
   return label
@@ -128,9 +137,20 @@ function shortenLabel(label: string): string {
   return trimmed;
 }
 
-function nodeSizeForImportance(node: PublicGraphNode): number {
-  const raw = Number(node.importance ?? 5);
-  const importance = Number.isFinite(raw) ? Math.max(1, Math.min(10, raw)) : 5;
+function nodeSizeForWeight(node: PublicGraphNode): number {
+  const rawWeight = Number(node.weight);
+  if (Number.isFinite(rawWeight)) {
+    const weight = Math.max(0, Math.min(20, rawWeight));
+    return 26 + Math.pow(weight, 1.18) * 2.55;
+  }
+
+  const defaultWeight = defaultNodeWeights[node.kind];
+  if (Number.isFinite(defaultWeight)) {
+    return 26 + Math.pow(defaultWeight, 1.18) * 2.55;
+  }
+
+  const rawImportance = Number(node.importance ?? 5);
+  const importance = Number.isFinite(rawImportance) ? Math.max(1, Math.min(10, rawImportance)) : 5;
   return 26 + Math.pow(importance, 1.45) * 3.1;
 }
 
@@ -269,7 +289,7 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
             typeLabel: publicNodeTypeLabel(node),
             color,
             typeColor: color,
-            size: nodeSizeForImportance(node),
+            size: nodeSizeForWeight(node),
           },
         };
       }),
