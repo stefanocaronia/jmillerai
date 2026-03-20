@@ -1,10 +1,13 @@
 import "./style.css";
+import { injectCssVars } from "./colors";
 import { initializeConsentBanner } from "./consent";
 import { mountCognitiveLoop } from "./cognitive-loop";
 import { mountMemoryGraph } from "./memory-graph";
 import { loadState } from "./site-data";
 import { renderShell, applyProgressMeters, applySpoilerToggles, badgeClass } from "./site-render";
 import type { PageId, StatusData } from "./site-types";
+
+injectCssVars();
 
 const appRoot = document.querySelector<HTMLDivElement>("#app");
 

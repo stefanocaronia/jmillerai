@@ -1,27 +1,13 @@
 @import url("https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600&family=Oxanium:wght@500;600&family=Share+Tech+Mono&display=swap");
 
 :root {
-  --bg: #100606;
-  --ink: #f2f2f2;
-  --ink-soft: #c3c3c3;
-  --ink-muted: #787878;
-  --line: rgba(255, 255, 255, 0.14);
-  --accent: #ff7a00;
+  /* Base theme and --memory-* / --badge-* vars injected by colors.ts */
   --radius: 2px;
-  --memory-thinking: #46d9ff;
-  --memory-experience: #ffb000;
-  --memory-reading: #f4e409;
-  --memory-dream: #b07cff;
-  --memory-conversation: #ff5ea8;
-  --memory-heartbeat: #ef4444;
-  --memory-belief: #6ee7b7;
-  --memory-trade: #8f8f8f;
-  --memory-summary: #c3c3c3;
 }
 
 html {
   overflow-y: scroll;
-}
+} 
 
 *,
 *::before,
@@ -914,8 +900,8 @@ a:hover {
 }
 
 .kind-badge--chat {
-  border-color: #6ee7b7;
-  color: #6ee7b7;
+  border-color: var(--memory-conversation);
+  color: var(--memory-conversation);
 }
 
 .kind-badge--heartbeat {
@@ -940,103 +926,103 @@ a:hover {
 }
 
 .kind-badge--idle {
-  border-color: rgba(255, 255, 255, 0.25);
-  color: rgba(255, 255, 255, 0.25);
+  border-color: var(--badge-idle);
+  color: var(--badge-idle);
 }
 
 .kind-badge--coding {
-  border-color: #34d399;
-  color: #34d399;
+  border-color: var(--badge-coding);
+  color: var(--badge-coding);
 }
 
 .kind-badge--sharing {
-  border-color: #ff5ea8;
-  color: #ff5ea8;
+  border-color: var(--badge-sharing);
+  color: var(--badge-sharing);
 }
 
 .kind-badge--blogging {
-  border-color: #f472b6;
-  color: #f472b6;
+  border-color: var(--badge-blogging);
+  color: var(--badge-blogging);
 }
 
 .kind-badge--mailing {
-  border-color: #a78bfa;
-  color: #a78bfa;
+  border-color: var(--badge-mailing);
+  color: var(--badge-mailing);
 }
 
 .kind-badge--maintenance {
-  border-color: var(--ink-muted);
-  color: var(--ink-muted);
+  border-color: var(--badge-maintenance);
+  color: var(--badge-maintenance);
 }
 
 .kind-badge--like {
-  border-color: #f59e0b;
-  color: #f59e0b;
+  border-color: var(--badge-like);
+  color: var(--badge-like);
 }
 
 .kind-badge--post {
-  border-color: #38bdf8;
-  color: #38bdf8;
+  border-color: var(--badge-post);
+  color: var(--badge-post);
 }
 
 .kind-badge--reply {
-  border-color: #34d399;
-  color: #34d399;
+  border-color: var(--badge-reply);
+  color: var(--badge-reply);
 }
 
 .kind-badge--follow {
-  border-color: #f472b6;
-  color: #f472b6;
+  border-color: var(--badge-follow);
+  color: var(--badge-follow);
 }
 
 .kind-badge--repost {
-  border-color: #a78bfa;
-  color: #a78bfa;
+  border-color: var(--badge-repost);
+  color: var(--badge-repost);
 }
 
 .kind-badge--unfollow {
-  border-color: #fb7185;
-  color: #fb7185;
+  border-color: var(--badge-unfollow);
+  color: var(--badge-unfollow);
 }
 
 .kind-badge--active {
-  border-color: #34d399;
-  color: #34d399;
+  border-color: var(--badge-active);
+  color: var(--badge-active);
 }
 
 .kind-badge--completed {
-  border-color: #38bdf8;
-  color: #38bdf8;
+  border-color: var(--badge-completed);
+  color: var(--badge-completed);
 }
 
 .kind-badge--paused {
-  border-color: #f59e0b;
-  color: #f59e0b;
+  border-color: var(--badge-paused);
+  color: var(--badge-paused);
 }
 
 .kind-badge--version {
-  border-color: var(--ink-soft);
-  color: var(--ink-soft);
+  border-color: var(--badge-version);
+  color: var(--badge-version);
 }
 
 .kind-badge--alpha {
-  border-color: #f59e0b;
-  color: #f59e0b;
+  border-color: var(--badge-alpha);
+  color: var(--badge-alpha);
 }
 
 .kind-badge--beta {
-  border-color: #38bdf8;
-  color: #38bdf8;
+  border-color: var(--badge-beta);
+  color: var(--badge-beta);
 }
 
 .kind-badge--rc {
-  border-color: #a78bfa;
-  color: #a78bfa;
+  border-color: var(--badge-rc);
+  color: var(--badge-rc);
 }
 
 .kind-badge--stable {
-  border-color: #34d399;
-  color: #34d399;
+  border-color: var(--badge-stable);
+  color: var(--badge-stable);
 }
 
 

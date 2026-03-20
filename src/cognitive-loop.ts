@@ -1,4 +1,5 @@
 import cytoscape, { type Core } from "cytoscape";
+import { modeColors, defaultModeColor } from "./colors";
 
 export type CognitiveLoopNode = {
   id: string;
@@ -50,26 +51,9 @@ type ProjectedLoopEdge = {
   curveWeight: number;
 };
 
-/** Node id → display color (matches kind-badge--* in CSS).
- *  Node IDs now match public mode names directly (source of truth: modes.yaml). */
-const modeColors: Record<string, string> = {
-  reading: "#f4e409",
-  thinking: "#46d9ff",
-  browsing: "#ffb000",
-  dreaming: "#b07cff",
-  heartbeat: "#ef4444",
-  trading: "#8f8f8f",
-  blogging: "#f472b6",
-  mailing: "#a78bfa",
-  coding: "#34d399",
-  sharing: "#ff5ea8",
-  chat: "#6ee7b7",
-};
-
-const DEFAULT_NODE_COLOR = "#c3c3c3";
 
 function nodeColor(node: CognitiveLoopNode): string {
-  return modeColors[resolveNodeId(node.id)] ?? DEFAULT_NODE_COLOR;
+  return modeColors[resolveNodeId(node.id)] ?? defaultModeColor;
 }
 
 export function nodePublicMode(node: CognitiveLoopNode): string | null {

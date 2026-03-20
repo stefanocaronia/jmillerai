@@ -1,4 +1,5 @@
 import cytoscape from "cytoscape";
+import { kindColors, memoryTypeColors, relationColors } from "./colors";
 
 export type PublicGraphNode = {
   id: string;
@@ -43,38 +44,6 @@ type NormalizedGraphNode = PublicGraphNode & {
   hoverLabel: string;
 };
 
-const kindColors: Record<string, string> = {
-  memory: "#f2f2f2",
-  book: "#e5e5e5",
-  source: "#f59e0b",
-  blog_post: "#f97316",
-  friend: "#34d399",
-  project: "#a78bfa",
-};
-
-const memoryTypeColors: Record<string, string> = {
-  thinking: "#46d9ff",
-  experience: "#ffb000",
-  reading: "#f4e409",
-  dream: "#b07cff",
-  conversation: "#ff5ea8",
-  mail: "#ff8a80",
-  social: "#38bdf8",
-  heartbeat: "#ef4444",
-  belief: "#6ee7b7",
-  trade: "#60a5fa",
-  summary: "#f9a8d4",
-};
-
-const relationColors: Record<string, string> = {
-  came_from: "#8f8f8f",
-  extends: "#46d9ff",
-  contradicts: "#d14b4b",
-  about: "#60a5fa",
-  inspired: "#ff7a00",
-  continues: "#f2f2f2",
-  relates_to: "#b07cff",
-};
 
 const PUBLIC_MIN_NODE_DISTANCE = 190;
 
