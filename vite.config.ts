@@ -5,6 +5,7 @@ import introPlugin from "./vite-plugin-intro";
 
 export default defineConfig({
   base: "/",
+  server: { port: 3000 },
   plugins: [devlogPlugin(), introPlugin()],
   build: {
     rollupOptions: {

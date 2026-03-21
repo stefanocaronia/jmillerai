@@ -10,6 +10,7 @@ export type DevlogPost = {
   title: string;
   date: string;
   time: string;
+  author: string;
   html: string;
 };
 
@@ -65,6 +66,7 @@ export default function devlogPlugin(): Plugin {
           title,
           date,
           time,
+          author: (data.author as string) || "",
           html: marked.parse(content, { async: false, breaks: true }) as string,
         };
       })

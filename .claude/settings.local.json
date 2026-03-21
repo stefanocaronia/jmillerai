@@ -11,7 +11,11 @@
       "Bash(npm run:*)",
       "Bash(find /f/www/jmillerai/src -type f \\\\\\(-name *.ts -o -name *.js -o -name *.json -o -name *.md \\\\\\))",
       "Bash(ls -la /f/www/jmillerai/src/*.ts)",
-      "Bash(node -e \":*)"
+      "Bash(node -e \":*)",
+      "Read(//f/www/stefanocaronia.it/dist/jmillerai/data/**)",
+      "Bash(python -c \"import json; d=json.load\\(open\\(''public-graph.json''\\)\\); kinds=set\\(n[''kind''] for n in d[''nodes'']\\); print\\(kinds\\)\")",
+      "Bash(python -c \":*)",
+      "Bash(netsh interface:*)"
     ]
   }
 }

@@ -6,6 +6,7 @@ declare module "virtual:devlog-posts" {
     title: string;
     date: string;
     time: string;
+    author: string;
     html: string;
   }
   const posts: DevlogPost[];

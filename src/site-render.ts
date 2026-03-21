@@ -950,6 +950,11 @@ function renderMapPage(state: AppState): string {
 
 const DEVLOG_PAGE_SIZE = 10;
 
+function renderAuthorBadge(author: string): string {
+  if (!author || author.toLowerCase() === "stefano") return "";
+  return `<span class="devlog-author devlog-author--ai">@${escapeHtml(author)}</span> `;
+}
+
 function renderDevlogSinglePost(slug: string): string {
   const post = devlogPosts.find((p) => p.slug === slug);
   if (!post) return renderDevlogArchive();
@@ -958,7 +963,7 @@ function renderDevlogSinglePost(slug: string): string {
     <article class="section-block" id="${escapeHtml(post.slug)}">
       <div class="section-line">
         <span class="section-name">${escapeHtml(post.title)}</span>
-        <span class="section-meta">${escapeHtml(formatDate(post.date, false))}${timeMeta}</span>
+        <span class="section-meta">${renderAuthorBadge(post.author)}${escapeHtml(formatDate(post.date, false))}${timeMeta}</span>
       </div>
       <div class="devlog-body body-copy">${post.html}</div>
     </article>
@@ -987,7 +992,7 @@ function renderDevlogArchive(): string {
     <article class="section-block" id="${escapeHtml(latest.slug)}">
       <div class="section-line">
         <a class="section-name devlog-permalink" href="#${escapeHtml(latest.slug)}">${escapeHtml(latest.title)}</a>
-        <span class="section-meta">${escapeHtml(formatDate(latest.date, false))}${latest.time ? `, ${escapeHtml(latest.time)}` : ""}</span>
+        <span class="section-meta">${renderAuthorBadge(latest.author)}${escapeHtml(formatDate(latest.date, false))}${latest.time ? `, ${escapeHtml(latest.time)}` : ""}</span>
       </div>
       <div class="devlog-body body-copy">${latest.html}</div>
     </article>
@@ -1004,7 +1009,7 @@ function renderDevlogArchive(): string {
             <li class="devlog-archive-item${i >= listLimit ? " devlog-hidden" : ""}" data-devlog-slug="${escapeHtml(post.slug)}">
               <div class="devlog-archive-head">
                 <a class="devlog-archive-link" href="#${escapeHtml(post.slug)}">${escapeHtml(post.title)}</a>
-                <span class="section-meta">${escapeHtml(formatDate(post.date, false))}</span>
+                <span class="section-meta">${renderAuthorBadge(post.author)}${escapeHtml(formatDate(post.date, false))}</span>
               </div>
               ${renderExpandable(excerpt, 140, "muted-copy")}
             </li>`;

@@ -217,6 +217,11 @@ a:hover {
   color: var(--ink-muted);
 }
 
+.devlog-author--ai {
+  color: #1d6fa1;
+  margin-right: 6px;
+}
+
 .section-block {
   margin-top: 24px;
   padding-top: 14px;
