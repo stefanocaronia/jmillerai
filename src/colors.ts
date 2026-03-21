@@ -45,7 +45,7 @@ export const relationColors: Record<string, string> = {
   extends: "#46d9ff",
   contradicts: "#d14b4b",
   about: "#60a5fa",
-  inspired: "#ff7a00",
+  inspired: "#f472b6",
   continues: "#f2f2f2",
   relates_to: "#b07cff",
 };
