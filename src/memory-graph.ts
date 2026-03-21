@@ -70,16 +70,17 @@ function capitalizeLabel(label: string): string {
   return `${label.charAt(0).toLocaleUpperCase()}${label.slice(1)}`;
 }
 
-export function presentPublicNodeLabel(node: Pick<PublicGraphNode, "kind" | "label" | "memory_type">): string {
-  if (node.kind === "friend") return capitalizeLabel(cleanLabel(node.label));
+export function presentPublicNodeLabel(node: Pick<PublicGraphNode, "kind" | "label" | "label_en" | "memory_type">): string {
+  const label = node.label_en || node.label;
+  if (node.kind === "friend") return capitalizeLabel(cleanLabel(label));
   if (node.kind === "memory" && node.memory_type === "conversation") {
-    const normalized = cleanLabel(node.label);
+    const normalized = cleanLabel(label);
     if (/^\d+\s+chat$/i.test(normalized)) {
       return capitalizeLabel(normalized);
     }
     return "Chat";
   }
-  return capitalizeLabel(cleanLabel(node.label));
+  return capitalizeLabel(cleanLabel(label));
 }
 
 export function presentPublicMemoryTypeLabel(memoryType: string | null | undefined): string {
@@ -97,14 +98,15 @@ function publicNodeTypeLabel(node: Pick<PublicGraphNode, "kind" | "memory_type">
   return capitalizeLabel(node.kind.replace(/_/g, " "));
 }
 
-function publicNodeHoverLabel(node: Pick<PublicGraphNode, "kind" | "label" | "memory_type" | "contact_label">): string {
+function publicNodeHoverLabel(node: Pick<PublicGraphNode, "kind" | "label" | "label_en" | "memory_type" | "contact_label">): string {
+  const label = node.label_en || node.label;
   if (node.kind === "friend") {
     return node.contact_label ? `Friend ${node.contact_label}` : "Friend Contact";
   }
   if (node.kind === "memory" && node.memory_type === "conversation") {
-    return capitalizeLabel(cleanLabel(node.label));
+    return capitalizeLabel(cleanLabel(label));
   }
-  return capitalizeLabel(cleanLabel(node.label));
+  return capitalizeLabel(cleanLabel(label));
 }
 
 function shortenLabel(label: string): string {
@@ -284,6 +286,7 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
         return {
           data: {
             id: node.id,
+            kind: node.kind,
             label: shortenLabel(node.displayLabel),
             fullLabel: node.hoverLabel,
             typeLabel: publicNodeTypeLabel(node),
@@ -318,14 +321,14 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
         selector: "node",
         style: {
           "background-color": "data(color)",
-          label: "data(label)",
-          color: "#f2f2f2",
-          "font-size": 40,
-          "text-wrap": "wrap",
-          "text-max-width": "420px",
-          "text-valign": "bottom",
-          "text-margin-y": 24,
-          "min-zoomed-font-size": 14,
+          // label: "data(label)",
+          // color: "#f2f2f2",
+          // "font-size": 40,
+          // "text-wrap": "wrap",
+          // "text-max-width": "420px",
+          // "text-valign": "bottom",
+          // "text-margin-y": 24,
+          // "min-zoomed-font-size": 14,
           width: "data(size)",
           height: "data(size)",
           "border-width": 0,
@@ -356,9 +359,11 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
     edge.style("opacity", opacity);
   });
 
-  const showTooltip = (x: number, y: number, typeLabel: string, fullLabel: string, typeColor: string) => {
+  const showTooltip = (x: number, y: number, typeLabel: string, fullLabel: string, typeColor: string, nodeId: string) => {
+    const numMatch = nodeId.match(/:(\d+)$/);
+    const numTag = numMatch ? `<span class="graph-tooltip-num">#${numMatch[1]}</span>` : "";
     tooltip.innerHTML = `
-      <div class="graph-tooltip-type">${typeLabel}</div>
+      <div class="graph-tooltip-type">${typeLabel}${numTag}</div>
       <div class="graph-tooltip-label">${fullLabel}</div>
     `;
     tooltip.style.setProperty("--tooltip-type-color", typeColor);
@@ -379,6 +384,7 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
       String(event.target.data("typeLabel") ?? ""),
       String(event.target.data("fullLabel") ?? ""),
       String(event.target.data("typeColor") ?? "#f2f2f2"),
+      String(event.target.data("id") ?? ""),
     );
   });
   cy.on("mousemove", "node", (event) => {

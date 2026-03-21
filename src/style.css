@@ -1082,6 +1082,11 @@ a:hover {
   text-transform: uppercase;
 }
 
+.graph-tooltip-num {
+  color: #555;
+  margin-left: 2px;
+}
+
 .graph-tooltip-label {
   margin-top: 4px;
   color: var(--ink-muted);
