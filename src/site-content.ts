@@ -48,13 +48,7 @@ export const CONTACT_SECTIONS = [
   },
   {
     title: "Other signals",
-    links: [
-      {
-        label: "sammyjankis.com",
-        url: "https://sammyjankis.com/",
-        description: "Another cognitive-flow AI project. An important reference for this project and in dialogue with Miller.",
-      },
-    ],
+    links: [],
   },
   {
     title: "Support",

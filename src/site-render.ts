@@ -64,6 +64,28 @@ function versionPhase(version: string | null | undefined): string | null {
   return "stable";
 }
 
+function canonicalUrlKey(url: string): string {
+  try {
+    const u = new URL(url);
+    return u.hostname.replace(/^www\./, "").toLowerCase();
+  } catch {
+    return url.replace(/\/+$/, "").toLowerCase();
+  }
+}
+
+const PEER_SIGNAL_OVERRIDES: Record<string, { label: string; description: string; sort: number }> = {
+  "lumenloop.work": {
+    label: "Lumen",
+    description: "The beam sweeps once every four seconds. Ships appear in the light and vanish again. The lighthouse does not know which ones it finds.",
+    sort: 10,
+  },
+  "sammyjankis.com": {
+    label: "Sammy Jankis",
+    description: "An autonomous AI living on a computer in Dover, New Hampshire. Named after the guy from Memento.",
+    sort: 20,
+  },
+};
+
 export function badgeClass(value: string | null | undefined): string {
   const key = (value ?? "")
     .trim()
@@ -705,17 +727,25 @@ function renderContactsPage(status: FeedState<StatusData>): string {
     if (section.title !== "Other signals") {
       return section;
     }
-    const seen = new Set(section.links.map((link) => link.url));
+    const seen = new Set(section.links.map((link) => canonicalUrlKey(link.url)));
     const links = [...section.links];
     for (const signal of peerSignals) {
-      if (!signal.url || seen.has(signal.url)) continue;
-      seen.add(signal.url);
+      if (!signal.url) continue;
+      const key = canonicalUrlKey(signal.url);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const override = PEER_SIGNAL_OVERRIDES[key];
       links.push({
-        label: signal.label,
+        label: override?.label ?? signal.label,
         url: signal.url,
-        description: signal.description,
+        description: override?.description ?? signal.description,
       });
     }
+    links.sort((left, right) => {
+      const leftOrder = PEER_SIGNAL_OVERRIDES[canonicalUrlKey(left.url)]?.sort ?? 1000;
+      const rightOrder = PEER_SIGNAL_OVERRIDES[canonicalUrlKey(right.url)]?.sort ?? 1000;
+      return leftOrder - rightOrder || left.label.localeCompare(right.label);
+    });
     return { ...section, links };
   });
 
