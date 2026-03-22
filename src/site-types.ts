@@ -38,6 +38,13 @@ export type StatusData = {
     exploration: number;
     grounding: number;
     novelty: number;
+    public_dimensions?: Array<{
+      internal_key: string;
+      public_key: string;
+      label: string;
+      description: string;
+      value: number;
+    }>;
   } | null;
   affect?: {
     created_at: string;
@@ -50,6 +57,13 @@ export type StatusData = {
       curiosity: number;
       saturation: number;
     };
+    public_dimensions?: Array<{
+      internal_key: string;
+      public_key: string;
+      label: string;
+      description: string;
+      value: number;
+    }>;
   } | null;
   peer_signals?: Array<{
     label: string;
