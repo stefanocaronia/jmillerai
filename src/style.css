@@ -1061,6 +1061,81 @@ a:hover {
   height: auto;
 }
 
+.affect-radar-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 22px;
+  align-items: start;
+  margin-top: 14px;
+}
+
+.affect-radar-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 18px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at center, rgba(34, 211, 238, 0.12), transparent 56%),
+    rgba(4, 9, 17, 0.72);
+}
+
+.affect-radar {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+}
+
+.affect-axis-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.affect-axis-card {
+  padding: 14px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(4, 9, 17, 0.62);
+}
+
+.affect-axis-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.affect-axis-label {
+  color: var(--affect-axis-color, var(--ink));
+  font-family: "Share Tech Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.affect-axis-head strong {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 0.95rem;
+}
+
+.affect-axis-card .muted-copy {
+  margin: 0;
+}
+
+.affect-axis-card .muted-copy + .muted-copy {
+  margin-top: 8px;
+}
+
+@media (max-width: 860px) {
+  .affect-radar-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .affect-axis-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .memory-graph-stage {
   position: relative;
   min-height: 760px;

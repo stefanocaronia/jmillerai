@@ -39,6 +39,23 @@ export type StatusData = {
     grounding: number;
     novelty: number;
   } | null;
+  affect?: {
+    created_at: string;
+    source: string;
+    state: {
+      valence: number;
+      arousal: number;
+      certainty: number;
+      coping: number;
+      curiosity: number;
+      saturation: number;
+    };
+  } | null;
+  peer_signals?: Array<{
+    label: string;
+    url: string;
+    description: string;
+  }> | null;
 };
 
 export type BookData = {

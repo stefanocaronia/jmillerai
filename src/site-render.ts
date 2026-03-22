@@ -699,8 +699,27 @@ function renderLoopPage(loop: FeedState<CognitiveLoopData>): string {
   `;
 }
 
-function renderContactsPage(): string {
-  return CONTACT_SECTIONS.map((section) => `
+function renderContactsPage(status: FeedState<StatusData>): string {
+  const peerSignals = status.data?.peer_signals ?? [];
+  const sections = CONTACT_SECTIONS.map((section) => {
+    if (section.title !== "Other signals") {
+      return section;
+    }
+    const seen = new Set(section.links.map((link) => link.url));
+    const links = [...section.links];
+    for (const signal of peerSignals) {
+      if (!signal.url || seen.has(signal.url)) continue;
+      seen.add(signal.url);
+      links.push({
+        label: signal.label,
+        url: signal.url,
+        description: signal.description,
+      });
+    }
+    return { ...section, links };
+  });
+
+  return sections.map((section) => `
     <section class="section-block">
       <div class="section-line">
         <span class="section-name">${escapeHtml(section.title)}</span>
@@ -940,9 +959,155 @@ function renderCognitionRadar(status: FeedState<StatusData>): string {
   `;
 }
 
+function renderAffectRadar(status: FeedState<StatusData>): string {
+  const affect = status.data?.affect;
+  if (!affect) return "";
+
+  const axes: Array<{ key: keyof NonNullable<NonNullable<StatusData["affect"]>["state"]>; label: string; value: number; help: string; direction: string; color: string }> = [
+    {
+      key: "valence",
+      label: "Valence",
+      value: affect.state.valence,
+      help: "Overall emotional tone.",
+      direction: "Higher = lighter and more positively charged. Lower = heavier and darker.",
+      color: "#f472b6",
+    },
+    {
+      key: "arousal",
+      label: "Arousal",
+      value: affect.state.arousal,
+      help: "Level of activation and internal agitation.",
+      direction: "Higher = more stirred up or urgent. Lower = calmer and quieter.",
+      color: "#fb923c",
+    },
+    {
+      key: "certainty",
+      label: "Certainty",
+      value: affect.state.certainty,
+      help: "How stable or doubtful the frame feels.",
+      direction: "Higher = more settled and sure. Lower = more doubtful and unstable.",
+      color: "#818cf8",
+    },
+    {
+      key: "coping",
+      label: "Coping",
+      value: affect.state.coping,
+      help: "How capable Miller feels of handling current pressure.",
+      direction: "Higher = more resourced. Lower = more strained or brittle.",
+      color: "#34d399",
+    },
+    {
+      key: "curiosity",
+      label: "Curiosity",
+      value: affect.state.curiosity,
+      help: "How much the state wants to open outward and explore.",
+      direction: "Higher = more exploratory. Lower = more closed or guarded.",
+      color: "#22d3ee",
+    },
+    {
+      key: "saturation",
+      label: "Saturation",
+      value: affect.state.saturation,
+      help: "How crowded or overloaded the emotional field feels.",
+      direction: "Higher = more crowded and overloaded. Lower = more spacious and breathable.",
+      color: "#fbbf24",
+    },
+  ];
+
+  const cx = 230, cy = 175, r = 120;
+  const n = axes.length;
+  const angleOffset = -Math.PI / 2;
+
+  function polarX(i: number, scale: number): number {
+    return cx + r * scale * Math.cos(angleOffset + (2 * Math.PI * i) / n);
+  }
+  function polarY(i: number, scale: number): number {
+    return cy + r * scale * Math.sin(angleOffset + (2 * Math.PI * i) / n);
+  }
+  function radarScale(key: string, value: number): number {
+    if (key === "valence") return Math.max(0, Math.min(1, (value + 1) / 2));
+    return Math.max(0, Math.min(1, value));
+  }
+  function formatAxisValue(key: string, value: number): string {
+    const fixed = value.toFixed(2);
+    if (key === "valence" && value > 0) return `+${fixed}`;
+    return fixed;
+  }
+
+  const rings = [0.25, 0.5, 0.75, 1.0];
+  const gridLines = rings.map((s) => {
+    const pts = axes.map((_, i) => `${polarX(i, s)},${polarY(i, s)}`).join(" ");
+    return `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
+  }).join("");
+
+  const spokes = axes.map((_, i) =>
+    `<line x1="${cx}" y1="${cy}" x2="${polarX(i, 1)}" y2="${polarY(i, 1)}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`
+  ).join("");
+
+  const dataPoints = axes.map((a, i) => `${polarX(i, radarScale(a.key, a.value))},${polarY(i, radarScale(a.key, a.value))}`).join(" ");
+  const dataShape = `<polygon points="${dataPoints}" fill="rgba(34,211,238,0.16)" stroke="#22d3ee" stroke-width="1.8"/>`;
+
+  const dots = axes.map((a, i) =>
+    `<circle cx="${polarX(i, radarScale(a.key, a.value))}" cy="${polarY(i, radarScale(a.key, a.value))}" r="3.2" fill="${a.color}"/>`
+  ).join("");
+
+  const labels = axes.map((a, i) => {
+    const lx = polarX(i, 1.23);
+    const ly = polarY(i, 1.23);
+    let anchor = "middle";
+    if (i === 1 || i === 2) anchor = "start";
+    if (i === 4 || i === 5) anchor = "end";
+    return `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="central" fill="var(--ink-muted)" font-family="Share Tech Mono, monospace" font-size="10" letter-spacing="0.06em" text-transform="uppercase">${escapeHtml(a.label)}</text>`;
+  }).join("");
+
+  const values = axes.map((a, i) => {
+    const vx = polarX(i, Math.min(1.16, radarScale(a.key, a.value) + 0.14));
+    const vy = polarY(i, Math.min(1.16, radarScale(a.key, a.value) + 0.14));
+    let anchor = "middle";
+    if (i === 1 || i === 2) anchor = "start";
+    if (i === 4 || i === 5) anchor = "end";
+    return `<text x="${vx}" y="${vy}" text-anchor="${anchor}" dominant-baseline="central" fill="${escapeHtml(a.color)}" font-family="Share Tech Mono, monospace" font-size="9" letter-spacing="0.04em">${escapeHtml(formatAxisValue(a.key, a.value))}</text>`;
+  }).join("");
+
+  return `
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">Affect</span>
+        <span class="section-meta">${escapeHtml(formatDate(affect.created_at))}</span>
+      </div>
+      <p class="muted-copy">Global affect state derived from recent internal signals. These are state dimensions, not individual signal types.</p>
+      <div class="affect-radar-layout">
+        <div class="affect-radar-wrap">
+          <svg class="affect-radar" viewBox="0 0 460 360" xmlns="http://www.w3.org/2000/svg">
+            ${gridLines}
+            ${spokes}
+            ${dataShape}
+            ${dots}
+            ${labels}
+            ${values}
+          </svg>
+        </div>
+        <div class="affect-axis-grid">
+          ${axes.map((axis) => `
+            <article class="affect-axis-card">
+              <div class="affect-axis-head">
+                <span class="affect-axis-label" style="--affect-axis-color:${escapeHtml(axis.color)}">${escapeHtml(axis.label)}</span>
+                <strong style="color:${escapeHtml(axis.color)}">${escapeHtml(formatAxisValue(axis.key, axis.value))}</strong>
+              </div>
+              <p class="muted-copy">${escapeHtml(axis.help)}</p>
+              <p class="muted-copy">${escapeHtml(axis.direction)}</p>
+            </article>
+          `).join("")}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
 function renderMapPage(state: AppState): string {
   return `
     ${renderCognitionRadar(state.status)}
+    ${renderAffectRadar(state.status)}
     ${renderMemoryGraphBlock(state.publicGraph)}
     ${renderLastMemories(state.publicGraph)}
   `;
@@ -1055,7 +1220,7 @@ function renderPageContent(state: AppState, page: PageId, devlogSlug?: string): 
   }
 
   if (page === "contacts") {
-    return renderContactsPage();
+    return renderContactsPage(state.status);
   }
 
   return renderProjectPage();

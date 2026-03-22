@@ -7,6 +7,7 @@ export type PublicGraphNode = {
   label: string;
   label_en?: string | null;
   url: string | null;
+  contact_kind?: string | null;
   timestamp?: string | null;
   memory_type?: string | null;
   weight?: number | null;
@@ -98,9 +99,12 @@ function publicNodeTypeLabel(node: Pick<PublicGraphNode, "kind" | "memory_type">
   return capitalizeLabel(node.kind.replace(/_/g, " "));
 }
 
-function publicNodeHoverLabel(node: Pick<PublicGraphNode, "kind" | "label" | "label_en" | "memory_type" | "contact_label">): string {
+function publicNodeHoverLabel(node: Pick<PublicGraphNode, "kind" | "label" | "label_en" | "memory_type" | "contact_label" | "contact_kind">): string {
   const label = node.label_en || node.label;
   if (node.kind === "friend") {
+    if (node.contact_kind === "ai") {
+      return node.contact_label ? `AI ${node.contact_label}` : "AI peer";
+    }
     return node.contact_label ? `Friend ${node.contact_label}` : "Friend Contact";
   }
   if (node.kind === "memory" && node.memory_type === "conversation") {
