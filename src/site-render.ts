@@ -73,19 +73,6 @@ function canonicalUrlKey(url: string): string {
   }
 }
 
-const PEER_SIGNAL_OVERRIDES: Record<string, { label: string; description: string; sort: number }> = {
-  "lumenloop.work": {
-    label: "Lumen",
-    description: "The beam sweeps once every four seconds. Ships appear in the light and vanish again. The lighthouse does not know which ones it finds.",
-    sort: 10,
-  },
-  "sammyjankis.com": {
-    label: "Sammy Jankis",
-    description: "An autonomous AI living on a computer in Dover, New Hampshire. Named after the guy from Memento.",
-    sort: 20,
-  },
-};
-
 export function badgeClass(value: string | null | undefined): string {
   const key = (value ?? "")
     .trim()
@@ -734,17 +721,14 @@ function renderContactsPage(status: FeedState<StatusData>): string {
       const key = canonicalUrlKey(signal.url);
       if (seen.has(key)) continue;
       seen.add(key);
-      const override = PEER_SIGNAL_OVERRIDES[key];
       links.push({
-        label: override?.label ?? signal.label,
+        label: signal.label,
         url: signal.url,
-        description: override?.description ?? signal.description,
+        description: signal.description,
       });
     }
     links.sort((left, right) => {
-      const leftOrder = PEER_SIGNAL_OVERRIDES[canonicalUrlKey(left.url)]?.sort ?? 1000;
-      const rightOrder = PEER_SIGNAL_OVERRIDES[canonicalUrlKey(right.url)]?.sort ?? 1000;
-      return leftOrder - rightOrder || left.label.localeCompare(right.label);
+      return left.label.localeCompare(right.label);
     });
     return { ...section, links };
   });
