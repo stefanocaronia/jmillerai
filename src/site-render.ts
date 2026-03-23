@@ -1179,7 +1179,7 @@ export function renderShell(state: AppState, page: PageId, pageUrl: (pageId: Pag
       ${renderHeader(page, pageUrl, state.status.data?.current_mode ?? "idle")}
       ${renderPageContent(state, page, devlogSlug)}
       <footer class="site-footer">
-        <span class="site-footer-meta">${renderFooterBrand()} <span>© 2026 S. Caronia / J. Miller <a class="site-license-link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener"><span class="site-license-mark" aria-hidden="true">cc</span><span>CC BY-NC-SA 4.0</span></a> · <a href="https://github.com/stefanocaronia/jmillerai/blob/main/COPYRIGHT" target="_blank" rel="noopener">Copyright</a></span></span>
+        <span class="site-footer-meta">${renderFooterBrand()} <span>© 2026 S. Caronia / J. Miller <a class="site-license-link" href="https://github.com/stefanocaronia/jmillerai/blob/main/LICENSE" target="_blank" rel="noopener"><span class="site-license-mark" aria-hidden="true">cc</span><span>CC BY-NC-SA 4.0</span></a> · <a href="https://github.com/stefanocaronia/jmillerai/blob/main/COPYRIGHT" target="_blank" rel="noopener">Copyright</a></span></span>
         ${renderFooterSnapshot(state)}
       </footer>
     </div>
