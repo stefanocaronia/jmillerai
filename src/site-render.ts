@@ -254,7 +254,7 @@ function renderFinishedBooks(book: FeedState<BookData>): string {
       ${items.map((item) => {
         const title = escapeHtml(en(item.title, item.title_en));
         const reviewLink = item.review_url
-          ? ` <a class="plain-link detail-ref" href="${escapeHtml(item.review_url)}" target="_blank" rel="noreferrer">[review]</a>`
+          ? ` · <a class="plain-link detail-ref" href="${escapeHtml(item.review_url)}" target="_blank" rel="noreferrer">Review Signal</a>`
           : "";
         const daysStr = (() => {
           if (item.started_at && item.finished_at) {
@@ -267,7 +267,7 @@ function renderFinishedBooks(book: FeedState<BookData>): string {
         return `
         <article class="stream-item">
           <div class="section-line">
-            <span><strong>${title}</strong> <span class="muted-copy">\u2014 ${escapeHtml(item.author ?? "Unknown author")}</span></span>
+            <span><strong>${title}</strong> <span class="muted-copy">- ${escapeHtml(item.author ?? "Unknown author")}</span></span>
             <span class="section-meta">${item.finished_at ? `finished ${escapeHtml(formatDate(item.finished_at))}` : ""}</span>
           </div>
           ${secondLine ? `<div class="section-line"><span>${reviewLink}</span>${daysStr ? `<span class="section-meta">${escapeHtml(daysStr)}</span>` : ""}</div>` : ""}
@@ -300,7 +300,7 @@ function renderCurrentlyReading(book: FeedState<BookData>): string {
         <span class="section-meta">${escapeHtml(formatDate(active.updated_at))}</span>
       </div>
       <p class="muted-copy">The book Miller is currently reading, processed slowly in small chunks across sessions.</p>
-      <h2>${escapeHtml(en(active.title, active.title_en))}</h2>
+      <h2 class="state-title">${escapeHtml(en(active.title, active.title_en))}</h2>
       <p class="body-copy">${escapeHtml(active.author ?? "Unknown author")}</p>
       <div class="progress-meter">
         <span class="progress-meter-fill" data-progress="${escapeHtml(progress)}"></span>

@@ -284,7 +284,8 @@ a:hover {
   text-underline-offset: 2px;
 }
 
-.detail-ref {
+.detail-ref,
+.detail-ref:visited {
   font-family: "Share Tech Mono", monospace;
   color: #a89050;
   font-size: 0.9em;
@@ -764,8 +765,11 @@ a:hover {
   background: none;
 }
 
-.plain-link {
-  font-size: 1rem;
+.plain-link,
+.plain-link:visited {
+  color: var(--ink);
+  font-family: "Chakra Petch", sans-serif;
+  text-decoration: underline;
 }
 
 .social-profile-link {

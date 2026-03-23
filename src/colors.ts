@@ -23,6 +23,7 @@ export const memoryTypeColors: Record<string, string> = {
   social: "#ff6b6b",
   heartbeat: "#ef4444",
   belief: "#362c91",
+  research: "#2dd4bf",
   trade: "#9a9a9a",
   summary: "#f9a8d4",
 };
@@ -64,6 +65,7 @@ export const modeColors: Record<string, string> = {
   coding: "#34d399",
   sharing: "#ff5ea8",
   chat: "#6ee7b7",
+  research: "#2dd4bf",
 };
 
 export const defaultModeColor = "#c3c3c3";
