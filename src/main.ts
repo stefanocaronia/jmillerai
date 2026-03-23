@@ -1,9 +1,9 @@
 import "./style.css";
 import { injectCssVars } from "./colors";
 import { initializeConsentBanner } from "./consent";
-import { loadState, loadPublicGraph } from "./site-data";
+import { loadStateWithCache, loadPublicGraph } from "./site-data";
 import { renderShell, applyProgressMeters, applySpoilerToggles, badgeClass, renderMemoryGraphBlock, renderLastMemories } from "./site-render";
-import type { PageId, StatusData } from "./site-types";
+import type { FeedState, PageId, StatusData } from "./site-types";
 
 injectCssVars();
 
@@ -79,28 +79,59 @@ async function start() {
     const devlogSlug = page === "devlog" ? location.hash.slice(1) || undefined : undefined;
     app.innerHTML = renderShell(emptyState, page, pageUrl, devlogSlug);
   } else if (page === "mind") {
-    // Mind page: only fetch status (for radars), render page immediately
     const empty = { data: null, error: null };
-    let status = empty as typeof empty & { data: import("./site-types").StatusData | null };
+
+    // Render page shell immediately (cached status for radars, spinners for graph)
+    function renderMindShell(status: FeedState<import("./site-types").StatusData>) {
+      const state = {
+        status, book: empty, readingFeed: empty, thinkingFeed: empty,
+        socialFeed: empty, projectsFeed: empty, cognitiveLoop: empty,
+        publicGraph: empty, signalsFeed: empty, dreamsFeed: empty,
+      } as Parameters<typeof renderShell>[0];
+      app.innerHTML = renderShell(state, page, pageUrl);
+      wireRadarTooltips(app);
+    }
+
+    // Try cached status for instant radars
+    let hasRendered = false;
     try {
-      const res = await fetch(feedUrl("status"), { cache: "no-store" });
-      if (res.ok) status = { data: await res.json(), error: null };
-    } catch { /* silent */ }
-    const state = {
-      status, book: empty, readingFeed: empty, thinkingFeed: empty,
-      socialFeed: empty, projectsFeed: empty, cognitiveLoop: empty,
-      publicGraph: empty, signalsFeed: empty, dreamsFeed: empty,
-    } as Parameters<typeof renderShell>[0];
-    app.innerHTML = renderShell(state, page, pageUrl);
-    wireRadarTooltips(app);
+      const raw = localStorage.getItem("jmillerai:state");
+      if (raw) {
+        const cached = JSON.parse(raw) as { status?: { data: import("./site-types").StatusData | null } };
+        if (cached.status?.data) {
+          renderMindShell({ data: cached.status.data, error: null });
+          hasRendered = true;
+        }
+      }
+    } catch { /* corrupt cache */ }
 
-    // Load graph data + Cytoscape chunk in parallel
-    const graphPromise = loadPublicGraph(feedUrl);
-    const cytoPromise = import("./memory-graph");
+    // Fetch fresh status in background, update radars if changed
+    fetch(feedUrl("status"), { cache: "no-store" })
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (data) {
+          renderMindShell({ data, error: null });
+          hasRendered = true;
+        } else if (!hasRendered) {
+          renderMindShell({ data: null, error: null });
+          hasRendered = true;
+        }
+      })
+      .catch(() => {
+        if (!hasRendered) {
+          renderMindShell({ data: null, error: null });
+          hasRendered = true;
+        }
+      });
 
-    graphPromise.then((graphState) => {
+    if (!hasRendered) {
+      renderMindShell({ data: null, error: null });
+      hasRendered = true;
+    }
+
+    // Load graph async — replaces spinner sections when ready
+    function applyGraphSections(graphState: import("./site-types").FeedState<import("./memory-graph-data").PublicGraphData>) {
       if (!graphState.data) return;
-      // Update "Latest memories" immediately (lightweight)
       const sections = app.querySelectorAll<HTMLElement>(".section-block");
       const memoriesSection = sections[sections.length - 1];
       if (memoriesSection) {
@@ -108,42 +139,50 @@ async function start() {
         tmp.innerHTML = renderLastMemories(graphState);
         memoriesSection.replaceWith(tmp.firstElementChild!);
       }
-      // Keep spinner visible until Cytoscape is ready to mount
-      cytoPromise.then(({ mountMemoryGraph }) => {
-        setTimeout(() => {
-          // Replace graph section HTML and mount in the same frame
-          const graphSections = app.querySelectorAll<HTMLElement>(".section-block");
-          const gs = graphSections[graphSections.length - 2];
-          if (gs) {
-            const tmp = document.createElement("div");
-            tmp.innerHTML = renderMemoryGraphBlock(graphState);
-            gs.replaceWith(tmp.firstElementChild!);
-          }
-          const stage = app.querySelector<HTMLElement>("#memory-graph-stage");
-          if (stage) {
-            unmountGraph = mountMemoryGraph(stage, graphState.data!);
-          }
-        }, 0);
+      import("./memory-graph").then(({ mountMemoryGraph }) => {
+        const graphSections = app.querySelectorAll<HTMLElement>(".section-block");
+        const gs = graphSections[graphSections.length - 2];
+        if (gs) {
+          const tmp = document.createElement("div");
+          tmp.innerHTML = renderMemoryGraphBlock(graphState);
+          gs.replaceWith(tmp.firstElementChild!);
+        }
+        const stage = app.querySelector<HTMLElement>("#memory-graph-stage");
+        if (stage) {
+          unmountGraph = mountMemoryGraph(stage, graphState.data!);
+        }
       });
-    });
+    }
+
+    loadPublicGraph(feedUrl).then(applyGraphSections);
   } else {
-    app.innerHTML = `<div class="loading">Initializing…</div>`;
-    const state = await loadState(feedUrl);
-    unmountGraph?.();
-    unmountGraph = null;
-    app.innerHTML = renderShell(state, page, pageUrl);
-    applyProgressMeters(app);
-    applySpoilerToggles(app);
-    wireRadarTooltips(app);
-    if (page === "loop" && state.cognitiveLoop.data) {
-      const container = document.querySelector<HTMLElement>("#cognitive-loop-stage");
-      if (container) {
-        const loopData = state.cognitiveLoop.data;
-        import("./cognitive-loop").then(({ mountCognitiveLoop }) => {
-          unmountGraph = mountCognitiveLoop(container, loopData);
-        });
+    function renderPage(state: Parameters<typeof renderShell>[0]) {
+      unmountGraph?.();
+      unmountGraph = null;
+      app.innerHTML = renderShell(state, page, pageUrl);
+      applyProgressMeters(app);
+      applySpoilerToggles(app);
+      wireRadarTooltips(app);
+      if (page === "loop" && state.cognitiveLoop.data) {
+        const container = document.querySelector<HTMLElement>("#cognitive-loop-stage");
+        if (container) {
+          const loopData = state.cognitiveLoop.data;
+          import("./cognitive-loop").then(({ mountCognitiveLoop }) => {
+            unmountGraph = mountCognitiveLoop(container, loopData);
+          });
+        }
       }
     }
+
+    const { cached, fresh } = loadStateWithCache(feedUrl);
+    if (cached) {
+      renderPage(cached);
+    } else {
+      app.innerHTML = `<div class="loading">Initializing…</div>`;
+    }
+    fresh.then((state) => {
+      if (state) renderPage(state);
+    });
   }
   initializeConsentBanner(import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined);
   if (page === "devlog") {

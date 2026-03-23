@@ -62,7 +62,9 @@ async function fetchBlogFeed(url: string): Promise<FeedState<BlogFeedData>> {
   }
 }
 
-export async function loadState(feedUrl: (name: string) => string): Promise<AppState> {
+const STATE_CACHE_KEY = "jmillerai:state";
+
+async function fetchFreshState(feedUrl: (name: string) => string): Promise<AppState> {
   const [status, book, readingFeed, thinkingFeed, socialFeed, projectsFeed, cognitiveLoop, signalsFeed, dreamsFeed] = await Promise.all([
     fetchJson<StatusData>(feedUrl("status")),
     fetchJson<BookData>(feedUrl("book")),
@@ -95,6 +97,35 @@ export async function loadState(feedUrl: (name: string) => string): Promise<AppS
     signalsFeed,
     dreamsFeed,
   };
+}
+
+function getCachedState(): AppState | null {
+  try {
+    const raw = localStorage.getItem(STATE_CACHE_KEY);
+    if (raw) return JSON.parse(raw) as AppState;
+  } catch { /* corrupt cache */ }
+  return null;
+}
+
+function saveCachedState(state: AppState): void {
+  try { localStorage.setItem(STATE_CACHE_KEY, JSON.stringify(state)); } catch { /* quota */ }
+}
+
+/**
+ * Stale-while-revalidate: returns cached state immediately if available,
+ * plus a promise that resolves with fresh state (or null if cache was already fresh).
+ */
+export function loadStateWithCache(feedUrl: (name: string) => string): {
+  cached: AppState | null;
+  fresh: Promise<AppState | null>;
+} {
+  const cached = getCachedState();
+  const fresh = fetchFreshState(feedUrl).then((state) => {
+    saveCachedState(state);
+    return state;
+  }).catch(() => null);
+
+  return { cached, fresh };
 }
 
 export async function loadPublicGraph(feedUrl: (name: string) => string): Promise<FeedState<PublicGraphData>> {
