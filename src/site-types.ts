@@ -82,6 +82,8 @@ export type BookData = {
     title_en?: string | null;
     author: string | null;
     progress_percent: number;
+    current_page?: number | null;
+    total_pages?: number | null;
     started_at: string | null;
     updated_at: string | null;
     cover_image: string | null;
@@ -109,6 +111,7 @@ export type BookData = {
     title: string;
     title_en?: string | null;
     author: string | null;
+    total_pages?: number | null;
     started_at?: string | null;
     finished_at: string | null;
     review_url?: string | null;

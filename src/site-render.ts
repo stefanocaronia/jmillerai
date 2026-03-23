@@ -256,21 +256,25 @@ function renderFinishedBooks(book: FeedState<BookData>): string {
         const reviewLink = item.review_url
           ? ` · <a class="plain-link detail-ref" href="${escapeHtml(item.review_url)}" target="_blank" rel="noreferrer">Review Signal</a>`
           : "";
-        const daysStr = (() => {
+        const days = (() => {
           if (item.started_at && item.finished_at) {
-            const days = Math.round((new Date(item.finished_at).getTime() - new Date(item.started_at).getTime()) / 86400000);
-            if (days > 0) return `${days} day${days === 1 ? "" : "s"}`;
+            const d = Math.round((new Date(item.finished_at).getTime() - new Date(item.started_at).getTime()) / 86400000);
+            if (d > 0) return d;
           }
-          return "";
+          return null;
         })();
-        const secondLine = reviewLink || daysStr;
+        const statParts: string[] = [];
+        if (item.total_pages) statParts.push(`${item.total_pages} pp`);
+        if (days !== null) statParts.push(`${days} day${days === 1 ? "" : "s"}`);
+        const statsStr = statParts.join(" — ");
+        const secondLine = reviewLink || statsStr;
         return `
         <article class="stream-item">
           <div class="section-line">
-            <span><strong>${title}</strong> <span class="muted-copy">- ${escapeHtml(item.author ?? "Unknown author")}</span></span>
+            <span><strong>${title}</strong> <span class="muted-copy">— ${escapeHtml(item.author ?? "Unknown author")}</span></span>
             <span class="section-meta">${item.finished_at ? `finished ${escapeHtml(formatDate(item.finished_at))}` : ""}</span>
           </div>
-          ${secondLine ? `<div class="section-line"><span>${reviewLink}</span>${daysStr ? `<span class="section-meta">${escapeHtml(daysStr)}</span>` : ""}</div>` : ""}
+          ${secondLine ? `<div class="section-line"><span>${reviewLink}</span>${statsStr ? `<span class="section-meta">${escapeHtml(statsStr)}</span>` : ""}</div>` : ""}
         </article>`;
       }).join("")}
     </div>
@@ -291,7 +295,7 @@ function renderCurrentlyReading(book: FeedState<BookData>): string {
   }
 
   const active = book.data.book;
-  const progress = active.progress_percent.toFixed(1);
+  const progress = Math.floor(active.progress_percent);
 
   return `
     <section class="section-block">
@@ -303,9 +307,9 @@ function renderCurrentlyReading(book: FeedState<BookData>): string {
       <h2 class="state-title">${escapeHtml(en(active.title, active.title_en))}</h2>
       <p class="body-copy">${escapeHtml(active.author ?? "Unknown author")}</p>
       <div class="progress-meter">
-        <span class="progress-meter-fill" data-progress="${escapeHtml(progress)}"></span>
+        <span class="progress-meter-fill" data-progress="${escapeHtml(String(progress))}"></span>
       </div>
-      <p class="section-note">${progress}%</p>
+      <div class="section-line"><span class="section-note">${progress}%</span>${active.current_page && active.total_pages ? `<span class="section-note muted-copy">p. ${active.current_page} of ${active.total_pages}</span>` : ""}</div>
       ${(() => { const f = en(active.current_focus, active.current_focus_en); return f ? renderExpandable(f, 200, "muted-copy") : ""; })()}
       ${renderFinishedBooks(book)}
     </section>
