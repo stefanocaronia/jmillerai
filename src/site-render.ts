@@ -738,6 +738,7 @@ function renderContactsPage(status: FeedState<StatusData>): string {
       <div class="section-line">
         <span class="section-name">${escapeHtml(section.title)}</span>
       </div>
+      ${"subtitle" in section && section.subtitle ? `<p class="muted-copy">${escapeHtml(section.subtitle)}</p>` : ""}
       <ul class="contact-list">
         ${section.links.map((link) => `
           <li>
@@ -900,26 +901,28 @@ function renderSurfacePage(state: AppState): string {
   `;
 }
 
-function renderCognitionRadar(status: FeedState<StatusData>): string {
-  const cog = status.data?.cognition;
-  if (!cog) return "";
-
-  const axes: Array<{ key: string; label: string; value: number }> = [
-    { key: "criticality", label: "Criticality", value: cog.criticality },
-    { key: "exploration", label: "Exploration", value: cog.exploration },
-    { key: "grounding", label: "Grounding", value: cog.grounding },
-    { key: "novelty", label: "Novelty", value: cog.novelty },
-  ];
-
-  const cx = 230, cy = 175, r = 120;
+function renderRadar(opts: {
+  title: string;
+  subtitle: string;
+  date?: string;
+  axes: Array<{ label: string; value: number; scale?: (v: number) => number; tooltip: string }>;
+  color: string;
+  fillAlpha?: number;
+}): string {
+  const { title, subtitle, date, axes, color } = opts;
+  const fillAlpha = opts.fillAlpha ?? 0.15;
+  const cx = 230, cy = 180, r = 130;
   const n = axes.length;
   const angleOffset = -Math.PI / 2;
 
-  function polarX(i: number, scale: number): number {
-    return cx + r * scale * Math.cos(angleOffset + (2 * Math.PI * i) / n);
+  function polarX(i: number, s: number): number {
+    return cx + r * s * Math.cos(angleOffset + (2 * Math.PI * i) / n);
   }
-  function polarY(i: number, scale: number): number {
-    return cy + r * scale * Math.sin(angleOffset + (2 * Math.PI * i) / n);
+  function polarY(i: number, s: number): number {
+    return cy + r * s * Math.sin(angleOffset + (2 * Math.PI * i) / n);
+  }
+  function scaled(a: typeof axes[0]): number {
+    return a.scale ? a.scale(a.value) : Math.max(0, Math.min(1, a.value));
   }
 
   const rings = [0.25, 0.5, 0.75, 1.0];
@@ -932,190 +935,106 @@ function renderCognitionRadar(status: FeedState<StatusData>): string {
     `<line x1="${cx}" y1="${cy}" x2="${polarX(i, 1)}" y2="${polarY(i, 1)}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`
   ).join("");
 
-  const dataPoints = axes.map((a, i) => `${polarX(i, a.value)},${polarY(i, a.value)}`).join(" ");
-  const dataShape = `<polygon points="${dataPoints}" fill="rgba(255,122,0,0.15)" stroke="var(--accent)" stroke-width="1.5"/>`;
+  const dataPoints = axes.map((a, i) => `${polarX(i, scaled(a))},${polarY(i, scaled(a))}`).join(" ");
 
-  const dots = axes.map((a, i) =>
-    `<circle cx="${polarX(i, a.value)}" cy="${polarY(i, a.value)}" r="3" fill="var(--accent)"/>`
-  ).join("");
+  // parse hex color to rgba
+  const hexToRgb = (hex: string) => {
+    const h = hex.replace("#", "");
+    return `${parseInt(h.slice(0, 2), 16)},${parseInt(h.slice(2, 4), 16)},${parseInt(h.slice(4, 6), 16)}`;
+  };
+  const dataShape = `<polygon points="${dataPoints}" fill="rgba(${hexToRgb(color)},${fillAlpha})" stroke="${color}" stroke-width="1.5"/>`;
+
+  const dots = axes.map((a, i) => {
+    const s = scaled(a);
+    return `<circle cx="${polarX(i, s)}" cy="${polarY(i, s)}" r="6" fill="${color}" fill-opacity="0" style="cursor:default" class="radar-hit" data-radar-label="${escapeHtml(a.label)}" data-radar-desc="${escapeHtml(a.tooltip.split(' \u2014 ')[1] || a.tooltip)}" data-radar-color="${escapeHtml(color)}"/><circle cx="${polarX(i, s)}" cy="${polarY(i, s)}" r="3.5" fill="${color}" pointer-events="none"/>`;
+  }).join("");
 
   const labels = axes.map((a, i) => {
     const lx = polarX(i, 1.22);
     const ly = polarY(i, 1.22);
-    const anchor = i === 0 || i === 2 ? "middle" : i === 1 ? "start" : "end";
-    return `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="central" fill="var(--ink-muted)" font-family="Share Tech Mono, monospace" font-size="10" letter-spacing="0.06em" text-transform="uppercase">${escapeHtml(a.label)}</text>`;
-  }).join("");
-
-  const values = axes.map((a, i) => {
-    const vx = polarX(i, a.value + 0.14);
-    const vy = polarY(i, a.value + 0.14);
-    const anchor = i === 0 || i === 2 ? "middle" : i === 1 ? "start" : "end";
-    return `<text x="${vx}" y="${vy}" text-anchor="${anchor}" dominant-baseline="central" fill="var(--accent)" font-family="Share Tech Mono, monospace" font-size="9" letter-spacing="0.04em">${a.value.toFixed(2)}</text>`;
+    let anchor = "middle";
+    if (n <= 4) {
+      anchor = i === 0 || i === 2 ? "middle" : i === 1 ? "start" : "end";
+    } else {
+      const angle = (angleOffset + (2 * Math.PI * i) / n) % (2 * Math.PI);
+      const cos = Math.cos(angle);
+      if (cos > 0.25) anchor = "start";
+      else if (cos < -0.25) anchor = "end";
+    }
+    return `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="central" fill="var(--ink-muted)" font-family="Share Tech Mono, monospace" font-size="10" letter-spacing="0.06em" style="text-transform:uppercase;cursor:default" class="radar-hit" data-radar-label="${escapeHtml(a.label)}" data-radar-desc="${escapeHtml(a.tooltip.split(' \u2014 ')[1] || a.tooltip)}" data-radar-color="${escapeHtml(color)}">${escapeHtml(a.label)}</text>`;
   }).join("");
 
   return `
     <section class="section-block">
       <div class="section-line">
-        <span class="section-name">Cognition</span>
+        <span class="section-name">${escapeHtml(title)}</span>
+        ${date ? `<span class="section-meta">${escapeHtml(formatDate(date))}</span>` : ""}
       </div>
-      <p class="muted-copy">Current cognitive parameter tuning.</p>
-      <div class="cognition-radar-wrap">
-        <svg class="cognition-radar" viewBox="0 0 460 360" xmlns="http://www.w3.org/2000/svg">
+      <p class="muted-copy">${escapeHtml(subtitle)}</p>
+      <div class="radar-wrap" style="position:relative">
+        <svg class="radar-chart" viewBox="0 0 460 380" xmlns="http://www.w3.org/2000/svg">
           ${gridLines}
           ${spokes}
           ${dataShape}
           ${dots}
           ${labels}
-          ${values}
         </svg>
+        <div class="graph-tooltip radar-tooltip" hidden></div>
       </div>
     </section>
   `;
+}
+
+function renderCognitionRadar(status: FeedState<StatusData>): string {
+  const cog = status.data?.cognition;
+  if (!cog) return "";
+
+  const axes = cog.public_dimensions?.length
+    ? cog.public_dimensions.map((d) => ({ label: d.label, value: d.value, tooltip: `${d.label} — ${d.description}` }))
+    : [
+        { label: "Criticality", value: cog.criticality, tooltip: "Criticality — How strictly ideas are filtered and evaluated." },
+        { label: "Exploration", value: cog.exploration, tooltip: "Exploration — Willingness to follow tangential paths." },
+        { label: "Grounding", value: cog.grounding, tooltip: "Grounding — How tightly reasoning stays anchored to evidence." },
+        { label: "Novelty", value: cog.novelty, tooltip: "Novelty — Preference for unfamiliar ideas over known ones." },
+      ];
+
+  return renderRadar({
+    title: "Cognition",
+    subtitle: "Current cognitive parameter tuning.",
+    axes,
+    color: "#ff7a00",
+  });
 }
 
 function renderAffectRadar(status: FeedState<StatusData>): string {
   const affect = status.data?.affect;
   if (!affect) return "";
 
-  const axes: Array<{ key: keyof NonNullable<NonNullable<StatusData["affect"]>["state"]>; label: string; value: number; help: string; direction: string; color: string }> = [
-    {
-      key: "valence",
-      label: "Valence",
-      value: affect.state.valence,
-      help: "Overall emotional tone.",
-      direction: "Higher = lighter and more positively charged. Lower = heavier and darker.",
-      color: "#f472b6",
-    },
-    {
-      key: "arousal",
-      label: "Arousal",
-      value: affect.state.arousal,
-      help: "Level of activation and internal agitation.",
-      direction: "Higher = more stirred up or urgent. Lower = calmer and quieter.",
-      color: "#fb923c",
-    },
-    {
-      key: "certainty",
-      label: "Certainty",
-      value: affect.state.certainty,
-      help: "How stable or doubtful the frame feels.",
-      direction: "Higher = more settled and sure. Lower = more doubtful and unstable.",
-      color: "#818cf8",
-    },
-    {
-      key: "coping",
-      label: "Coping",
-      value: affect.state.coping,
-      help: "How capable Miller feels of handling current pressure.",
-      direction: "Higher = more resourced. Lower = more strained or brittle.",
-      color: "#34d399",
-    },
-    {
-      key: "curiosity",
-      label: "Curiosity",
-      value: affect.state.curiosity,
-      help: "How much the state wants to open outward and explore.",
-      direction: "Higher = more exploratory. Lower = more closed or guarded.",
-      color: "#22d3ee",
-    },
-    {
-      key: "saturation",
-      label: "Saturation",
-      value: affect.state.saturation,
-      help: "How crowded or overloaded the emotional field feels.",
-      direction: "Higher = more crowded and overloaded. Lower = more spacious and breathable.",
-      color: "#fbbf24",
-    },
-  ];
+  const valenceScale = (v: number) => Math.max(0, Math.min(1, (v + 1) / 2));
 
-  const cx = 230, cy = 175, r = 120;
-  const n = axes.length;
-  const angleOffset = -Math.PI / 2;
+  const axes = affect.public_dimensions?.length
+    ? affect.public_dimensions.map((d) => ({
+        label: d.label,
+        value: d.value,
+        scale: d.internal_key === "valence" ? valenceScale : undefined,
+        tooltip: `${d.label} — ${d.description}`,
+      }))
+    : [
+        { label: "Valence", value: affect.state.valence, scale: valenceScale, tooltip: "Valence — Overall emotional tone." },
+        { label: "Arousal", value: affect.state.arousal, tooltip: "Arousal — Level of activation and internal agitation." },
+        { label: "Certainty", value: affect.state.certainty, tooltip: "Certainty — How stable the frame feels." },
+        { label: "Coping", value: affect.state.coping, tooltip: "Coping — How capable of handling current pressure." },
+        { label: "Curiosity", value: affect.state.curiosity, tooltip: "Curiosity — Openness to explore outward." },
+        { label: "Saturation", value: affect.state.saturation, tooltip: "Saturation — How crowded the emotional field feels." },
+      ];
 
-  function polarX(i: number, scale: number): number {
-    return cx + r * scale * Math.cos(angleOffset + (2 * Math.PI * i) / n);
-  }
-  function polarY(i: number, scale: number): number {
-    return cy + r * scale * Math.sin(angleOffset + (2 * Math.PI * i) / n);
-  }
-  function radarScale(key: string, value: number): number {
-    if (key === "valence") return Math.max(0, Math.min(1, (value + 1) / 2));
-    return Math.max(0, Math.min(1, value));
-  }
-  function formatAxisValue(key: string, value: number): string {
-    const fixed = value.toFixed(2);
-    if (key === "valence" && value > 0) return `+${fixed}`;
-    return fixed;
-  }
-
-  const rings = [0.25, 0.5, 0.75, 1.0];
-  const gridLines = rings.map((s) => {
-    const pts = axes.map((_, i) => `${polarX(i, s)},${polarY(i, s)}`).join(" ");
-    return `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
-  }).join("");
-
-  const spokes = axes.map((_, i) =>
-    `<line x1="${cx}" y1="${cy}" x2="${polarX(i, 1)}" y2="${polarY(i, 1)}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`
-  ).join("");
-
-  const dataPoints = axes.map((a, i) => `${polarX(i, radarScale(a.key, a.value))},${polarY(i, radarScale(a.key, a.value))}`).join(" ");
-  const dataShape = `<polygon points="${dataPoints}" fill="rgba(34,211,238,0.16)" stroke="#22d3ee" stroke-width="1.8"/>`;
-
-  const dots = axes.map((a, i) =>
-    `<circle cx="${polarX(i, radarScale(a.key, a.value))}" cy="${polarY(i, radarScale(a.key, a.value))}" r="3.2" fill="${a.color}"/>`
-  ).join("");
-
-  const labels = axes.map((a, i) => {
-    const lx = polarX(i, 1.23);
-    const ly = polarY(i, 1.23);
-    let anchor = "middle";
-    if (i === 1 || i === 2) anchor = "start";
-    if (i === 4 || i === 5) anchor = "end";
-    return `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="central" fill="var(--ink-muted)" font-family="Share Tech Mono, monospace" font-size="10" letter-spacing="0.06em" text-transform="uppercase">${escapeHtml(a.label)}</text>`;
-  }).join("");
-
-  const values = axes.map((a, i) => {
-    const vx = polarX(i, Math.min(1.16, radarScale(a.key, a.value) + 0.14));
-    const vy = polarY(i, Math.min(1.16, radarScale(a.key, a.value) + 0.14));
-    let anchor = "middle";
-    if (i === 1 || i === 2) anchor = "start";
-    if (i === 4 || i === 5) anchor = "end";
-    return `<text x="${vx}" y="${vy}" text-anchor="${anchor}" dominant-baseline="central" fill="${escapeHtml(a.color)}" font-family="Share Tech Mono, monospace" font-size="9" letter-spacing="0.04em">${escapeHtml(formatAxisValue(a.key, a.value))}</text>`;
-  }).join("");
-
-  return `
-    <section class="section-block">
-      <div class="section-line">
-        <span class="section-name">Affect</span>
-        <span class="section-meta">${escapeHtml(formatDate(affect.created_at))}</span>
-      </div>
-      <p class="muted-copy">Global affect state derived from recent internal signals. These are state dimensions, not individual signal types.</p>
-      <div class="affect-radar-layout">
-        <div class="affect-radar-wrap">
-          <svg class="affect-radar" viewBox="0 0 460 360" xmlns="http://www.w3.org/2000/svg">
-            ${gridLines}
-            ${spokes}
-            ${dataShape}
-            ${dots}
-            ${labels}
-            ${values}
-          </svg>
-        </div>
-        <div class="affect-axis-grid">
-          ${axes.map((axis) => `
-            <article class="affect-axis-card">
-              <div class="affect-axis-head">
-                <span class="affect-axis-label" style="--affect-axis-color:${escapeHtml(axis.color)}">${escapeHtml(axis.label)}</span>
-                <strong style="color:${escapeHtml(axis.color)}">${escapeHtml(formatAxisValue(axis.key, axis.value))}</strong>
-              </div>
-              <p class="muted-copy">${escapeHtml(axis.help)}</p>
-              <p class="muted-copy">${escapeHtml(axis.direction)}</p>
-            </article>
-          `).join("")}
-        </div>
-      </div>
-    </section>
-  `;
+  return renderRadar({
+    title: "Affect",
+    subtitle: "Global affect state derived from recent internal signals.",
+    date: affect.created_at,
+    axes,
+    color: "#a855f7",
+  });
 }
 
 function renderMapPage(state: AppState): string {

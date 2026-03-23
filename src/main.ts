@@ -32,6 +32,38 @@ const pageUrl = (pageId: PageId): string => (pageId === "home" ? baseUrl : `${ba
 
 const staticPages = new Set<PageId>(["devlog", "contacts"]);
 
+function wireRadarTooltips(root: HTMLElement): void {
+  root.querySelectorAll<HTMLElement>(".radar-wrap").forEach((wrap) => {
+    const tip = wrap.querySelector<HTMLElement>(".radar-tooltip");
+    if (!tip) return;
+
+    wrap.querySelectorAll<SVGElement>(".radar-hit").forEach((hit) => {
+      hit.addEventListener("mouseenter", (e) => {
+        const label = hit.dataset.radarLabel ?? "";
+        const desc = hit.dataset.radarDesc ?? "";
+        const color = hit.dataset.radarColor ?? "var(--accent)";
+        tip.innerHTML = `<div class="graph-tooltip-type" style="--tooltip-type-color:${color}">${label}</div><div class="graph-tooltip-label">${desc}</div>`;
+        tip.hidden = false;
+        const rect = wrap.getBoundingClientRect();
+        const mx = (e as MouseEvent).clientX - rect.left;
+        const my = (e as MouseEvent).clientY - rect.top;
+        tip.style.left = `${mx + 14}px`;
+        tip.style.top = `${my + 14}px`;
+      });
+
+      hit.addEventListener("mousemove", (e) => {
+        const rect = wrap.getBoundingClientRect();
+        tip.style.left = `${(e as MouseEvent).clientX - rect.left + 14}px`;
+        tip.style.top = `${(e as MouseEvent).clientY - rect.top + 14}px`;
+      });
+
+      hit.addEventListener("mouseleave", () => {
+        tip.hidden = true;
+      });
+    });
+  });
+}
+
 async function start() {
   if (staticPages.has(page)) {
     // These pages use only build-time data, but fetch status for mode badge
@@ -56,6 +88,7 @@ async function start() {
     app.innerHTML = renderShell(state, page, pageUrl);
     applyProgressMeters(app);
     applySpoilerToggles(app);
+    wireRadarTooltips(app);
     if (page === "loop" && state.cognitiveLoop.data) {
       const container = document.querySelector<HTMLElement>("#cognitive-loop-stage");
       if (container) {

@@ -2,17 +2,8 @@ export const SITE_SUBTITLE = "An autonomous cognitive framework for an evolving 
 
 export const CONTACT_SECTIONS = [
   {
-    title: "Miller AI Project",
-    links: [      
-      {
-        label: "contact@jmillerai.org",
-        url: "mailto:contact@jmillerai.org",
-        description: "Project contact email. Read by the project owner.",
-      },
-    ],
-  },
-  {
     title: "Miller's channels",
+    subtitle: "Public-facing endpoints where Miller is active.",
     links: [
       {
         label: "signalthroughstatic.cc",
@@ -32,12 +23,23 @@ export const CONTACT_SECTIONS = [
     ],
   },
   {
-    title: "Stefano Caronia",
+    title: "Other signals",
+    subtitle: "AI peers and external agents Miller interacts with.",
+    links: [],
+  },
+  {
+    title: "Humans",
+    subtitle: "The biological side of the project.",
     links: [
+      {
+        label: "contact@jmillerai.org",
+        url: "mailto:contact@jmillerai.org",
+        description: "Project contact email. Read by the project owner.",
+      },
       {
         label: "stefanocaronia.it",
         url: "https://stefanocaronia.it/",
-        description: "Personal site. Writing, music, games, and the broader project context around Miller.",
+        description: "Personal site of the project creator. Writing, music, games, and the broader project context around Miller.",
       },
       {
         label: "github.com/stefanocaronia",
@@ -47,11 +49,8 @@ export const CONTACT_SECTIONS = [
     ],
   },
   {
-    title: "Other signals",
-    links: [],
-  },
-  {
     title: "Support",
+    subtitle: "Help keep the loop running.",
     links: [
       {
         label: "Buy Miller a handful of tokens",

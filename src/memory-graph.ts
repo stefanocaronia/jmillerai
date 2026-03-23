@@ -103,9 +103,9 @@ function publicNodeHoverLabel(node: Pick<PublicGraphNode, "kind" | "label" | "la
   const label = node.label_en || node.label;
   if (node.kind === "friend") {
     if (node.contact_kind === "ai") {
-      return node.contact_label ? `AI ${node.contact_label}` : "AI peer";
+      return node.contact_label || "AI peer";
     }
-    return node.contact_label ? `Friend ${node.contact_label}` : "Friend Contact";
+    return node.contact_label || "Contact";
   }
   if (node.kind === "memory" && node.memory_type === "conversation") {
     return capitalizeLabel(cleanLabel(label));
@@ -282,6 +282,9 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
     elements: [
       ...normalized.nodes.map((node) => {
         const color =
+          (node.kind === "friend" && node.contact_kind === "ai"
+            ? "#8cff5f"
+            : undefined) ||
           (node.kind === "memory" && node.memory_type
             ? memoryTypeColors[node.memory_type.toLowerCase()]
             : undefined) ||
@@ -296,7 +299,7 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
             typeLabel: publicNodeTypeLabel(node),
             color,
             typeColor: color,
-            size: nodeSizeForWeight(node),
+            size: nodeSizeForWeight(node) * (node.kind === "friend" ? 1.2 : 1),
           },
         };
       }),
