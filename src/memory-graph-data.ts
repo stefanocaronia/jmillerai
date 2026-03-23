@@ -28,6 +28,31 @@ export type PublicGraphData = {
   edges: PublicGraphEdge[];
 };
 
+// Minified v2 wire types (short keys, no nulls)
+type V2Node = { i: string; k: string; l: string; le?: string; u?: string; ck?: string; t?: string; mt?: string; w?: number; im?: number; cl?: string };
+type V2Edge = { s: string; t: string; r: string; st: number };
+type V2Graph = { v: 2; ts: string; n: V2Node[]; e: V2Edge[] };
+
+/** Inflate a v2 minified graph payload into the canonical v1 shape. */
+export function inflateGraph(raw: Record<string, unknown>): PublicGraphData {
+  if ((raw as { v?: number }).v === 2) {
+    const g = raw as unknown as V2Graph;
+    return {
+      schema_version: 2,
+      generated_at: g.ts,
+      nodes: g.n.map((n) => ({
+        id: n.i, kind: n.k, label: n.l,
+        label_en: n.le ?? null, url: n.u ?? null, contact_kind: n.ck ?? null,
+        timestamp: n.t ?? null, memory_type: n.mt ?? null,
+        weight: n.w ?? null, importance: n.im ?? null, contact_label: n.cl ?? null,
+      })),
+      edges: g.e.map((e) => ({ source: e.s, target: e.t, relation: e.r, strength: e.st })),
+    };
+  }
+  // v1 passthrough
+  return raw as PublicGraphData;
+}
+
 export type MemoryGraphLegendItem = {
   key: string;
   label: string;

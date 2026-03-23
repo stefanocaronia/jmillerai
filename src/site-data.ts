@@ -10,7 +10,7 @@ import type {
   ThinkingFeedData,
 } from "./site-types";
 import type { CognitiveLoopData } from "./cognitive-loop-data";
-import type { PublicGraphData } from "./memory-graph-data";
+import { inflateGraph, type PublicGraphData } from "./memory-graph-data";
 
 async function fetchJson<T>(url: string): Promise<FeedState<T>> {
   try {
@@ -97,6 +97,10 @@ export async function loadState(feedUrl: (name: string) => string): Promise<AppS
   };
 }
 
-export function loadPublicGraph(feedUrl: (name: string) => string): Promise<FeedState<PublicGraphData>> {
-  return fetchJson<PublicGraphData>(feedUrl("public-graph"));
+export async function loadPublicGraph(feedUrl: (name: string) => string): Promise<FeedState<PublicGraphData>> {
+  const result = await fetchJson<Record<string, unknown>>(feedUrl("public-graph"));
+  if (result.data) {
+    return { data: inflateGraph(result.data), error: null };
+  }
+  return { data: null, error: result.error };
 }
