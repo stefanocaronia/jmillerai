@@ -1,4 +1,4 @@
-import { isLoopDebugEnabled, nodePublicMode, projectLoopGraph, type CognitiveLoopData } from "./cognitive-loop";
+import { isLoopDebugEnabled, nodePublicMode, projectLoopGraph, type CognitiveLoopData } from "./cognitive-loop-data";
 import {
   getMemoryGraphEdgeLegend,
   getMemoryGraphLegend,
@@ -6,7 +6,7 @@ import {
   presentPublicMemoryTypeLabel,
   presentPublicNodeLabel,
   type PublicGraphData,
-} from "./memory-graph";
+} from "./memory-graph-data";
 import { CONTACT_SECTIONS, SITE_SUBTITLE } from "./site-content";
 import introSections from "virtual:intro-sections";
 import devlogPosts from "virtual:devlog-posts";
@@ -555,14 +555,14 @@ function renderBlog(signalsFeed: FeedState<BlogFeedData>, dreamsFeed: FeedState<
   `;
 }
 
-function renderLastMemories(graph: FeedState<PublicGraphData>): string {
+export function renderLastMemories(graph: FeedState<PublicGraphData>, loading = false): string {
   if (!graph.data) {
     return `
       <section class="section-block">
         <div class="section-line">
           <span class="section-name">Latest memories</span>
         </div>
-        ${renderFeedError(graph, "public graph")}
+        ${loading ? `<div class="feed-loader"><span class="feed-loader-ring"></span></div>` : renderFeedError(graph, "public graph")}
       </section>
     `;
   }
@@ -605,14 +605,14 @@ function renderLastMemories(graph: FeedState<PublicGraphData>): string {
   `;
 }
 
-function renderMemoryGraphBlock(graph: FeedState<PublicGraphData>): string {
+export function renderMemoryGraphBlock(graph: FeedState<PublicGraphData>, loading = false): string {
   if (!graph.data) {
     return `
       <section class="section-block">
         <div class="section-line">
           <span class="section-name">Memory network</span>
         </div>
-        <p class="muted-copy">Graph canvas pending.</p>
+        ${loading ? `<div class="feed-loader"><span class="feed-loader-ring"></span></div>` : renderFeedError(graph, "public graph")}
       </section>
     `;
   }
@@ -1055,8 +1055,8 @@ function renderMapPage(state: AppState): string {
   return `
     ${renderCognitionRadar(state.status)}
     ${renderAffectRadar(state.status)}
-    ${renderMemoryGraphBlock(state.publicGraph)}
-    ${renderLastMemories(state.publicGraph)}
+    ${renderMemoryGraphBlock(state.publicGraph, !state.publicGraph.data && !state.publicGraph.error)}
+    ${renderLastMemories(state.publicGraph, !state.publicGraph.data && !state.publicGraph.error)}
   `;
 }
 

@@ -32,7 +32,7 @@ export const memoryTypeColors: Record<string, string> = {
 
 export const kindColors: Record<string, string> = {
   memory: "#f2f2f2",
-  book: "#afafaf",
+  book: "#f1e8e8",
   source: "#ea4df8",
   blog_post: "#f97316",
   friend: "#34d399",

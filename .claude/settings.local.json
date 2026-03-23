@@ -15,7 +15,8 @@
       "Read(//f/www/stefanocaronia.it/dist/jmillerai/data/**)",
       "Bash(python -c \"import json; d=json.load\\(open\\(''public-graph.json''\\)\\); kinds=set\\(n[''kind''] for n in d[''nodes'']\\); print\\(kinds\\)\")",
       "Bash(python -c \":*)",
-      "Bash(netsh interface:*)"
+      "Bash(netsh interface:*)",
+      "Bash(grep -E \"^d|^-.*\\\\.\\(ts|js|html\\)$\")"
     ]
   }
 }

@@ -1,5 +1,5 @@
-import type { CognitiveLoopData } from "./cognitive-loop";
-import type { PublicGraphData } from "./memory-graph";
+import type { CognitiveLoopData } from "./cognitive-loop-data";
+import type { PublicGraphData } from "./memory-graph-data";
 
 export type PageId = "home" | "traces" | "surface" | "loop" | "mind" | "contacts" | "devlog";
 export type Mode = string;

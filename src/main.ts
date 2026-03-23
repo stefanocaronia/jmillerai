@@ -1,10 +1,8 @@
 import "./style.css";
 import { injectCssVars } from "./colors";
 import { initializeConsentBanner } from "./consent";
-import { mountCognitiveLoop } from "./cognitive-loop";
-import { mountMemoryGraph } from "./memory-graph";
-import { loadState } from "./site-data";
-import { renderShell, applyProgressMeters, applySpoilerToggles, badgeClass } from "./site-render";
+import { loadState, loadPublicGraph } from "./site-data";
+import { renderShell, applyProgressMeters, applySpoilerToggles, badgeClass, renderMemoryGraphBlock, renderLastMemories } from "./site-render";
 import type { PageId, StatusData } from "./site-types";
 
 injectCssVars();
@@ -80,6 +78,54 @@ async function start() {
     } as Parameters<typeof renderShell>[0];
     const devlogSlug = page === "devlog" ? location.hash.slice(1) || undefined : undefined;
     app.innerHTML = renderShell(emptyState, page, pageUrl, devlogSlug);
+  } else if (page === "mind") {
+    // Mind page: only fetch status (for radars), render page immediately
+    const empty = { data: null, error: null };
+    let status = empty as typeof empty & { data: import("./site-types").StatusData | null };
+    try {
+      const res = await fetch(feedUrl("status"), { cache: "no-store" });
+      if (res.ok) status = { data: await res.json(), error: null };
+    } catch { /* silent */ }
+    const state = {
+      status, book: empty, readingFeed: empty, thinkingFeed: empty,
+      socialFeed: empty, projectsFeed: empty, cognitiveLoop: empty,
+      publicGraph: empty, signalsFeed: empty, dreamsFeed: empty,
+    } as Parameters<typeof renderShell>[0];
+    app.innerHTML = renderShell(state, page, pageUrl);
+    wireRadarTooltips(app);
+
+    // Load graph data + Cytoscape chunk in parallel
+    const graphPromise = loadPublicGraph(feedUrl);
+    const cytoPromise = import("./memory-graph");
+
+    graphPromise.then((graphState) => {
+      if (!graphState.data) return;
+      // Update "Latest memories" immediately (lightweight)
+      const sections = app.querySelectorAll<HTMLElement>(".section-block");
+      const memoriesSection = sections[sections.length - 1];
+      if (memoriesSection) {
+        const tmp = document.createElement("div");
+        tmp.innerHTML = renderLastMemories(graphState);
+        memoriesSection.replaceWith(tmp.firstElementChild!);
+      }
+      // Keep spinner visible until Cytoscape is ready to mount
+      cytoPromise.then(({ mountMemoryGraph }) => {
+        setTimeout(() => {
+          // Replace graph section HTML and mount in the same frame
+          const graphSections = app.querySelectorAll<HTMLElement>(".section-block");
+          const gs = graphSections[graphSections.length - 2];
+          if (gs) {
+            const tmp = document.createElement("div");
+            tmp.innerHTML = renderMemoryGraphBlock(graphState);
+            gs.replaceWith(tmp.firstElementChild!);
+          }
+          const stage = app.querySelector<HTMLElement>("#memory-graph-stage");
+          if (stage) {
+            unmountGraph = mountMemoryGraph(stage, graphState.data!);
+          }
+        }, 0);
+      });
+    });
   } else {
     app.innerHTML = `<div class="loading">Initializing…</div>`;
     const state = await loadState(feedUrl);
@@ -92,13 +138,10 @@ async function start() {
     if (page === "loop" && state.cognitiveLoop.data) {
       const container = document.querySelector<HTMLElement>("#cognitive-loop-stage");
       if (container) {
-        unmountGraph = mountCognitiveLoop(container, state.cognitiveLoop.data);
-      }
-    }
-    if (page === "mind" && state.publicGraph.data) {
-      const container = document.querySelector<HTMLElement>("#memory-graph-stage");
-      if (container) {
-        unmountGraph = mountMemoryGraph(container, state.publicGraph.data);
+        const loopData = state.cognitiveLoop.data;
+        import("./cognitive-loop").then(({ mountCognitiveLoop }) => {
+          unmountGraph = mountCognitiveLoop(container, loopData);
+        });
       }
     }
   }

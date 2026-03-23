@@ -9,8 +9,8 @@ import type {
   StatusData,
   ThinkingFeedData,
 } from "./site-types";
-import type { CognitiveLoopData } from "./cognitive-loop";
-import type { PublicGraphData } from "./memory-graph";
+import type { CognitiveLoopData } from "./cognitive-loop-data";
+import type { PublicGraphData } from "./memory-graph-data";
 
 async function fetchJson<T>(url: string): Promise<FeedState<T>> {
   try {
@@ -63,7 +63,7 @@ async function fetchBlogFeed(url: string): Promise<FeedState<BlogFeedData>> {
 }
 
 export async function loadState(feedUrl: (name: string) => string): Promise<AppState> {
-  const [status, book, readingFeed, thinkingFeed, socialFeed, projectsFeed, cognitiveLoop, publicGraph, signalsFeed, dreamsFeed] = await Promise.all([
+  const [status, book, readingFeed, thinkingFeed, socialFeed, projectsFeed, cognitiveLoop, signalsFeed, dreamsFeed] = await Promise.all([
     fetchJson<StatusData>(feedUrl("status")),
     fetchJson<BookData>(feedUrl("book")),
     fetchJson<ReadingFeedData>(feedUrl("reading-feed")),
@@ -71,7 +71,6 @@ export async function loadState(feedUrl: (name: string) => string): Promise<AppS
     fetchJson<SocialFeedData>(feedUrl("social-feed")),
     fetchJson<ProjectsFeedData>(feedUrl("projects-feed")),
     fetchJson<CognitiveLoopData>(feedUrl("cognitive-loop")),
-    fetchJson<PublicGraphData>(feedUrl("public-graph")),
     fetchBlogFeed("https://signalthroughstatic.cc/signals/index.xml"),
     fetchBlogFeed("https://signalthroughstatic.cc/dreams/index.xml"),
   ]);
@@ -92,8 +91,12 @@ export async function loadState(feedUrl: (name: string) => string): Promise<AppS
     socialFeed: resolvedSocialFeed,
     projectsFeed,
     cognitiveLoop,
-    publicGraph,
+    publicGraph: { data: null, error: null },
     signalsFeed,
     dreamsFeed,
   };
+}
+
+export function loadPublicGraph(feedUrl: (name: string) => string): Promise<FeedState<PublicGraphData>> {
+  return fetchJson<PublicGraphData>(feedUrl("public-graph"));
 }

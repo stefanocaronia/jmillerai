@@ -1,51 +1,17 @@
 import cytoscape from "cytoscape";
 import { kindColors, memoryTypeColors, relationColors } from "./colors";
+import {
+  type PublicGraphNode,
+  type PublicGraphData,
+  presentPublicNodeLabel,
+  presentPublicMemoryTypeLabel,
+} from "./memory-graph-data";
 
-export type PublicGraphNode = {
-  id: string;
-  kind: string;
-  label: string;
-  label_en?: string | null;
-  url: string | null;
-  contact_kind?: string | null;
-  timestamp?: string | null;
-  memory_type?: string | null;
-  weight?: number | null;
-  importance?: number | null;
-  contact_label?: string | null;
-};
-
-export type PublicGraphEdge = {
-  source: string;
-  target: string;
-  relation: string;
-  strength: number;
-};
-
-export type PublicGraphData = {
-  schema_version: number;
-  generated_at: string;
-  nodes: PublicGraphNode[];
-  edges: PublicGraphEdge[];
-};
-
-export type MemoryGraphLegendItem = {
-  key: string;
-  label: string;
-  color: string;
-};
-
-export type MemoryGraphEdgeLegendItem = {
-  key: string;
-  label: string;
-  color: string;
-};
 
 type NormalizedGraphNode = PublicGraphNode & {
   displayLabel: string;
   hoverLabel: string;
 };
-
 
 const PUBLIC_MIN_NODE_DISTANCE = 190;
 const defaultNodeWeights: Record<string, number> = {
@@ -69,24 +35,6 @@ function cleanLabel(label: string): string {
 function capitalizeLabel(label: string): string {
   if (!label) return label;
   return `${label.charAt(0).toLocaleUpperCase()}${label.slice(1)}`;
-}
-
-export function presentPublicNodeLabel(node: Pick<PublicGraphNode, "kind" | "label" | "label_en" | "memory_type">): string {
-  const label = node.label_en || node.label;
-  if (node.kind === "friend") return capitalizeLabel(cleanLabel(label));
-  if (node.kind === "memory" && node.memory_type === "conversation") {
-    const normalized = cleanLabel(label);
-    if (/^\d+\s+chat$/i.test(normalized)) {
-      return capitalizeLabel(normalized);
-    }
-    return "Chat";
-  }
-  return capitalizeLabel(cleanLabel(label));
-}
-
-export function presentPublicMemoryTypeLabel(memoryType: string | null | undefined): string {
-  if (!memoryType) return "memory";
-  return memoryType === "conversation" ? "chat" : memoryType;
 }
 
 function publicNodeTypeLabel(node: Pick<PublicGraphNode, "kind" | "memory_type">): string {
@@ -160,11 +108,21 @@ function nodeSizeForWeight(node: PublicGraphNode): number {
   return 26 + Math.pow(importance, 1.45) * 3.1;
 }
 
-function enforceNodeSpacing(cy: cytoscape.Core, minDistance: number) {
+const YIELD_EVERY = 30;
+
+function yieldToMain(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+async function enforceNodeSpacing(cy: cytoscape.Core, minDistance: number) {
   const nodes = cy.nodes().toArray();
   if (nodes.length < 2) return;
 
-  for (let iteration = 0; iteration < 420; iteration += 1) {
+  for (let iteration = 0; iteration < 50; iteration += 1) {
+    if (iteration > 0 && iteration % YIELD_EVERY === 0) {
+      await yieldToMain();
+    }
+
     let moved = false;
 
     for (let i = 0; i < nodes.length; i += 1) {
@@ -231,52 +189,13 @@ function normalizeGraph(graph: PublicGraphData) {
   return { nodes, edges };
 }
 
-export function getMemoryGraphStats(graph: PublicGraphData) {
-  const normalized = normalizeGraph(graph);
-  return {
-    visibleNodes: normalized.nodes.length,
-    visibleEdges: normalized.edges.length,
-  };
-}
-
-export function getMemoryGraphLegend(): MemoryGraphLegendItem[] {
-  return [
-    { key: "thinking", label: "Thinking", color: memoryTypeColors.thinking },
-    { key: "experience", label: "Experience", color: memoryTypeColors.experience },
-    { key: "reading", label: "Reading", color: memoryTypeColors.reading },
-    { key: "dream", label: "Dream", color: memoryTypeColors.dream },
-    { key: "chat", label: "Chat", color: memoryTypeColors.conversation },
-    { key: "mail", label: "Mail", color: memoryTypeColors.mail },
-    { key: "social", label: "Social", color: memoryTypeColors.social },
-    { key: "belief", label: "Belief", color: memoryTypeColors.belief },
-    { key: "trade", label: "Trade", color: memoryTypeColors.trade },
-    { key: "summary", label: "Summary", color: memoryTypeColors.summary },
-    { key: "contact", label: "Contact", color: kindColors.friend },
-    { key: "book", label: "Book", color: kindColors.book },
-    { key: "source", label: "Source", color: kindColors.source },
-    { key: "blog-post", label: "Blog post", color: kindColors.blog_post },
-    { key: "project", label: "Project", color: kindColors.project },
-  ];
-}
-
-export function getMemoryGraphEdgeLegend(): MemoryGraphEdgeLegendItem[] {
-  return [
-    { key: "came_from", label: "Came from", color: relationColors.came_from },
-    { key: "extends", label: "Extends", color: relationColors.extends },
-    { key: "inspired", label: "Inspired", color: relationColors.inspired },
-    { key: "about", label: "About", color: relationColors.about },
-    { key: "continues", label: "Continues", color: relationColors.continues },
-    { key: "relates_to", label: "Relates to", color: relationColors.relates_to },
-    { key: "contradicts", label: "Contradicts", color: relationColors.contradicts },
-  ];
-}
-
 export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData): () => void {
   const normalized = normalizeGraph(graph);
   const tooltip = document.createElement("div");
   tooltip.className = "graph-tooltip";
   tooltip.hidden = true;
   container.appendChild(tooltip);
+  let destroyed = false;
   const cy = cytoscape({
     container,
     elements: [
@@ -328,14 +247,6 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
         selector: "node",
         style: {
           "background-color": "data(color)",
-          // label: "data(label)",
-          // color: "#f2f2f2",
-          // "font-size": 40,
-          // "text-wrap": "wrap",
-          // "text-max-width": "420px",
-          // "text-valign": "bottom",
-          // "text-margin-y": 24,
-          // "min-zoomed-font-size": 14,
           width: "data(size)",
           height: "data(size)",
           "border-width": 0,
@@ -355,15 +266,17 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
       },
     ],
   });
-  enforceNodeSpacing(cy, PUBLIC_MIN_NODE_DISTANCE);
+  // Run spacing async so the browser stays responsive
+  void enforceNodeSpacing(cy, PUBLIC_MIN_NODE_DISTANCE).then(() => {
+    if (destroyed) return;
 
-  // Exponential easing: only strong edges are clearly visible
-  cy.edges().forEach((edge) => {
-    const s = edge.data("strength") as number;
-    // normalize 1..3 → 0..1, then apply cubic easing
-    const t = Math.max(0, Math.min(1, s / 10));
-    const opacity = 0.25 + t * t * 0.65;
-    edge.style("opacity", opacity);
+    // Exponential easing: only strong edges are clearly visible
+    cy.edges().forEach((edge) => {
+      const s = edge.data("strength") as number;
+      const t = Math.max(0, Math.min(1, s / 10));
+      const opacity = 0.25 + t * t * 0.65;
+      edge.style("opacity", opacity);
+    });
   });
 
   const showTooltip = (x: number, y: number, typeLabel: string, fullLabel: string, typeColor: string, nodeId: string) => {
@@ -402,6 +315,7 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
   cy.on("mouseout", "node", hideTooltip);
 
   return () => {
+    destroyed = true;
     tooltip.remove();
     cy.destroy();
   };
