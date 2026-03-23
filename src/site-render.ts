@@ -254,7 +254,7 @@ function renderFinishedBooks(book: FeedState<BookData>): string {
       ${items.map((item) => {
         const title = escapeHtml(en(item.title, item.title_en));
         const reviewLink = item.review_url
-          ? ` <a class="plain-link detail-ref" href="${escapeHtml(item.review_url)}" target="_blank" rel="noreferrer">review</a>`
+          ? ` <a class="plain-link detail-ref" href="${escapeHtml(item.review_url)}" target="_blank" rel="noreferrer">[review]</a>`
           : "";
         const daysStr = (() => {
           if (item.started_at && item.finished_at) {
@@ -263,16 +263,14 @@ function renderFinishedBooks(book: FeedState<BookData>): string {
           }
           return "";
         })();
+        const secondLine = reviewLink || daysStr;
         return `
         <article class="stream-item">
           <div class="section-line">
-            <span class="body-copy">${title}</span>
+            <span><strong>${title}</strong> <span class="muted-copy">\u2014 ${escapeHtml(item.author ?? "Unknown author")}</span></span>
             <span class="section-meta">${item.finished_at ? `finished ${escapeHtml(formatDate(item.finished_at))}` : ""}</span>
           </div>
-          <div class="section-line">
-            <span class="muted-copy">${escapeHtml(item.author ?? "Unknown author")}${reviewLink}</span>
-            ${daysStr ? `<span class="section-meta">${escapeHtml(daysStr)}</span>` : ""}
-          </div>
+          ${secondLine ? `<div class="section-line"><span>${reviewLink}</span>${daysStr ? `<span class="section-meta">${escapeHtml(daysStr)}</span>` : ""}</div>` : ""}
         </article>`;
       }).join("")}
     </div>
