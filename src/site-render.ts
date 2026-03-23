@@ -243,6 +243,42 @@ function renderCurrentState(status: FeedState<StatusData>): string {
 }
 
 
+function renderFinishedBooks(book: FeedState<BookData>): string {
+  const items = book.data?.finished_books ?? [];
+  if (items.length === 0) return "";
+
+  return `
+    <hr class="section-divider" />
+    <span class="subsection-label">Finished books</span>
+    <div class="stream-list">
+      ${items.map((item) => {
+        const title = escapeHtml(en(item.title, item.title_en));
+        const reviewLink = item.review_url
+          ? ` <a class="plain-link detail-ref" href="${escapeHtml(item.review_url)}" target="_blank" rel="noreferrer">review</a>`
+          : "";
+        const daysStr = (() => {
+          if (item.started_at && item.finished_at) {
+            const days = Math.round((new Date(item.finished_at).getTime() - new Date(item.started_at).getTime()) / 86400000);
+            if (days > 0) return `${days} day${days === 1 ? "" : "s"}`;
+          }
+          return "";
+        })();
+        return `
+        <article class="stream-item">
+          <div class="section-line">
+            <span class="body-copy">${title}</span>
+            <span class="section-meta">${item.finished_at ? `finished ${escapeHtml(formatDate(item.finished_at))}` : ""}</span>
+          </div>
+          <div class="section-line">
+            <span class="muted-copy">${escapeHtml(item.author ?? "Unknown author")}${reviewLink}</span>
+            ${daysStr ? `<span class="section-meta">${escapeHtml(daysStr)}</span>` : ""}
+          </div>
+        </article>`;
+      }).join("")}
+    </div>
+  `;
+}
+
 function renderCurrentlyReading(book: FeedState<BookData>): string {
   if (!book.data || !book.data.book) {
     return `
@@ -250,7 +286,8 @@ function renderCurrentlyReading(book: FeedState<BookData>): string {
         <div class="section-line">
           <span class="section-name">Currently reading</span>
         </div>
-        ${renderFeedError(book, "book feed")}
+        ${book.error ? renderFeedError(book, "book feed") : `<p class="muted-copy">Miller is between books, browsing the shelves for something that pulls.</p>`}
+        ${renderFinishedBooks(book)}
       </section>
     `;
   }
@@ -272,31 +309,7 @@ function renderCurrentlyReading(book: FeedState<BookData>): string {
       </div>
       <p class="section-note">${progress}%</p>
       ${(() => { const f = en(active.current_focus, active.current_focus_en); return f ? renderExpandable(f, 200, "muted-copy") : ""; })()}
-    </section>
-  `;
-}
-
-function renderReadingArchive(book: FeedState<BookData>): string {
-  const items = book.data?.finished_books ?? [];
-  if (items.length === 0) {
-    return "";
-  }
-
-  return `
-    <section class="section-block">
-      <div class="section-line">
-        <span class="section-name">Reading archive</span>
-        <span class="section-meta">${items.length}</span>
-      </div>
-      <ul class="book-archive-list">
-        ${items.map((item) => `
-          <li>
-            <span class="book-archive-title">${escapeHtml(item.title)}</span>
-            <span class="muted-copy">${escapeHtml(item.author ?? "Unknown author")}</span>
-            ${item.finished_at ? `<span class="section-meta">${escapeHtml(formatDate(item.finished_at))}</span>` : ""}
-          </li>
-        `).join("")}
-      </ul>
+      ${renderFinishedBooks(book)}
     </section>
   `;
 }
@@ -886,7 +899,6 @@ function renderTracesPage(state: AppState): string {
     ${renderCurrentState(state.status)}
     ${renderCurrentlyReading(state.book)}
     ${renderReadingTrace(state.readingFeed)}
-    ${renderReadingArchive(state.book)}
     ${renderThinkingFeed(state.thinkingFeed)}
   `;
 }

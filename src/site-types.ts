@@ -107,8 +107,11 @@ export type BookData = {
   finished_books?: Array<{
     slug: string | null;
     title: string;
+    title_en?: string | null;
     author: string | null;
+    started_at?: string | null;
     finished_at: string | null;
+    review_url?: string | null;
   }>;
 };
 
