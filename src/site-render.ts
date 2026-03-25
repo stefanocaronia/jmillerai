@@ -436,7 +436,7 @@ function renderThinkingFeed(feed: FeedState<ThinkingFeedData>, limit = 5): strin
 
           return `
             <article class="stream-item">
-              <div class="section-line">
+              <div class="section-line thinking-item-head">
                 <span class="metric-bars">${bars}<span class="metric-dots">${dots}</span><span class="thought-verdict">${escapeHtml(verdict)}</span></span>
                 <span class="section-meta">${escapeHtml(formatDate(item.created_at))}</span>
               </div>

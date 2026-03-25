@@ -1482,7 +1482,8 @@ a:hover {
     display: none;
   }
 
-  .social-item-head > .section-meta {
+  .social-item-head > .section-meta,
+  .thinking-item-head > .section-meta {
     display: inline;
   }
 

@@ -226,6 +226,7 @@ function bindDebugControls(container: HTMLElement, cy: Core): () => void {
 export function mountCognitiveLoop(container: HTMLElement, loop: CognitiveLoopData): () => void {
   const graph = projectLoopGraph(loop);
   const debugEnabled = isLoopDebugEnabled();
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
   const cy = cytoscape({
     container,
