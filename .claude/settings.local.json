@@ -16,7 +16,18 @@
       "Bash(python -c \"import json; d=json.load\\(open\\(''public-graph.json''\\)\\); kinds=set\\(n[''kind''] for n in d[''nodes'']\\); print\\(kinds\\)\")",
       "Bash(python -c \":*)",
       "Bash(netsh interface:*)",
-      "Bash(grep -E \"^d|^-.*\\\\.\\(ts|js|html\\)$\")"
+      "Bash(grep -E \"^d|^-.*\\\\.\\(ts|js|html\\)$\")",
+      "Bash(powershell -Command \"New-NetFirewallRule -DisplayName ''Vite Dev Server'' -Direction Inbound -LocalPort 3000 -Protocol TCP -Action Allow\")",
+      "Bash(powershell -Command \"Test-NetConnection -ComputerName 10.9.4.1 -Port 3000\")",
+      "Bash(powershell -Command \"Get-NetFirewallRule -DisplayName ''Vite Dev Server'' -ErrorAction SilentlyContinue | Select-Object DisplayName, Enabled, Direction, Action\")",
+      "Bash(powershell -Command \"Test-NetConnection -ComputerName 10.9.4.10 -Port 3000\")",
+      "Bash(powershell -Command \"Get-NetFirewallRule -DisplayName ''Vite Dev Server'' | Get-NetFirewallProfile\")",
+      "Bash(powershell -Command \"Get-NetConnectionProfile | Select-Object InterfaceAlias, NetworkCategory\")",
+      "Bash(powershell -Command \"Get-NetFirewallRule -Direction Inbound -Action Block -Enabled True | Where-Object { $_.DisplayName -match ''node|Node'' } | Select-Object DisplayName, Action\")",
+      "Bash(gh run:*)",
+      "Bash(grep -n \"^\\\\|[^t\\(][^e\\(][^s\\(]\"\"[A-Z]\\\\|''''[A-Z]\\\\|^\\\\`[A-Z]\" \"f:/www/jmillerai/src/site-render.ts\")",
+      "Bash(grep -n \"[''''\"\"\\\\`][^''''\"\"]*[''''\"\"\\\\`]\")",
+      "Bash(grep -n \"pp\\\\|day.*s\\\\|Live trading|Unknown total|\\\\`p\\\\. \\\\|signals\\\\|dreams\\\\| of \" \"f:/www/jmillerai/src/site-render.ts\")"
     ]
   }
 }
