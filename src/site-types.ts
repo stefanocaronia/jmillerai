@@ -64,6 +64,10 @@ export type StatusData = {
       description: string;
       value: number;
     }>;
+    summary_headline?: string | null;
+    summary_body?: string | null;
+    summary_headline_en?: string | null;
+    summary_body_en?: string | null;
   } | null;
   peer_signals?: Array<{
     label: string;

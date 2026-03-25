@@ -1042,13 +1042,25 @@ function renderAffectRadar(status: FeedState<StatusData>): string {
         { label: "Saturation", value: affect.state.saturation, tooltip: "Saturation — How crowded the emotional field feels." },
       ];
 
-  return renderRadar({
+  const radarHtml = renderRadar({
     title: "Affect",
     subtitle: "Global affect state derived from recent internal signals.",
     date: affect.created_at,
     axes,
     color: "#a855f7",
   });
+
+  const headline = en(affect.summary_headline, affect.summary_headline_en);
+  const body = en(affect.summary_body, affect.summary_body_en);
+  if (!headline && !body) return radarHtml;
+
+  const summaryHtml = `<div class="stream-item">
+    <div class="graph-legend-title">Summary</div>
+    ${headline ? `<div class="state-title" style="margin-top:6px">${escapeHtml(headline)}</div>` : ""}
+    ${body ? `<div class="muted-copy">${escapeHtml(body)}</div>` : ""}
+  </div>`;
+
+  return radarHtml + summaryHtml;
 }
 
 function renderMapPage(state: AppState): string {
