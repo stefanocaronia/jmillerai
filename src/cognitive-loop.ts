@@ -106,6 +106,7 @@ function bindDebugControls(container: HTMLElement, cy: Core): () => void {
   const status = panel?.querySelector<HTMLElement>("[data-loop-debug-status]");
   const edgeStatus = panel?.querySelector<HTMLElement>("[data-loop-debug-edge]");
 
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
   let selectedEdgeId: string | null = null;
 
   if (status) {
@@ -226,7 +227,6 @@ export function mountCognitiveLoop(container: HTMLElement, loop: CognitiveLoopDa
   const graph = projectLoopGraph(loop);
   const debugEnabled = isLoopDebugEnabled();
 
-  const isMobile = window.matchMedia("(max-width: 768px)").matches;
   const cy = cytoscape({
     container,
     userPanningEnabled: !isMobile,
