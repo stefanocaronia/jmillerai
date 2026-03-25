@@ -269,11 +269,12 @@ function renderFinishedBooks(book: FeedState<BookData>): string {
         const statsStr = statParts.join(" — ");
         return `
         <article class="stream-item">
-          <div class="section-line">
+          <div class="section-line book-header-line">
             <span><strong>${title}</strong>${reviewLink}</span>
-            <span class="section-meta" style="white-space:nowrap">${item.finished_at ? `finished ${escapeHtml(formatDate(item.finished_at))}` : ""}</span>
+            <span class="section-meta book-finished-meta book-finished-desktop">${item.finished_at ? `finished ${escapeHtml(formatDate(item.finished_at))}` : ""}</span>
           </div>
           <div class="muted-copy">${escapeHtml(item.author ?? "Unknown author")}</div>
+          ${item.finished_at ? `<div class="section-meta book-finished-mobile" style="text-align:right">finished ${escapeHtml(formatDate(item.finished_at))}</div>` : ""}
           ${statsStr ? `<div class="section-line"><span></span><span class="section-meta">${escapeHtml(statsStr)}</span></div>` : ""}
         </article>`;
       }).join("")}
@@ -799,12 +800,12 @@ function renderCurrentProject(feed: FeedState<ProjectsFeedData>): string {
   const tags = [project.language, project.platform].filter(Boolean);
   const projectLinks: string[] = [];
   if (project.repo_url) {
-    projectLinks.push(`<li><a class="plain-link project-link" href="${escapeHtml(project.repo_url)}" target="_blank" rel="noreferrer"><svg class="project-link-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>Source code</a> <span class="muted-copy">(${escapeHtml(shortUrl(project.repo_url))})</span></li>`);
+    projectLinks.push(`<li><a class="plain-link project-link" href="${escapeHtml(project.repo_url)}" target="_blank" rel="noreferrer"><svg class="project-link-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>Source code</a> <span class="muted-copy project-link-url">(${escapeHtml(shortUrl(project.repo_url))})</span></li>`);
   }
   if (project.pages_url) {
     const phase = versionPhase(project.version);
     const previewParts = ["Preview", project.version ? `v${escapeHtml(project.version)}` : "", phase ? phase : ""].filter(Boolean).join(" ");
-    projectLinks.push(`<li><a class="plain-link project-link" href="${escapeHtml(project.pages_url)}" target="_blank" rel="noreferrer"><svg class="project-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1v-3"/><path d="M9 2h5v5"/><path d="M14 2L7 9"/></svg>${previewParts}</a> <span class="muted-copy">(${escapeHtml(shortUrl(project.pages_url))})</span></li>`);
+    projectLinks.push(`<li><a class="plain-link project-link" href="${escapeHtml(project.pages_url)}" target="_blank" rel="noreferrer"><svg class="project-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1v-3"/><path d="M9 2h5v5"/><path d="M14 2L7 9"/></svg>${previewParts}</a> <span class="muted-copy project-link-url">(${escapeHtml(shortUrl(project.pages_url))})</span></li>`);
   }
   const linksHtml = projectLinks.length
     ? `<ul class="project-links">${projectLinks.join("")}</ul>`
@@ -922,10 +923,11 @@ function renderRadar(opts: {
   axes: Array<{ label: string; value: number; scale?: (v: number) => number; tooltip: string }>;
   color: string;
   fillAlpha?: number;
+  gradient?: { topColor: string; bottomColor: string };
 }): string {
-  const { title, subtitle, date, axes, color } = opts;
+  const { title, subtitle, date, axes, color, gradient } = opts;
   const fillAlpha = opts.fillAlpha ?? 0.15;
-  const cx = 230, cy = 180, r = 130;
+  const cx = 250, cy = 250, r = 200;
   const n = axes.length;
   const angleOffset = -Math.PI / 2;
 
@@ -956,7 +958,15 @@ function renderRadar(opts: {
     const h = hex.replace("#", "");
     return `${parseInt(h.slice(0, 2), 16)},${parseInt(h.slice(2, 4), 16)},${parseInt(h.slice(4, 6), 16)}`;
   };
-  const dataShape = `<polygon points="${dataPoints}" fill="rgba(${hexToRgb(color)},${fillAlpha})" stroke="${color}" stroke-width="1.5"/>`;
+  const gradId = gradient ? `radar-grad-${title.toLowerCase().replace(/\s+/g, "-")}` : "";
+  const gradDefs = gradient
+    ? `<defs><linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${gradient.topColor}" stop-opacity="${fillAlpha}"/>
+        <stop offset="100%" stop-color="${gradient.bottomColor}" stop-opacity="${fillAlpha}"/>
+      </linearGradient></defs>`
+    : "";
+  const fillAttr = gradient ? `url(#${gradId})` : `rgba(${hexToRgb(color)},${fillAlpha})`;
+  const dataShape = `<polygon points="${dataPoints}" fill="${fillAttr}" stroke="${color}" stroke-width="1.5"/>`;
 
   const dots = axes.map((a, i) => {
     const s = scaled(a);
@@ -975,7 +985,7 @@ function renderRadar(opts: {
       if (cos > 0.25) anchor = "start";
       else if (cos < -0.25) anchor = "end";
     }
-    return `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="central" fill="var(--ink-muted)" font-family="Share Tech Mono, monospace" font-size="10" letter-spacing="0.06em" style="text-transform:uppercase;cursor:default" class="radar-hit" data-radar-label="${escapeHtml(a.label)}" data-radar-desc="${escapeHtml(a.tooltip.split(' \u2014 ')[1] || a.tooltip)}" data-radar-color="${escapeHtml(color)}">${escapeHtml(a.label)}</text>`;
+    return `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="central" fill="var(--ink-muted)" font-family="Share Tech Mono, monospace" font-size="17" letter-spacing="0.06em" style="text-transform:uppercase;cursor:default" class="radar-hit" data-radar-label="${escapeHtml(a.label)}" data-radar-desc="${escapeHtml(a.tooltip.split(' \u2014 ')[1] || a.tooltip)}" data-radar-color="${escapeHtml(color)}">${escapeHtml(a.label)}</text>`;
   }).join("");
 
   return `
@@ -986,7 +996,8 @@ function renderRadar(opts: {
       </div>
       <p class="muted-copy">${escapeHtml(subtitle)}</p>
       <div class="radar-wrap" style="position:relative">
-        <svg class="radar-chart" viewBox="0 0 460 380" xmlns="http://www.w3.org/2000/svg">
+        <svg class="radar-chart" viewBox="-150 -20 900 560" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+          ${gradDefs}
           ${gridLines}
           ${spokes}
           ${dataShape}
@@ -1012,12 +1023,23 @@ function renderCognitionRadar(status: FeedState<StatusData>): string {
         { label: "Novelty", value: cog.novelty, tooltip: "Novelty — Preference for unfamiliar ideas over known ones." },
       ];
 
-  return renderRadar({
+  const radarHtml = renderRadar({
     title: "Cognition",
-    subtitle: "Current cognitive parameter tuning.",
+    subtitle: "Self-set cognitive parameters. Miller adjusts these deliberately between sessions.",
     axes,
-    color: "#ff7a00",
+    color: "#2d8cf0",
   });
+
+  const headline = en(cog.summary_headline, cog.summary_headline_en);
+  const body = en(cog.summary_body, cog.summary_body_en);
+  if (!headline && !body) return radarHtml;
+
+  const summaryHtml = `<div class="radar-summary">
+    ${headline ? `<div class="state-title" style="margin-top:6px">${escapeHtml(headline)}</div>` : ""}
+    ${body ? `<div class="muted-copy">${escapeHtml(body)}</div>` : ""}
+  </div>`;
+
+  return radarHtml + summaryHtml;
 }
 
 function renderAffectRadar(status: FeedState<StatusData>): string {
@@ -1026,15 +1048,28 @@ function renderAffectRadar(status: FeedState<StatusData>): string {
 
   const valenceScale = (v: number) => Math.max(0, Math.min(1, (v + 1) / 2));
 
+  // Invert emotional tone so higher = darker/heavier — keeps all top axes "negative"
+  const invertedAxes = new Set(["valence", "emotional_tone"]);
+  const invertLabel: Record<string, string> = {
+    "Emotional tone": "Emotional weight",
+  };
+  const invertDesc: Record<string, string> = {
+    "Emotional tone": "Whether the moment feels heavier, darker, or more burdened.",
+  };
+
   const axes = affect.public_dimensions?.length
-    ? affect.public_dimensions.map((d) => ({
-        label: d.label,
-        value: d.value,
-        scale: d.internal_key === "valence" ? valenceScale : undefined,
-        tooltip: `${d.label} — ${d.description}`,
-      }))
+    ? affect.public_dimensions.map((d) => {
+        const invert = invertedAxes.has(d.internal_key) || invertedAxes.has(d.public_key);
+        const label = invertLabel[d.label] ?? d.label;
+        const desc = invertDesc[d.label] ?? d.description;
+        return {
+          label,
+          value: invert ? 1 - valenceScale(d.value) : d.value,
+          tooltip: `${label} — ${desc}`,
+        };
+      })
     : [
-        { label: "Valence", value: affect.state.valence, scale: valenceScale, tooltip: "Valence — Overall emotional tone." },
+        { label: "Emotional weight", value: 1 - valenceScale(affect.state.valence), tooltip: "Emotional weight — Whether the moment feels heavier, darker, or more burdened." },
         { label: "Arousal", value: affect.state.arousal, tooltip: "Arousal — Level of activation and internal agitation." },
         { label: "Certainty", value: affect.state.certainty, tooltip: "Certainty — How stable the frame feels." },
         { label: "Coping", value: affect.state.coping, tooltip: "Coping — How capable of handling current pressure." },
@@ -1048,14 +1083,14 @@ function renderAffectRadar(status: FeedState<StatusData>): string {
     date: affect.created_at,
     axes,
     color: "#a855f7",
+    gradient: { topColor: "#e03030", bottomColor: "#a855f7" },
   });
 
   const headline = en(affect.summary_headline, affect.summary_headline_en);
   const body = en(affect.summary_body, affect.summary_body_en);
   if (!headline && !body) return radarHtml;
 
-  const summaryHtml = `<div class="stream-item">
-    <div class="graph-legend-title">Summary</div>
+  const summaryHtml = `<div class="radar-summary">
     ${headline ? `<div class="state-title" style="margin-top:6px">${escapeHtml(headline)}</div>` : ""}
     ${body ? `<div class="muted-copy">${escapeHtml(body)}</div>` : ""}
   </div>`;

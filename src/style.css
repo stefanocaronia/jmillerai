@@ -215,6 +215,8 @@ a:hover {
 
 .section-meta {
   color: var(--ink-muted);
+  white-space: nowrap;
+  text-align: right;
 }
 
 .devlog-author--ai {
@@ -1067,17 +1069,32 @@ a:hover {
 
 .radar-chart {
   width: 100%;
-  max-width: 480px;
+  max-width: 600px;
   height: auto;
 }
 
 
+
+.book-finished-mobile {
+  display: none;
+}
+
+.radar-summary {
+  margin-top: 10px;
+  padding-top: 0;
+}
 
 .memory-graph-stage {
   position: relative;
   min-height: 760px;
   margin-top: 14px;
   background: transparent;
+}
+
+@media (max-width: 768px) {
+  .memory-graph-stage {
+    min-height: 400px;
+  }
 }
 
 .graph-tooltip {
@@ -1416,13 +1433,33 @@ a:hover {
   }
 
   .loop-graph-stage {
-    min-height: 560px;
+    min-height: 400px;
   }
 
   .consent-banner {
     right: 16px;
     bottom: 16px;
     width: calc(100% - 32px);
+  }
+
+  .book-finished-desktop {
+    display: none;
+  }
+
+  .book-finished-mobile {
+    display: block;
+  }
+
+  .thought-verdict {
+    display: none;
+  }
+
+  .project-link-url {
+    display: none;
+  }
+
+  .social-item-summary {
+    display: none;
   }
 }
 
@@ -1433,8 +1470,24 @@ a:hover {
 }
 
 @media (max-width: 400px) {
+  .site-header-top {
+    flex-wrap: wrap;
+  }
+
   .header-mode-group {
+    width: 100%;
+  }
+
+  .section-line > .section-meta {
     display: none;
+  }
+
+  .social-item-head > .section-meta {
+    display: inline;
+  }
+
+  .section-name {
+    white-space: nowrap;
   }
 }
 

@@ -196,8 +196,12 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
   tooltip.hidden = true;
   container.appendChild(tooltip);
   let destroyed = false;
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
   const cy = cytoscape({
     container,
+    userPanningEnabled: !isMobile,
+    userZoomingEnabled: true,
+    autoungrabify: true,
     elements: [
       ...normalized.nodes.map((node) => {
         const color =
@@ -277,6 +281,17 @@ export function mountMemoryGraph(container: HTMLElement, graph: PublicGraphData)
       const opacity = 0.25 + t * t * 0.65;
       edge.style("opacity", opacity);
     });
+
+    // Fit container height to graph content on mobile
+    if (isMobile) {
+      cy.fit(undefined, 20);
+      const containerWidth = container.clientWidth;
+      const h = Math.min(containerWidth, 600);
+      container.style.minHeight = `${h}px`;
+      container.style.height = `${h}px`;
+      cy.resize();
+      cy.fit(undefined, 20);
+    }
   });
 
   const showTooltip = (x: number, y: number, typeLabel: string, fullLabel: string, typeColor: string, nodeId: string) => {

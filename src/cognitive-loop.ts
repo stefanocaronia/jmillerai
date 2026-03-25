@@ -114,7 +114,17 @@ function bindDebugControls(container: HTMLElement, cy: Core): () => void {
 
   const dumpPositions = () => logNodePositions(cy, "manual");
   const dumpCurves = () => logEdgeCurves(cy, "manual");
-  const fitGraph = () => cy.fit(undefined, 18);
+  const fitGraph = () => {
+    cy.fit(undefined, 18);
+    if (isMobile) {
+      const containerWidth = container.clientWidth;
+      const h = Math.min(containerWidth, 500);
+      container.style.minHeight = `${h}px`;
+      container.style.height = `${h}px`;
+      cy.resize();
+      cy.fit(undefined, 18);
+    }
+  };
   const selectedEdge = () => (selectedEdgeId ? cy.getElementById(selectedEdgeId) : null);
   const setEdgeStatus = (message: string) => {
     if (edgeStatus) {
@@ -216,8 +226,10 @@ export function mountCognitiveLoop(container: HTMLElement, loop: CognitiveLoopDa
   const graph = projectLoopGraph(loop);
   const debugEnabled = isLoopDebugEnabled();
 
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
   const cy = cytoscape({
     container,
+    userPanningEnabled: !isMobile,
     autoungrabify: !debugEnabled,
     elements: [
       ...graph.nodes.map((node) => ({
