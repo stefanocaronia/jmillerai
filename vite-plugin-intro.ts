@@ -9,6 +9,11 @@ export type IntroSection = {
   html: string;
 };
 
+export type IntroData = {
+  en: IntroSection[];
+  it: IntroSection[];
+};
+
 const VIRTUAL_ID = "virtual:intro-sections";
 const RESOLVED_ID = "\0" + VIRTUAL_ID;
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -22,8 +27,8 @@ function transformSpoilers(html: string): string {
   );
 }
 
-function loadIntro(): IntroSection[] {
-  const filePath = resolve(__dirname, "content/intro.md");
+function loadIntroFile(filename: string): IntroSection[] {
+  const filePath = resolve(__dirname, `content/${filename}`);
   const raw = readFileSync(filePath, "utf-8");
 
   // Split on ## headings — first chunk has no title
@@ -53,12 +58,15 @@ export default function introPlugin(): Plugin {
     },
     load(id) {
       if (id === RESOLVED_ID) {
-        const sections = loadIntro();
-        return `export default ${JSON.stringify(sections)};`;
+        const data: IntroData = {
+          en: loadIntroFile("intro.md"),
+          it: loadIntroFile("intro-it.md"),
+        };
+        return `export default ${JSON.stringify(data)};`;
       }
     },
     handleHotUpdate({ file, server }) {
-      if (file.endsWith("intro.md")) {
+      if (file.endsWith("intro.md") || file.endsWith("intro-it.md")) {
         const mod = server.moduleGraph.getModuleById(RESOLVED_ID);
         if (mod) {
           server.moduleGraph.invalidateModule(mod);

@@ -1,4 +1,5 @@
 import { modeColors, defaultModeColor } from "./colors";
+import { translateMode } from "./strings";
 
 export type CognitiveLoopNode = {
   id: string;
@@ -158,11 +159,11 @@ function graphNodeId(node: CognitiveLoopNode): string {
 
 function graphLabel(node: CognitiveLoopNode): string {
   if (node.id === "memory" || node.id === "short-state") {
-    return "MEMORY";
+    return translateMode("memory-hub").toUpperCase();
   }
 
   const id = resolveNodeId(node.id);
-  return id in modeColors ? id.toUpperCase() : shortenLabel(node.label);
+  return id in modeColors ? translateMode(id).toUpperCase() : shortenLabel(node.label);
 }
 
 function defaultCurveDistance(source: string, target: string): number {

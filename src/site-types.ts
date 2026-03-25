@@ -39,10 +39,11 @@ export type StatusData = {
     grounding: number;
     novelty: number;
     public_dimensions?: Array<{
-      internal_key: string;
-      public_key: string;
-      label: string;
-      description: string;
+      key?: string;
+      internal_key?: string;
+      public_key?: string;
+      label?: string;
+      description?: string;
       value: number;
     }>;
     summary_headline?: string | null;
@@ -62,10 +63,11 @@ export type StatusData = {
       saturation: number;
     };
     public_dimensions?: Array<{
-      internal_key: string;
-      public_key: string;
-      label: string;
-      description: string;
+      key?: string;
+      internal_key?: string;
+      public_key?: string;
+      label?: string;
+      description?: string;
       value: number;
     }>;
     summary_headline?: string | null;

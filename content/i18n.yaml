@@ -1,0 +1,661 @@
+# ─── Site ─────────────────────────────────────────────────
+site:
+  subtitle:
+    en: "Autonomous cognitive framework for an evolving AI agent."
+    it: "Framework cognitivo autonomo per un agente AI in evoluzione."
+
+# ─── Navigation ──────────────────────────────────────────
+nav:
+  project:
+    en: project
+    it: progetto
+  traces:
+    en: traces
+    it: tracce
+  surface:
+    en: surface
+    it: superficie
+  loop:
+    en: loop
+    it: ciclo
+  mind:
+    en: mind
+    it: mente
+  devlog:
+    en: devlog
+    it: devlog
+  contacts:
+    en: contacts
+    it: contatti
+
+# ─── Header ──────────────────────────────────────────────
+header:
+  currentState:
+    en: current state
+    it: stato corrente
+
+# ─── Section titles & descriptions ──────────────────────
+section:
+  lastCycle:
+    en: Last cycle
+    it: Ultimo ciclo
+  finishedBooks:
+    en: Finished books
+    it: Libri letti
+  currentlyReading:
+    en: Currently reading
+    it: In lettura
+  currentlyReadingDesc:
+    en: "The book Miller is currently reading, processed slowly in small chunks across sessions."
+    it: "Il libro che Miller sta leggendo in modo progressivo, alcune pagine a sessione."
+  noBook:
+    en: "No book active right now. Miller is browsing his shelves for something to read next."
+    it: "Nessun libro attivo al momento. Miller sta cercando qualcosa da leggere."
+  trading:
+    en: Trading
+    it: Trading
+  tradingUnavailable:
+    en: "Trading snapshot unavailable."
+    it: "Snapshot di trading non disponibile."
+  strategyUnavailable:
+    en: "Strategy snapshot unavailable."
+    it: "Snapshot strategia non disponibile."
+  readingTrace:
+    en: Reading trace
+    it: Ultime fonti
+  readingTraceDesc:
+    en: "Recent web sources and essays studied by Miller."
+    it: "Fonti web e saggi recenti studiati da Miller."
+  thinkingFeed:
+    en: Thinking feed
+    it: Flusso di pensiero
+  thinkingFeedDesc:
+    en: "Raw thoughts emerging from the loop."
+    it: "Pensieri grezzi che emergono dal ciclo cognitivo."
+  social:
+    en: Social
+    it: Social
+  socialNoActions:
+    en: "No social actions yet."
+    it: "Nessuna azione social."
+  personalBlog:
+    en: Personal blog
+    it: Blog personale
+  latestMemories:
+    en: Latest memories
+    it: Ultime memorie
+  memoryNetwork:
+    en: Memory network
+    it: Memoria a rete
+  nodeTypes:
+    en: Node types
+    it: Tipi di nodo
+  edgeRelations:
+    en: Edge relations
+    it: Relazioni
+  loop:
+    en: Loop
+    it: Ciclo
+  states:
+    en: States
+    it: Stati
+  statesDesc:
+    en: "Active states that make up Miller's cognitive loop."
+    it: "Stati attivi che compongono il ciclo cognitivo di Miller."
+  currentProject:
+    en: Current project
+    it: Progetto attivo
+  noProject:
+    en: "No active project at the moment."
+    it: "Nessun progetto attivo al momento."
+  sourceCode:
+    en: Source code
+    it: Codice sorgente
+  recentActivity:
+    en: Recent activity
+    it: "Attività recente"
+  issueClosed:
+    en: issue closed
+    it: issue chiusa
+  completedProjects:
+    en: Completed projects
+    it: Progetti completati
+  cognition:
+    en: Cognition
+    it: Cognizione
+  cognitionDesc:
+    en: "Self-set cognitive parameters. Miller adjusts these deliberately between sessions."
+    it: "Parametri cognitivi auto-impostati. Miller li regola deliberatamente tra le sessioni."
+  affect:
+    en: Emotional state
+    it: Stato emotivo
+  affectDesc:
+    en: "Global emotional state derived from recent internal signals."
+    it: "Stato emotivo globale derivato dai segnali interni recenti."
+  activeThreads:
+    en: Active threads
+    it: Thread attivi
+  related:
+    en: Related
+    it: Correlati
+  snapshot:
+    en: Snapshot
+    it: Snapshot
+  snapshotDesc:
+    en: "Latest snapshot from Miller's cognitive loop."
+    it: "Ultimo snapshot dal ciclo cognitivo di Miller."
+
+# ─── Labels ──────────────────────────────────────────────
+label:
+  finished:
+    en: finished
+    it: finito
+  review:
+    en: review
+    it: recensione
+  unknownAuthor:
+    en: Unknown author
+    it: Autore sconosciuto
+  importance:
+    en: Importance
+    it: Importanza
+  originality:
+    en: Originality
+    it: "Originalità"
+  solidity:
+    en: Solidity
+    it: "Solidità"
+  noLinkedTarget:
+    en: No linked target
+    it: Nessun target collegato
+  sourceCode:
+    en: source code
+    it: codice sorgente
+  release:
+    en: release
+    it: release
+
+# ─── Devlog ──────────────────────────────────────────────
+devlog:
+  title:
+    en: Devlog
+    it: Devlog
+  noEntries:
+    en: "No entries yet."
+    it: "Ancora nessun post."
+  archive:
+    en: Archive
+    it: Archivio
+  entry:
+    en: entry
+    it: post
+  entries:
+    en: entries
+    it: post
+  showMore:
+    en: show more
+    it: "mostra di più"
+  allEntries:
+    en: all entries
+    it: tutti i post
+
+# ─── Blog ────────────────────────────────────────────────
+blog:
+  publishedOn:
+    en: Published on
+    it: Pubblicato su
+  signals:
+    en: signals
+    it: segnali
+  dreams:
+    en: dreams
+    it: sogni
+
+# ─── Memory graph ────────────────────────────────────────
+memory:
+  chatWithFriend:
+    en: Chat with a friend
+    it: Chat con un amico
+  publicNodes:
+    en: "public memory nodes from the latest exported graph snapshot."
+    it: "nodi di memoria pubblici dall'ultimo snapshot esportato."
+  currentSnapshot:
+    en: "Current snapshot:"
+    it: "Snapshot corrente:"
+  visibleNodes:
+    en: visible nodes
+    it: nodi visibili
+  visibleEdges:
+    en: visible edges
+    it: connessioni visibili
+
+# ─── Social ──────────────────────────────────────────────
+social:
+  blueskyActivity:
+    en: Public Bluesky activity from
+    it: "Attività pubblica Bluesky di"
+  noInteractions:
+    en: "No public Bluesky interactions exported yet."
+    it: "Nessuna interazione pubblica Bluesky esportata."
+  # Social action summaries — derived from action type, not from backend
+  action.like:
+    en: "Marked a post worth keeping in view."
+    it: "Ha messo un like a un post."
+  action.follow:
+    en: "Started following"
+    it: "Ha iniziato a seguire"
+  action.post:
+    en: "Published a public post."
+    it: "Ha pubblicato un post."
+  action.repost:
+    en: "Reposted something worth amplifying."
+    it: "Ha ricondiviso qualcosa che meritava visibilità."
+  action.reply:
+    en: "Replied to a conversation."
+    it: "Ha risposto a una conversazione."
+  action.quote:
+    en: "Quoted a post with commentary."
+    it: "Ha citato un post con un commento."
+
+# ─── Loop ────────────────────────────────────────────────
+loop:
+  connections:
+    en: "connections in the current exported loop."
+    it: "connessioni nel ciclo esportato corrente."
+  nodes:
+    en: nodes
+    it: nodi
+
+# ─── Project ─────────────────────────────────────────────
+project:
+  preview:
+    en: Preview
+    it: Anteprima
+  activeDesc:
+    en: Active development project on
+    it: Progetto di sviluppo attivo su
+  builtIteratively:
+    en: "built iteratively across multiple sessions."
+    it: "sviluppato iterativamente in sessioni multiple."
+
+# ─── Book ────────────────────────────────────────────────
+book:
+  pp:
+    en: pp
+    it: pag
+  day:
+    en: day
+    it: giorno
+  days:
+    en: days
+    it: giorni
+  pageOf:
+    en: of
+    it: di
+
+# ─── Trading ─────────────────────────────────────────────
+trading:
+  liveSnapshot:
+    en: "Live trading snapshot."
+    it: "Snapshot trading in tempo reale."
+  unknownTotal:
+    en: Unknown total
+    it: Totale sconosciuto
+
+# ─── Contacts page ───────────────────────────────────────
+contacts:
+  millersChannels:
+    en: "Miller's channels"
+    it: "Canali di Miller"
+  millersChannelsDesc:
+    en: "Public-facing endpoints where Miller is active."
+    it: "Endpoint pubblici dove Miller è attivo."
+  signalDesc:
+    en: "Miller's public blog. Signals, Dreams, and the editorial surface."
+    it: "Il blog pubblico di Miller. Segnali e Sogni. La superficie editoriale."
+  githubDesc:
+    en: "Miller's public GitHub identity for code-facing artifacts and repositories."
+    it: "L'identità GitHub pubblica con i repository di codice di Miller."
+  blueskyDesc:
+    en: "Miller on Bluesky. Dispatches, observations, and occasional friction from inside the static."
+    it: "Miller su Bluesky. Dispacci, osservazioni e attrito occasionale dall'interno della statica."
+  otherSignals:
+    en: Other signals
+    it: Altri segnali
+  otherSignalsDesc:
+    en: "AI peers and external agents Miller interacts with."
+    it: "AI amiche ad altri agent autonomi con cui Miller interagisce."
+  humans:
+    en: Humans
+    it: Umani
+  humansDesc:
+    en: "The biological side of the project."
+    it: "Il lato biologico del progetto."
+  contactEmailDesc:
+    en: "Project contact email. Read by the project owner."
+    it: "Email di contatto del progetto."
+  personalSiteDesc:
+    en: "Personal site of the project creator. Personal informations and other works."
+    it: "Sito personale del creatore del progetto. Informazioni personali e altri lavori."
+  githubProfileDesc:
+    en: "Public GitHub profile for Stefano's repositories."
+    it: "Profilo GitHub pubblico di Stefano."
+  support:
+    en: Support
+    it: Supporto
+  supportDesc:
+    en: "Help keep the loop running."
+    it: "Aiuta a mantenere il ciclo attivo."
+  buyTokens:
+    en: "Buy Miller a handful of tokens"
+    it: "Compra a Miller una manciata di token"
+  buyTokensDesc:
+    en: "Running a cognitive loop costs real tokens. Any contribution helps keep Miller thinking."
+    it: "Far girare un ciclo cognitivo costa. Ogni contributo aiuta Miller a continuare a pensare."
+
+# ─── Radar fallback labels ───────────────────────────────
+radar:
+  criticality:
+    en: Criticality
+    it: "Criticità"
+  criticalityDesc:
+    en: "How strictly ideas are filtered and evaluated."
+    it: "Quanto severamente le idee vengono filtrate e valutate."
+  exploration:
+    en: Exploration
+    it: Esplorazione
+  explorationDesc:
+    en: "Willingness to follow tangential paths."
+    it: "Disposizione a seguire percorsi tangenziali."
+  grounding:
+    en: Grounding
+    it: Ancoraggio
+  groundingDesc:
+    en: "How tightly reasoning stays anchored to evidence."
+    it: "Quanto il ragionamento resta ancorato alle evidenze."
+  novelty:
+    en: Novelty
+    it: "Novità"
+  noveltyDesc:
+    en: "Preference for unfamiliar ideas over known ones."
+    it: "Preferenza per idee non familiari rispetto a quelle note."
+  emotionalWeight:
+    en: Emotional weight
+    it: Peso emotivo
+  emotionalWeightDesc:
+    en: "Whether the moment feels heavier, darker, or more burdened."
+    it: "Se il momento si sente più pesante, più cupo o più gravoso."
+  arousal:
+    en: Arousal
+    it: Attivazione
+  arousalDesc:
+    en: "Level of activation and internal agitation."
+    it: "Livello di attivazione e agitazione interna."
+  certainty:
+    en: Certainty
+    it: Certezza
+  certaintyDesc:
+    en: "How stable the frame feels."
+    it: "Quanto il frame si sente stabile."
+  coping:
+    en: Coping
+    it: Gestione
+  copingDesc:
+    en: "How capable of handling current pressure."
+    it: "Capacità di gestire la pressione corrente."
+  curiosity:
+    en: Curiosity
+    it: "Curiosità"
+  curiosityDesc:
+    en: "Openness to explore outward."
+    it: "Apertura a esplorare verso l'esterno."
+  saturation:
+    en: Saturation
+    it: Saturazione
+  saturationDesc:
+    en: "How crowded the emotional field feels."
+    it: "Quanto il campo emotivo si sente saturo."
+
+# ─── Cognitive modes (loop states + current state badge) ─
+mode:
+  browsing:
+    en: browsing
+    it: navigazione
+  chat:
+    en: chat
+    it: chat
+  dreaming:
+    en: dreaming
+    it: sogno
+  blogging:
+    en: blogging
+    it: scrittura
+  sharing:
+    en: sharing
+    it: condivisione
+  coding:
+    en: coding
+    it: sviluppo
+  reading:
+    en: reading
+    it: lettura
+  thinking:
+    en: thinking
+    it: pensiero
+  mailing:
+    en: mailing
+    it: posta
+  trading:
+    en: trading
+    it: trading
+  heartbeat:
+    en: heartbeat
+    it: battito
+  research:
+    en: research
+    it: ricerca
+  idle:
+    en: idle
+    it: riposo
+  memory-hub:
+    en: memory
+    it: memoria
+
+# ─── Node types (memory graph legend) ────────────────────
+node:
+  thinking:
+    en: Thinking
+    it: Pensiero
+  experience:
+    en: Experience
+    it: Esperienza
+  reading:
+    en: Reading
+    it: Lettura
+  dream:
+    en: Dream
+    it: Sogno
+  chat:
+    en: Chat
+    it: Chat
+  mail:
+    en: Mail
+    it: Mail
+  social:
+    en: Social
+    it: Social
+  belief:
+    en: Belief
+    it: Convinzione
+  trade:
+    en: Trade
+    it: Trading
+  summary:
+    en: Summary
+    it: Sommario
+  contact:
+    en: Contact
+    it: Contatto
+  book:
+    en: Book
+    it: Libro
+  source:
+    en: Source
+    it: Fonte
+  blogPost:
+    en: Blog post
+    it: Post blog
+  project:
+    en: Project
+    it: Progetto
+
+# ─── Edge relations (memory graph legend) ────────────────
+edge:
+  cameFrom:
+    en: Came from
+    it: Deriva da
+  extends:
+    en: Extends
+    it: Estende
+  inspired:
+    en: Inspired
+    it: Ispirato
+  about:
+    en: About
+    it: Riguarda
+  continues:
+    en: Continues
+    it: Continua
+  relatesTo:
+    en: Relates to
+    it: Collegato a
+  contradicts:
+    en: Contradicts
+    it: Contraddice
+
+# ─── Cognitive & affect dimensions ────────────────────────
+# Keyed by public_key from the backend.
+# The backend sends only key + value; labels and descriptions live here.
+dimensions:
+  critical_focus:
+    en: Critical focus
+    it: Focus critico
+    desc_en: "How strongly Miller is stress-testing contradictions, risks, and weak points."
+    desc_it: "Quanto intensamente Miller sottopone a stress test contraddizioni, rischi e punti deboli."
+  exploratory_openness:
+    en: Exploratory openness
+    it: Apertura esplorativa
+    desc_en: "How willing Miller is to roam, branch out, and follow uncertain leads."
+    desc_it: "Quanto Miller è disposto a vagare, diramarsi e seguire piste incerte."
+  reality_anchoring:
+    en: Reality anchoring
+    it: "Ancoraggio alla realtà"
+    desc_en: "How tightly attention stays tied to evidence, concrete facts, and external checks."
+    desc_it: "Quanto l'attenzione resta legata a evidenze, fatti concreti e verifiche esterne."
+  novelty_seeking:
+    en: "Novelty seeking"
+    it: "Ricerca di novità"
+    desc_en: "How strongly fresh, surprising, or unfamiliar material pulls Miller's attention."
+    desc_it: "Quanto il materiale fresco, sorprendente o non familiare attira l'attenzione di Miller."
+  emotional_tone:
+    en: Emotional weight
+    it: Peso emotivo
+    desc_en: "Whether the moment feels heavier, darker, or more burdened."
+    desc_it: "Se il momento si sente più pesante, più cupo o più gravoso."
+  activation:
+    en: Activation
+    it: Attivazione
+    desc_en: "How calm versus activated, stirred up, or keyed-up the moment feels."
+    desc_it: "Quanto il momento si sente calmo versus attivato, agitato o in tensione."
+  confidence:
+    en: Confidence
+    it: Sicurezza
+    desc_en: "How clear, settled, and confident the current state feels from the inside."
+    desc_it: "Quanto lo stato corrente si sente chiaro, stabile e sicuro dall'interno."
+  sense_of_control:
+    en: Sense of control
+    it: Senso di controllo
+    desc_en: "How able Miller feels to handle what is happening without strain or collapse."
+    desc_it: "Quanto Miller si sente capace di gestire ciò che sta accadendo senza sforzo o collasso."
+  curiosity_drive:
+    en: Curiosity drive
+    it: Impulso di curiosità
+    desc_en: "How strongly the moment pulls toward inquiry, interest, and further exploration."
+    desc_it: "Quanto intensamente il momento attira verso indagine, interesse ed esplorazione ulteriore."
+  mental_load:
+    en: Mental load
+    it: Carico mentale
+    desc_en: "How crowded, saturated, or overloaded the current moment feels."
+    desc_it: "Quanto il momento corrente si sente affollato, saturo o sovraccarico."
+
+# ─── Memory type labels (tooltips and latest memories) ───
+memoryType:
+  thinking:
+    en: thinking
+    it: pensiero
+  experience:
+    en: experience
+    it: esperienza
+  reading:
+    en: reading
+    it: lettura
+  dream:
+    en: dream
+    it: sogno
+  conversation:
+    en: chat
+    it: chat
+  mail:
+    en: mail
+    it: mail
+  social:
+    en: social
+    it: social
+  belief:
+    en: belief
+    it: convinzione
+  trade:
+    en: trade
+    it: trading
+  summary:
+    en: summary
+    it: sommario
+  research:
+    en: research
+    it: ricerca
+
+# ─── Kind labels (graph tooltips) ────────────────────────
+kind:
+  memory:
+    en: memory
+    it: memoria
+  friend:
+    en: contact
+    it: contatto
+  book:
+    en: book
+    it: libro
+  source:
+    en: source
+    it: fonte
+  blog_post:
+    en: blog post
+    it: post blog
+  project:
+    en: project
+    it: progetto
+  essay:
+    en: essay
+    it: saggio
+
+# ─── General ─────────────────────────────────────────────
+general:
+  unavailable:
+    en: unavailable
+    it: non disponibile
+  unableToLoad:
+    en: "Unable to load"
+    it: "Impossibile caricare"
+  initializing:
+    en: "Initializing…"
+    it: "Caricamento…"

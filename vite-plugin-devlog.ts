@@ -8,10 +8,12 @@ import { marked } from "marked";
 export type DevlogPost = {
   slug: string;
   title: string;
+  title_it?: string;
   date: string;
   time: string;
   author: string;
   html: string;
+  html_it?: string;
 };
 
 const VIRTUAL_ID = "virtual:devlog-posts";
@@ -61,13 +63,19 @@ export default function devlogPlugin(): Plugin {
         const time = typeof rawTime === "number"
           ? `${String(Math.floor(rawTime / 60)).padStart(2, "0")}:${String(rawTime % 60).padStart(2, "0")}`
           : rawTime != null ? String(rawTime) : "";
+        const titleIt = (data.title_it as string) || undefined;
+        const enSplit = content.split(/<!--\s*EN\s*-->/i);
+        const contentIt = enSplit.length > 1 ? enSplit[0].trim() : undefined;
+        const contentEn = enSplit.length > 1 ? enSplit[1].trim() : enSplit[0].trim();
         return {
           slug: `${date}-${slugify(title)}`,
           title,
+          title_it: titleIt,
           date,
           time,
           author: (data.author as string) || "",
-          html: marked.parse(content, { async: false, breaks: true }) as string,
+          html: marked.parse(contentEn, { async: false, breaks: true }) as string,
+          html_it: contentIt ? marked.parse(contentIt, { async: false, breaks: true }) as string : undefined,
         };
       })
       .sort((a, b) => b.date.localeCompare(a.date));

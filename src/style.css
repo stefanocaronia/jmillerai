@@ -166,6 +166,11 @@ a:hover {
   color: var(--accent);
 }
 
+.lang-toggle,
+.lang-toggle:visited {
+  margin-left: auto;
+}
+
 .body-copy,
 .muted-copy {
   margin: 0;

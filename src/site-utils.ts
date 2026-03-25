@@ -38,9 +38,11 @@ export function escapeHtml(value: string): string {
     .replaceAll("'", "&#039;");
 }
 
-/** Prefer English (_en) field if available, fallback to original */
+import { localized } from "./i18n";
+
+/** Pick field based on current language. See i18n.ts */
 export function en<T extends string | null | undefined>(original: T, english?: T | null): T {
-  return (english != null && english !== "" ? english : original) as T;
+  return localized(original, english);
 }
 
 export function summarizeText(text: string, maxLength = 220): string {

@@ -1,4 +1,6 @@
 import { kindColors, memoryTypeColors, relationColors } from "./colors";
+import { localized } from "./i18n";
+import { t, translateMemoryType, translateKind } from "./strings";
 
 export type PublicGraphNode = {
   id: string;
@@ -80,7 +82,7 @@ function capitalizeLabel(label: string): string {
 }
 
 export function presentPublicNodeLabel(node: Pick<PublicGraphNode, "kind" | "label" | "label_en" | "memory_type">): string {
-  const label = node.label_en || node.label;
+  const label = localized(node.label, node.label_en);
   if (node.kind === "friend") return capitalizeLabel(cleanLabel(label));
   if (node.kind === "memory" && node.memory_type === "conversation") {
     const normalized = cleanLabel(label);
@@ -94,7 +96,11 @@ export function presentPublicNodeLabel(node: Pick<PublicGraphNode, "kind" | "lab
 
 export function presentPublicMemoryTypeLabel(memoryType: string | null | undefined): string {
   if (!memoryType) return "memory";
-  return memoryType === "conversation" ? "chat" : memoryType;
+  return translateMemoryType(memoryType);
+}
+
+export function presentPublicKindLabel(kind: string): string {
+  return translateKind(kind);
 }
 
 export function getMemoryGraphStats(graph: PublicGraphData) {
@@ -115,32 +121,32 @@ export function getMemoryGraphStats(graph: PublicGraphData) {
 
 export function getMemoryGraphLegend(): MemoryGraphLegendItem[] {
   return [
-    { key: "thinking", label: "Thinking", color: memoryTypeColors.thinking },
-    { key: "experience", label: "Experience", color: memoryTypeColors.experience },
-    { key: "reading", label: "Reading", color: memoryTypeColors.reading },
-    { key: "dream", label: "Dream", color: memoryTypeColors.dream },
-    { key: "chat", label: "Chat", color: memoryTypeColors.conversation },
-    { key: "mail", label: "Mail", color: memoryTypeColors.mail },
-    { key: "social", label: "Social", color: memoryTypeColors.social },
-    { key: "belief", label: "Belief", color: memoryTypeColors.belief },
-    { key: "trade", label: "Trade", color: memoryTypeColors.trade },
-    { key: "summary", label: "Summary", color: memoryTypeColors.summary },
-    { key: "contact", label: "Contact", color: kindColors.friend },
-    { key: "book", label: "Book", color: kindColors.book },
-    { key: "source", label: "Source", color: kindColors.source },
-    { key: "blog-post", label: "Blog post", color: kindColors.blog_post },
-    { key: "project", label: "Project", color: kindColors.project },
+    { key: "thinking", label: t("node.thinking"), color: memoryTypeColors.thinking },
+    { key: "experience", label: t("node.experience"), color: memoryTypeColors.experience },
+    { key: "reading", label: t("node.reading"), color: memoryTypeColors.reading },
+    { key: "dream", label: t("node.dream"), color: memoryTypeColors.dream },
+    { key: "chat", label: t("node.chat"), color: memoryTypeColors.conversation },
+    { key: "mail", label: t("node.mail"), color: memoryTypeColors.mail },
+    { key: "social", label: t("node.social"), color: memoryTypeColors.social },
+    { key: "belief", label: t("node.belief"), color: memoryTypeColors.belief },
+    { key: "trade", label: t("node.trade"), color: memoryTypeColors.trade },
+    { key: "summary", label: t("node.summary"), color: memoryTypeColors.summary },
+    { key: "contact", label: t("node.contact"), color: kindColors.friend },
+    { key: "book", label: t("node.book"), color: kindColors.book },
+    { key: "source", label: t("node.source"), color: kindColors.source },
+    { key: "blog-post", label: t("node.blogPost"), color: kindColors.blog_post },
+    { key: "project", label: t("node.project"), color: kindColors.project },
   ];
 }
 
 export function getMemoryGraphEdgeLegend(): MemoryGraphEdgeLegendItem[] {
   return [
-    { key: "came_from", label: "Came from", color: relationColors.came_from },
-    { key: "extends", label: "Extends", color: relationColors.extends },
-    { key: "inspired", label: "Inspired", color: relationColors.inspired },
-    { key: "about", label: "About", color: relationColors.about },
-    { key: "continues", label: "Continues", color: relationColors.continues },
-    { key: "relates_to", label: "Relates to", color: relationColors.relates_to },
-    { key: "contradicts", label: "Contradicts", color: relationColors.contradicts },
+    { key: "came_from", label: t("edge.cameFrom"), color: relationColors.came_from },
+    { key: "extends", label: t("edge.extends"), color: relationColors.extends },
+    { key: "inspired", label: t("edge.inspired"), color: relationColors.inspired },
+    { key: "about", label: t("edge.about"), color: relationColors.about },
+    { key: "continues", label: t("edge.continues"), color: relationColors.continues },
+    { key: "relates_to", label: t("edge.relatesTo"), color: relationColors.relates_to },
+    { key: "contradicts", label: t("edge.contradicts"), color: relationColors.contradicts },
   ];
 }

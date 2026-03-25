@@ -1,10 +1,12 @@
 import cytoscape from "cytoscape";
 import { kindColors, memoryTypeColors, relationColors } from "./colors";
+import { localized } from "./i18n";
 import {
   type PublicGraphNode,
   type PublicGraphData,
   presentPublicNodeLabel,
   presentPublicMemoryTypeLabel,
+  presentPublicKindLabel,
 } from "./memory-graph-data";
 
 
@@ -42,13 +44,11 @@ function publicNodeTypeLabel(node: Pick<PublicGraphNode, "kind" | "memory_type">
     const memoryType = presentPublicMemoryTypeLabel(node.memory_type);
     return capitalizeLabel(memoryType);
   }
-  if (node.kind === "friend") return "Contact";
-  if (node.kind === "blog_post") return "Blog post";
-  return capitalizeLabel(node.kind.replace(/_/g, " "));
+  return capitalizeLabel(presentPublicKindLabel(node.kind));
 }
 
 function publicNodeHoverLabel(node: Pick<PublicGraphNode, "kind" | "label" | "label_en" | "memory_type" | "contact_label" | "contact_kind">): string {
-  const label = node.label_en || node.label;
+  const label = localized(node.label, node.label_en);
   if (node.kind === "friend") {
     if (node.contact_kind === "ai") {
       return node.contact_label || "AI peer";

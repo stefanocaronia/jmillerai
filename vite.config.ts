@@ -2,11 +2,12 @@ import { resolve } from "node:path";
 import { defineConfig } from "vite";
 import devlogPlugin from "./vite-plugin-devlog";
 import introPlugin from "./vite-plugin-intro";
+import i18nPlugin from "./vite-plugin-i18n";
 
 export default defineConfig({
   base: "/",
   server: { port: 3000, host: true },
-  plugins: [devlogPlugin(), introPlugin()],
+  plugins: [devlogPlugin(), introPlugin(), i18nPlugin()],
   build: {
     rollupOptions: {
       input: {

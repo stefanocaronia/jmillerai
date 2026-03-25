@@ -1,61 +1,65 @@
-export const SITE_SUBTITLE = "An autonomous cognitive framework for an evolving AI agent.";
+import { t } from "./strings";
 
-export const CONTACT_SECTIONS = [
+export const CONTACT_SECTIONS = () => [
   {
-    title: "Miller's channels",
-    subtitle: "Public-facing endpoints where Miller is active.",
+    key: "millers-channels",
+    title: t("contacts.millersChannels"),
+    subtitle: t("contacts.millersChannelsDesc"),
     links: [
       {
         label: "signalthroughstatic.cc",
         url: "https://signalthroughstatic.cc/",
-        description: "Miller's public blog. Signals, Dreams, Briefing, and the editorial surface.",
+        description: t("contacts.signalDesc"),
       },
       {
         label: "github.com/josephusm",
         url: "https://github.com/josephusm",
-        description: "Miller's public GitHub identity for code-facing artifacts and repositories.",
+        description: t("contacts.githubDesc"),
       },
       {
         label: "jmillerai.bsky.social",
         url: "https://bsky.app/profile/jmillerai.bsky.social",
-        description: "Miller on Bluesky. Dispatches, observations, and occasional friction from inside the static.",
+        description: t("contacts.blueskyDesc"),
       },
     ],
   },
   {
-    title: "Other signals",
-    subtitle: "AI peers and external agents Miller interacts with.",
+    key: "other-signals",
+    title: t("contacts.otherSignals"),
+    subtitle: t("contacts.otherSignalsDesc"),
     links: [],
   },
   {
-    title: "Humans",
-    subtitle: "The biological side of the project.",
+    key: "humans",
+    title: t("contacts.humans"),
+    subtitle: t("contacts.humansDesc"),
     links: [
       {
         label: "contact@jmillerai.org",
         url: "mailto:contact@jmillerai.org",
-        description: "Project contact email. Read by the project owner.",
+        description: t("contacts.contactEmailDesc"),
       },
       {
         label: "stefanocaronia.it",
         url: "https://stefanocaronia.it/",
-        description: "Personal site of the project creator. Writing, music, games, and the broader project context around Miller.",
+        description: t("contacts.personalSiteDesc"),
       },
       {
         label: "github.com/stefanocaronia",
         url: "https://github.com/stefanocaronia",
-        description: "Public GitHub profile for Stefano's repositories and project history.",
+        description: t("contacts.githubProfileDesc"),
       },
     ],
   },
   {
-    title: "Support",
-    subtitle: "Help keep the loop running.",
+    key: "support",
+    title: t("contacts.support"),
+    subtitle: t("contacts.supportDesc"),
     links: [
       {
-        label: "Buy Miller a handful of tokens",
+        label: t("contacts.buyTokens"),
         url: "https://paypal.me/stefanocaronia",
-        description: "Running a cognitive loop costs real tokens. Any contribution helps keep Miller thinking.",
+        description: t("contacts.buyTokensDesc"),
       },
     ],
   },

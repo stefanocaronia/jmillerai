@@ -1,6 +1,8 @@
 import "./style.css";
 import { injectCssVars } from "./colors";
 import { initializeConsentBanner } from "./consent";
+import { getLang, setLang } from "./i18n";
+import { t, translateMode } from "./strings";
 import { loadStateWithCache, loadPublicGraph } from "./site-data";
 import { renderShell, applyProgressMeters, applySpoilerToggles, badgeClass, renderMemoryGraphBlock, renderLastMemories } from "./site-render";
 import type { FeedState, PageId, StatusData } from "./site-types";
@@ -178,7 +180,7 @@ async function start() {
     if (cached) {
       renderPage(cached);
     } else {
-      app.innerHTML = `<div class="loading">Initializing…</div>`;
+      app.innerHTML = `<div class="loading">${t("general.initializing")}</div>`;
     }
     fresh.then((state) => {
       if (state) renderPage(state);
@@ -190,6 +192,14 @@ async function start() {
   }
 
   app.addEventListener("click", (e) => {
+    const langToggle = (e.target as HTMLElement).closest<HTMLElement>("[data-lang-toggle]");
+    if (langToggle) {
+      e.preventDefault();
+      setLang(getLang() === "en" ? "it" : "en");
+      location.reload();
+      return;
+    }
+
     const toggle = (e.target as HTMLElement).closest<HTMLElement>(".expand-toggle");
     if (!toggle) return;
     e.preventDefault();
@@ -255,8 +265,9 @@ async function pollStatus() {
     const badge = document.querySelector<HTMLElement>("[data-mode-badge]");
     if (!badge) return;
     const newMode = data.current_mode ?? "idle";
-    if (badge.textContent === newMode) return;
-    badge.textContent = newMode;
+    if (badge.dataset.modeKey === newMode) return;
+    badge.dataset.modeKey = newMode;
+    badge.textContent = translateMode(newMode);
     const activeClass = newMode !== "idle" ? " is-active-mode" : "";
     badge.className = `kind-badge${badgeClass(newMode)} header-mode-badge${activeClass}`;
   } catch {

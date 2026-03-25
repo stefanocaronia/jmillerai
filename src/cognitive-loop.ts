@@ -231,6 +231,7 @@ export function mountCognitiveLoop(container: HTMLElement, loop: CognitiveLoopDa
   const cy = cytoscape({
     container,
     userPanningEnabled: !isMobile,
+    userZoomingEnabled: false,
     autoungrabify: !debugEnabled,
     elements: [
       ...graph.nodes.map((node) => ({
