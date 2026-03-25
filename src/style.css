@@ -239,7 +239,7 @@ a:hover {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  align-items: center;
+  align-items: baseline;
 }
 
 .section-block h2,
