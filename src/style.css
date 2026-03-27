@@ -915,9 +915,15 @@ a:hover {
   color: var(--memory-dream);
 }
 
-.kind-badge--chat {
+.kind-badge--chat,
+.kind-badge--conversation {
   border-color: var(--memory-conversation);
   color: var(--memory-conversation);
+}
+
+.kind-badge--research {
+  border-color: var(--memory-research);
+  color: var(--memory-research);
 }
 
 .kind-badge--heartbeat {
@@ -956,6 +962,11 @@ a:hover {
   color: var(--badge-sharing);
 }
 
+.kind-badge--social {
+  border-color: var(--memory-social);
+  color: var(--memory-social);
+}
+
 .kind-badge--blogging {
   border-color: var(--badge-blogging);
   color: var(--badge-blogging);
@@ -964,6 +975,11 @@ a:hover {
 .kind-badge--mailing {
   border-color: var(--badge-mailing);
   color: var(--badge-mailing);
+}
+
+.kind-badge--mail {
+  border-color: var(--memory-mail);
+  color: var(--memory-mail);
 }
 
 .kind-badge--maintenance {
