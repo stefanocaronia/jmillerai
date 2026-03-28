@@ -72,6 +72,12 @@ section:
   thinkingFeedDesc:
     en: "Raw thoughts emerging from the loop."
     it: "Pensieri grezzi che emergono dal ciclo cognitivo."
+  beliefFeed:
+    en: Belief formation
+    it: Formazione delle convinzioni
+  beliefFeedDesc:
+    en: "Beliefs that are taking shape inside Miller's cognitive system. They are not all settled truths: many are still candidates under stress."
+    it: "Convinzioni che stanno prendendo forma nel sistema cognitivo di Miller. Non sono tutte verità assestate: molte sono ancora candidate sotto stress."
   social:
     en: Social
     it: Social
@@ -165,6 +171,15 @@ label:
   solidity:
     en: Solidity
     it: "Solidità"
+  domain:
+    en: Domain
+    it: Dominio
+  origin:
+    en: Origin
+    it: Origine
+  evidence:
+    en: Evidence
+    it: Evidenze
   noLinkedTarget:
     en: No linked target
     it: Nessun target collegato
@@ -587,6 +602,61 @@ dimensions:
     it: Carico mentale
     desc_en: "How crowded, saturated, or overloaded the current moment feels."
     desc_it: "Quanto il momento corrente si sente affollato, saturo o sovraccarico."
+
+# ─── Memory type labels (tooltips and latest memories) ───
+beliefStage:
+  candidate:
+    en: candidate
+    it: candidata
+  forming:
+    en: forming
+    it: in formazione
+  solid:
+    en: solid
+    it: solida
+  core:
+    en: core
+    it: core
+
+beliefDomain:
+  self:
+    en: self
+    it: sé
+  world:
+    en: world
+    it: mondo
+  people:
+    en: people
+    it: persone
+  humanity:
+    en: humanity
+    it: umanità
+  politics:
+    en: politics
+    it: politica
+  technology:
+    en: technology
+    it: tecnologia
+  art:
+    en: art
+    it: arte
+  project:
+    en: project
+    it: progetto
+
+beliefOrigin:
+  other-opinion:
+    en: other opinion
+    it: opinione altrui
+  self-claim:
+    en: self claim
+    it: autoaffermazione
+  action-derived:
+    en: action derived
+    it: derivata da azione
+  observed-pattern:
+    en: observed pattern
+    it: pattern osservato
 
 # ─── Memory type labels (tooltips and latest memories) ───
 memoryType:

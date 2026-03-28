@@ -74,7 +74,7 @@ async function start() {
       if (res.ok) status = { data: await res.json(), error: null };
     } catch { /* silent */ }
     const emptyState = {
-      status, book: empty, readingFeed: empty, thinkingFeed: empty,
+      status, book: empty, readingFeed: empty, thinkingFeed: empty, beliefFeed: empty,
       socialFeed: empty, projectsFeed: empty, cognitiveLoop: empty,
       publicGraph: empty, signalsFeed: empty, dreamsFeed: empty,
     } as Parameters<typeof renderShell>[0];
@@ -86,7 +86,7 @@ async function start() {
     // Render page shell immediately (cached status for radars, spinners for graph)
     function renderMindShell(status: FeedState<import("./site-types").StatusData>) {
       const state = {
-        status, book: empty, readingFeed: empty, thinkingFeed: empty,
+        status, book: empty, readingFeed: empty, thinkingFeed: empty, beliefFeed: empty,
         socialFeed: empty, projectsFeed: empty, cognitiveLoop: empty,
         publicGraph: empty, signalsFeed: empty, dreamsFeed: empty,
       } as Parameters<typeof renderShell>[0];

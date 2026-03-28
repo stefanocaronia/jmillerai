@@ -166,6 +166,29 @@ export type ThinkingFeedData = {
   }>;
 };
 
+export type BeliefFeedData = {
+  schema_version: number;
+  generated_at: string;
+  items: Array<{
+    key: string;
+    title: string;
+    title_en?: string | null;
+    content?: string | null;
+    content_en?: string | null;
+    importance: number;
+    solidity?: number | null;
+    tier: string;
+    candidate: boolean;
+    stage: string;
+    domain?: string | null;
+    origin?: string | null;
+    tags?: string[];
+    tags_en?: string[] | null;
+    created_at: string;
+    evidence?: Array<{ kind?: string; label: string; label_en?: string | null }>;
+  }>;
+};
+
 export type SocialFeedData = {
   schema_version?: number;
   generated_at?: string;
@@ -245,6 +268,7 @@ export type AppState = {
   book: FeedState<BookData>;
   readingFeed: FeedState<ReadingFeedData>;
   thinkingFeed: FeedState<ThinkingFeedData>;
+  beliefFeed: FeedState<BeliefFeedData>;
   socialFeed: FeedState<SocialFeedData>;
   projectsFeed: FeedState<ProjectsFeedData>;
   cognitiveLoop: FeedState<CognitiveLoopData>;

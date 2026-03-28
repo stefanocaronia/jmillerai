@@ -14,6 +14,7 @@ import introData from "virtual:intro-sections";
 import devlogPosts from "virtual:devlog-posts";
 import type {
   AppState,
+  BeliefFeedData,
   BlogFeedData,
   BlogFeedKind,
   BookData,
@@ -447,6 +448,92 @@ function renderThinkingFeed(feed: FeedState<ThinkingFeedData>, limit = 5): strin
               ${renderExpandable(en(item.content ?? item.summary, item.content_en ?? item.summary_en) ?? "", 320, "muted-copy", true)}
               ${renderRelatedList(relatedItems, { small: true })}
               ${tags}
+            </article>
+          `;
+        }).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function translateBeliefField(group: "beliefStage" | "beliefDomain" | "beliefOrigin", value: string | null | undefined): string {
+  if (!value) return "";
+  const key = `${group}.${value}`;
+  const translated = t(key);
+  return translated !== key ? translated : value.replace(/-/g, " ");
+}
+
+function renderBeliefFeed(feed: FeedState<BeliefFeedData>, limit = 6): string {
+  if (!feed.data) {
+    return `
+      <section class="section-block">
+        <div class="section-line">
+          <span class="section-name">${escapeHtml(t("section.beliefFeed"))}</span>
+        </div>
+        ${renderFeedError(feed, "belief feed")}
+      </section>
+    `;
+  }
+
+  return `
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">${escapeHtml(t("section.beliefFeed"))}</span>
+      </div>
+      <p class="muted-copy">${escapeHtml(t("section.beliefFeedDesc"))}</p>
+      <div class="stream-list">
+        ${feed.data.items.slice(0, limit).map((item) => {
+          const metrics = [
+            { label: t("label.importance"), value: item.importance, max: 10, cls: "metric-bar--importance" },
+            { label: t("label.solidity"), value: item.solidity ?? 0, max: 5, cls: "metric-bar--solidity" },
+          ];
+          const bars = metrics
+            .filter((m) => m.value != null)
+            .map((m) => {
+              const pct = m.value! / m.max;
+              const w = Math.round(3 + pct * 21);
+              return `<span class="metric-bar ${m.cls}" title="${m.label}: ${m.value}/${m.max}" style="width:${w}px"></span>`;
+            })
+            .join("");
+
+          const metaParts = [
+            item.domain ? `${t("label.domain")}: ${translateBeliefField("beliefDomain", item.domain)}` : "",
+            item.origin ? `${t("label.origin")}: ${translateBeliefField("beliefOrigin", item.origin)}` : "",
+          ].filter(Boolean);
+
+          const badges = [
+            `<span class="kind-badge kind-badge--belief">${escapeHtml(translateMemoryType("belief"))}</span>`,
+            item.stage ? `<span class="kind-badge${badgeClass(item.stage)}">${escapeHtml(translateBeliefField("beliefStage", item.stage))}</span>` : "",
+          ].filter(Boolean).join("");
+
+          const evidence = item.evidence?.length
+            ? `
+                <div class="belief-evidence">
+                  <span class="subsection-label">${escapeHtml(t("label.evidence"))}</span>
+                  ${renderRelatedList(
+                    item.evidence.map((entry) => ({
+                      kind: entry.kind,
+                      label: en(entry.label, entry.label_en),
+                    })),
+                    { small: true },
+                  )}
+                </div>
+              `
+            : "";
+
+          const tagSource = item.tags_en?.length ? item.tags_en : item.tags ?? [];
+
+          return `
+            <article class="stream-item">
+              <div class="section-line thinking-item-head">
+                <span class="metric-bars">${bars}${badges}</span>
+                <span class="section-meta">${escapeHtml(formatDate(item.created_at))}</span>
+              </div>
+              <h3>${escapeHtml(en(item.title, item.title_en))}</h3>
+              ${metaParts.length ? `<p class="muted-copy belief-meta">${escapeHtml(metaParts.join(" · "))}</p>` : ""}
+              ${renderExpandable(en(item.content, item.content_en) ?? "", 320, "muted-copy", true)}
+              ${evidence}
+              ${renderTagList(tagSource)}
             </article>
           `;
         }).join("")}
@@ -907,6 +994,7 @@ function renderTracesPage(state: AppState): string {
     ${renderCurrentlyReading(state.book)}
     ${renderReadingTrace(state.readingFeed)}
     ${renderThinkingFeed(state.thinkingFeed)}
+    ${renderBeliefFeed(state.beliefFeed)}
   `;
 }
 

@@ -1,5 +1,6 @@
 import type {
   AppState,
+  BeliefFeedData,
   BlogFeedData,
   BookData,
   FeedState,
@@ -65,11 +66,12 @@ async function fetchBlogFeed(url: string): Promise<FeedState<BlogFeedData>> {
 const STATE_CACHE_KEY = "jmillerai:state";
 
 async function fetchFreshState(feedUrl: (name: string) => string): Promise<AppState> {
-  const [status, book, readingFeed, thinkingFeed, socialFeed, projectsFeed, cognitiveLoop, signalsFeed, dreamsFeed] = await Promise.all([
+  const [status, book, readingFeed, thinkingFeed, beliefFeed, socialFeed, projectsFeed, cognitiveLoop, signalsFeed, dreamsFeed] = await Promise.all([
     fetchJson<StatusData>(feedUrl("status")),
     fetchJson<BookData>(feedUrl("book")),
     fetchJson<ReadingFeedData>(feedUrl("reading-feed")),
     fetchJson<ThinkingFeedData>(feedUrl("thinking-feed")),
+    fetchJson<BeliefFeedData>(feedUrl("belief-feed")),
     fetchJson<SocialFeedData>(feedUrl("social-feed")),
     fetchJson<ProjectsFeedData>(feedUrl("projects-feed")),
     fetchJson<CognitiveLoopData>(feedUrl("cognitive-loop")),
@@ -90,6 +92,7 @@ async function fetchFreshState(feedUrl: (name: string) => string): Promise<AppSt
     book,
     readingFeed,
     thinkingFeed,
+    beliefFeed,
     socialFeed: resolvedSocialFeed,
     projectsFeed,
     cognitiveLoop,

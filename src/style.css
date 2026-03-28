@@ -936,6 +936,14 @@ a:hover {
   color: var(--memory-belief);
 }
 
+.kind-badge--candidate,
+.kind-badge--forming,
+.kind-badge--solid,
+.kind-badge--core {
+  border-color: color-mix(in srgb, var(--memory-belief) 68%, var(--ink-muted) 32%);
+  color: color-mix(in srgb, var(--memory-belief) 78%, white 22%);
+}
+
 .kind-badge--trade,
 .kind-badge--trading {
   border-color: var(--memory-trade);
@@ -1055,6 +1063,19 @@ a:hover {
 .kind-badge--stable {
   border-color: var(--badge-stable);
   color: var(--badge-stable);
+}
+
+.belief-meta {
+  margin: 0.25rem 0 0.6rem;
+}
+
+.belief-evidence {
+  margin-top: 0.75rem;
+}
+
+.belief-evidence .subsection-label {
+  display: block;
+  margin-bottom: 0.3rem;
 }
 
 

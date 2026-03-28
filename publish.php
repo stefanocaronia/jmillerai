@@ -30,6 +30,7 @@ $allowedTargets = [
     'book' => 'book.json',
     'reading-feed' => 'reading-feed.json',
     'thinking-feed' => 'thinking-feed.json',
+    'belief-feed' => 'belief-feed.json',
     'public-graph' => 'public-graph.json',
     'cognitive-loop' => 'cognitive-loop.json',
     'social-feed' => 'social-feed.json',
