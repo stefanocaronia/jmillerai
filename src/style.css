@@ -936,6 +936,46 @@ a:hover {
   color: var(--memory-belief);
 }
 
+.kind-badge--core {
+  border-color: #a78bfa;
+  color: #a78bfa;
+}
+
+.kind-badge--candidate {
+  border-color: #787878;
+  color: #787878;
+}
+
+.kind-badge--self {
+  border-color: #46d9ff;
+  color: #46d9ff;
+}
+
+.kind-badge--humanity {
+  border-color: #34d399;
+  color: #34d399;
+}
+
+.kind-badge--world {
+  border-color: #60a5fa;
+  color: #60a5fa;
+}
+
+.kind-badge--politics {
+  border-color: #fb7185;
+  color: #fb7185;
+}
+
+.kind-badge--people {
+  border-color: #a78bfa;
+  color: #a78bfa;
+}
+
+.kind-badge--technology {
+  border-color: #2dd4bf;
+  color: #2dd4bf;
+}
+
 .kind-badge--candidate,
 .kind-badge--forming,
 .kind-badge--solid,

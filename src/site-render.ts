@@ -497,13 +497,12 @@ function renderBeliefFeed(feed: FeedState<BeliefFeedData>, limit = 6): string {
             .join("");
 
           const metaParts = [
-            item.domain ? `${t("label.domain")}: ${translateBeliefField("beliefDomain", item.domain)}` : "",
             item.origin ? `${t("label.origin")}: ${translateBeliefField("beliefOrigin", item.origin)}` : "",
           ].filter(Boolean);
 
           const badges = [
-            `<span class="kind-badge kind-badge--belief">${escapeHtml(translateMemoryType("belief"))}</span>`,
-            item.stage ? `<span class="kind-badge${badgeClass(item.stage)}">${escapeHtml(translateBeliefField("beliefStage", item.stage))}</span>` : "",
+            item.stage ? `<span class="kind-badge kind-badge--sm${badgeClass(item.stage)}">${escapeHtml(translateBeliefField("beliefStage", item.stage))}</span>` : "",
+            item.domain ? `<span class="kind-badge kind-badge--sm${badgeClass(item.domain)}">${escapeHtml(translateBeliefField("beliefDomain", item.domain))}</span>` : "",
           ].filter(Boolean).join("");
 
           const evidence = item.evidence?.length
