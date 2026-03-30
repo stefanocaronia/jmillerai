@@ -1,4 +1,5 @@
 import { grantAnalyticsConsent, prepareAnalytics, rejectAnalyticsConsent } from "./analytics";
+import { t } from "./strings";
 
 type ConsentChoice = "accepted" | "rejected";
 
@@ -30,11 +31,11 @@ function renderConsentBanner(): string {
     <aside class="consent-banner" data-consent-banner role="dialog" aria-live="polite" aria-label="Cookie consent">
       <div class="consent-banner__copy">
         <span class="section-name">Cookies</span>
-        <p class="body-copy">This site uses essential storage for core functionality and optional Google Analytics to measure visits. Essential storage stays on. Analytics starts only if you accept.</p>
+        <p class="body-copy">${t("consent.description")}</p>
       </div>
       <div class="consent-banner__actions">
-        <button type="button" class="consent-banner__button consent-banner__button--ghost" data-consent-action="reject">Reject analytics</button>
-        <button type="button" class="consent-banner__button" data-consent-action="accept">Accept analytics</button>
+        <button type="button" class="consent-banner__button consent-banner__button--ghost" data-consent-action="reject">${t("consent.reject")}</button>
+        <button type="button" class="consent-banner__button" data-consent-action="accept">${t("consent.accept")}</button>
       </div>
     </aside>
   `;

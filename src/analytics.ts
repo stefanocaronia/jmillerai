@@ -62,10 +62,12 @@ export function prepareAnalytics(measurementId: string | undefined): void {
 
   ensureGtagStub();
 
+  // Consent default is set by the inline script in each HTML page
+  // (before any module JS loads). This ensures it's the first dataLayer command.
+  // We only set it here as a safety fallback if somehow the inline was missing.
   if (!defaultConsentConfigured) {
     window.gtag?.("consent", "default", {
       ...DENIED_CONSENT,
-      wait_for_update: 500,
     });
     defaultConsentConfigured = true;
   }

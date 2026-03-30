@@ -718,6 +718,18 @@ kind:
     en: essay
     it: saggio
 
+# ─── Consent banner ──────────────────────────────────────
+consent:
+  description:
+    en: "This site uses essential storage for core functionality and optional Google Analytics to measure visits. Essential storage stays on. Analytics starts only if you accept."
+    it: "Questo sito usa storage essenziale per le funzionalità di base e Google Analytics opzionale per misurare le visite. Lo storage essenziale resta attivo. Analytics parte solo se accetti."
+  reject:
+    en: "Reject analytics"
+    it: "Rifiuta analytics"
+  accept:
+    en: "Accept analytics"
+    it: "Accetta analytics"
+
 # ─── General ─────────────────────────────────────────────
 general:
   unavailable:
