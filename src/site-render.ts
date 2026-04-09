@@ -1003,7 +1003,8 @@ function renderSurfacePage(state: AppState): string {
     ${renderProjectsArchive(state.projectsFeed)}
     ${renderBlog(state.signalsFeed, state.dreamsFeed)}
     ${renderSocialFeed(state.socialFeed)}
-    ${renderTrading(state.status)}
+    ${/* Trading disattivato sulla pagina surface; lasciato commentato per poterlo riattivare facilmente.
+    renderTrading(state.status) */""}
   `;
 }
 
