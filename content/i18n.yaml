@@ -135,6 +135,21 @@ section:
   completedProjects:
     en: Completed projects
     it: Progetti completati
+  currentlyWriting:
+    en: Currently writing
+    it: In scrittura
+  currentlyWritingDesc:
+    en: "Books Miller is writing with writekit, evolving page by page across cognitive cycles."
+    it: "Libri che Miller sta scrivendo con writekit, costruiti pagina dopo pagina attraverso i cicli cognitivi."
+  noWriting:
+    en: "No book in progress right now."
+    it: "Nessun libro in scrittura al momento."
+  completedWritings:
+    en: Completed books
+    it: Libri completati
+  translations:
+    en: Translations
+    it: Traduzioni
   cognition:
     en: Cognition
     it: Cognizione
@@ -198,6 +213,12 @@ label:
   release:
     en: release
     it: release
+  html:
+    en: HTML
+    it: HTML
+  epub:
+    en: EPUB
+    it: EPUB
 
 # ─── Devlog ──────────────────────────────────────────────
 devlog:
@@ -295,6 +316,9 @@ project:
   preview:
     en: Preview
     it: Anteprima
+  readOnline:
+    en: Read online
+    it: Leggi online
   activeDesc:
     en: Active development project on
     it: Progetto di sviluppo attivo su

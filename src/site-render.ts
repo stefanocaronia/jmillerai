@@ -910,7 +910,7 @@ function renderCurrentProject(feed: FeedState<ProjectsFeedData>): string {
     `;
   }
 
-  if (!feed.data.current) {
+  if (!feed.data.coding.current) {
     return `
       <section class="section-block">
         <div class="section-line">
@@ -921,7 +921,7 @@ function renderCurrentProject(feed: FeedState<ProjectsFeedData>): string {
     `;
   }
 
-  const project = feed.data.current;
+  const project = feed.data.coding.current;
   const tags = [project.language, project.platform].filter(Boolean);
   const projectLinks: string[] = [];
   if (project.repo_url) {
@@ -985,7 +985,7 @@ function renderCurrentProject(feed: FeedState<ProjectsFeedData>): string {
 }
 
 function renderProjectsArchive(feed: FeedState<ProjectsFeedData>): string {
-  const items = feed.data?.completed ?? [];
+  const items = feed.data?.coding.completed ?? [];
   if (items.length === 0) {
     return "";
   }
@@ -1022,6 +1022,149 @@ function renderProjectsArchive(feed: FeedState<ProjectsFeedData>): string {
   `;
 }
 
+function renderTranslationRow(t9n: { lang: string; pages_url: string | null; epub_url: string | null }): string {
+  const lang = t9n.lang.toUpperCase();
+  const html = t9n.pages_url
+    ? `<a class="plain-link" href="${escapeHtml(t9n.pages_url)}" target="_blank" rel="noreferrer">${escapeHtml(t("label.html"))}</a>`
+    : `<span class="muted-copy translation-disabled">${escapeHtml(t("label.html"))}</span>`;
+  const epub = t9n.epub_url
+    ? `<a class="plain-link" href="${escapeHtml(t9n.epub_url)}" target="_blank" rel="noreferrer">${escapeHtml(t("label.epub"))}</a>`
+    : `<span class="muted-copy translation-disabled">${escapeHtml(t("label.epub"))}</span>`;
+  return `<li class="translation-row">
+    <span class="kind-badge kind-badge--sm">${escapeHtml(lang)}</span>
+    ${html}
+    ${epub}
+  </li>`;
+}
+
+function renderCurrentlyWriting(feed: FeedState<ProjectsFeedData>): string {
+  if (!feed.data || !feed.data.writing.current) {
+    return `
+      <section class="section-block">
+        <div class="section-line">
+          <span class="section-name">${escapeHtml(t("section.currentlyWriting"))}</span>
+        </div>
+        <p class="muted-copy">${escapeHtml(t("section.noWriting"))}</p>
+      </section>
+    `;
+  }
+
+  const project = feed.data.writing.current;
+  const projectLinks: string[] = [];
+  if (project.repo_url) {
+    projectLinks.push(`<li><a class="plain-link project-link" href="${escapeHtml(project.repo_url)}" target="_blank" rel="noreferrer"><svg class="project-link-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>${escapeHtml(t("section.sourceCode"))}</a> <span class="muted-copy project-link-url">(${escapeHtml(shortUrl(project.repo_url))})</span></li>`);
+  }
+  if (project.pages_url) {
+    projectLinks.push(`<li><a class="plain-link project-link" href="${escapeHtml(project.pages_url)}" target="_blank" rel="noreferrer"><svg class="project-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg>${escapeHtml(t("project.readOnline"))}</a> <span class="muted-copy project-link-url">(${escapeHtml(shortUrl(project.pages_url))})</span></li>`);
+  }
+  const linksHtml = projectLinks.length
+    ? `<ul class="project-links">${projectLinks.join("")}</ul>`
+    : "";
+
+  const translationsHtml = (() => {
+    const list = project.translations ?? [];
+    if (list.length === 0) return "";
+    return `
+      <div class="translations-block">
+        <hr class="section-divider" />
+        <span class="subsection-label">${escapeHtml(t("section.translations"))}</span>
+        <ul class="translation-list">
+          ${list.map(renderTranslationRow).join("")}
+        </ul>
+      </div>`;
+  })();
+
+  const activityHtml = (() => {
+    const items = project.recent_activity?.slice(0, 3);
+    if (!items || items.length === 0) return "";
+    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+    return `
+      <div class="recent-activity">
+        <hr class="section-divider" />
+        <span class="subsection-label">${escapeHtml(t("section.recentActivity"))}</span>
+        <div class="stream-list">
+          ${items.map((item) => {
+            const dateStr = formatDate(item.date);
+            const typeLabel = item.type === "issue_closed" ? t("section.issueClosed") : item.type;
+            const text = item.type === "issue_closed"
+              ? `#${item.number ?? ""} ${escapeHtml(capitalize(item.title ?? ""))}`
+              : escapeHtml(capitalize(item.message ?? item.title ?? ""));
+            return `<article class="stream-item">
+              <div class="section-line">
+                <span class="activity-type-badge activity-type--${escapeHtml(item.type)}">${escapeHtml(typeLabel)}</span>
+                <span class="section-meta">${escapeHtml(dateStr)}</span>
+              </div>
+              <p class="muted-copy">${text}</p>
+            </article>`;
+          }).join("")}
+        </div>
+      </div>`;
+  })();
+
+  return `
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">${escapeHtml(t("section.currentlyWriting"))}</span>
+        ${project.updated_at ? `<span class="section-meta">${escapeHtml(formatDate(project.updated_at))}</span>` : ""}
+      </div>
+      <p class="muted-copy">${escapeHtml(t("section.currentlyWritingDesc"))}</p>
+      <h2>${escapeHtml(en(project.title, project.title_en))}</h2>
+      <div class="state-inline">
+        <span class="kind-badge${badgeClass(project.status)}">${escapeHtml(project.status)}</span>
+        ${(() => { const phase = versionPhase(project.version); return phase ? `<span class="kind-badge${badgeClass(phase)}">${escapeHtml(phase)}</span>` : ""; })()}
+        ${project.version ? `<span class="kind-badge kind-badge--version">v${escapeHtml(project.version)}</span>` : ""}
+        ${project.language ? `<span class="kind-badge">${escapeHtml(project.language)}</span>` : ""}
+      </div>
+      ${(() => { const desc = en(project.description, project.description_en); return desc ? `<p class="body-copy">${escapeHtml(desc)}</p>` : ""; })()}
+      ${linksHtml}
+      ${translationsHtml}
+      ${activityHtml}
+    </section>
+  `;
+}
+
+function renderWritingArchive(feed: FeedState<ProjectsFeedData>): string {
+  const items = feed.data?.writing.completed ?? [];
+  if (items.length === 0) {
+    return "";
+  }
+
+  return `
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">${escapeHtml(t("section.completedWritings"))}</span>
+        <span class="section-meta">${items.length}</span>
+      </div>
+      <ul class="book-archive-list">
+        ${items.map((item) => {
+          const meta = item.language ? `<span class="muted-copy">${escapeHtml(item.language)}</span>` : "";
+          const repo = item.repo_url
+            ? `<a class="plain-link" href="${escapeHtml(item.repo_url)}" target="_blank" rel="noreferrer">${escapeHtml(t("label.sourceCode"))}</a>`
+            : "";
+          const pages = item.pages_url
+            ? `<a class="plain-link" href="${escapeHtml(item.pages_url)}" target="_blank" rel="noreferrer">${escapeHtml(t("project.readOnline"))}</a>`
+            : "";
+          const langs = (item.translations ?? [])
+            .filter((tr) => tr.pages_url || tr.epub_url)
+            .map((tr) => `<span class="kind-badge kind-badge--sm">${escapeHtml(tr.lang.toUpperCase())}</span>`)
+            .join("");
+          const langsHtml = langs ? `<span class="translation-langs">${langs}</span>` : "";
+
+          return `
+            <li>
+              <span class="book-archive-title">${escapeHtml(en(item.title, item.title_en))}</span>
+              ${meta}
+              ${repo}${pages}
+              ${langsHtml}
+              ${item.updated_at ? `<span class="section-meta">${escapeHtml(formatDate(item.updated_at))}</span>` : ""}
+            </li>
+          `;
+        }).join("")}
+      </ul>
+    </section>
+  `;
+}
+
 function renderTracesPage(state: AppState): string {
   return `
     ${renderCurrentState(state.status)}
@@ -1036,7 +1179,9 @@ function renderTracesPage(state: AppState): string {
 function renderSurfacePage(state: AppState): string {
   return `
     ${renderCurrentProject(state.projectsFeed)}
+    ${renderCurrentlyWriting(state.projectsFeed)}
     ${renderProjectsArchive(state.projectsFeed)}
+    ${renderWritingArchive(state.projectsFeed)}
     ${renderBlog(state.signalsFeed, state.dreamsFeed)}
     ${renderSocialFeed(state.socialFeed)}
     ${/* Trading disattivato sulla pagina surface; lasciato commentato per poterlo riattivare facilmente.

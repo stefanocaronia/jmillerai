@@ -224,44 +224,72 @@ export type SocialFeedData = {
   }>;
 };
 
+export type ProjectActivity = {
+  type: string;
+  message?: string;
+  title?: string;
+  sha_short?: string;
+  number?: number;
+  date: string;
+};
+
+export type CodingProject = {
+  slug: string;
+  title: string;
+  title_en?: string | null;
+  description: string | null;
+  description_en?: string | null;
+  language: string | null;
+  platform: string | null;
+  status: string;
+  version: string | null;
+  repo_url: string | null;
+  pages_url: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  recent_activity?: ProjectActivity[];
+};
+
+export type CodingProjectCompact = Omit<CodingProject, "recent_activity" | "status">;
+
+export type WritingTranslation = {
+  lang: string;
+  pages_url: string | null;
+  epub_url: string | null;
+};
+
+export type WritingProject = {
+  slug: string;
+  title: string;
+  title_en?: string | null;
+  description: string | null;
+  description_en?: string | null;
+  language: string | null;
+  status: string;
+  version: string | null;
+  repo_url: string | null;
+  pages_url: string | null;
+  translations: WritingTranslation[];
+  created_at: string | null;
+  updated_at: string | null;
+  recent_activity?: ProjectActivity[];
+};
+
+export type WritingProjectCompact = Omit<WritingProject, "recent_activity">;
+
 export type ProjectsFeedData = {
   schema_version: number;
   generated_at: string;
-  has_current: boolean;
-  current: {
-    slug: string;
-    title: string;
-    title_en?: string | null;
-    description: string | null;
-    description_en?: string | null;
-    language: string | null;
-    platform: string | null;
-    status: string;
-    version: string | null;
-    repo_url: string | null;
-    pages_url: string | null;
-    created_at: string | null;
-    updated_at: string | null;
-    recent_activity?: Array<{
-      type: string;
-      message?: string;
-      title?: string;
-      sha_short?: string;
-      number?: number;
-      date: string;
-    }>;
-  } | null;
-  completed: Array<{
-    slug: string;
-    title: string;
-    description: string | null;
-    language: string | null;
-    platform: string | null;
-    version: string | null;
-    repo_url: string | null;
-    pages_url: string | null;
-    updated_at: string | null;
-  }>;
+  coding: {
+    has_current: boolean;
+    current: CodingProject | null;
+    completed: CodingProjectCompact[];
+  };
+  writing: {
+    has_current: boolean;
+    current: WritingProject | null;
+    completed: WritingProjectCompact[];
+  };
 };
 
 export type BlogFeedData = {
