@@ -20,6 +20,7 @@ import type {
   BookData,
   FeedState,
   PageId,
+  PlanData,
   ProjectsFeedData,
   ReadingFeedData,
   SocialFeedData,
@@ -317,6 +318,40 @@ function renderCurrentlyReading(book: FeedState<BookData>): string {
       <div class="section-line"><span class="section-note">${progress}%</span>${active.current_page && active.total_pages ? `<span class="section-note muted-copy">p. ${active.current_page} ${t("book.pageOf")} ${active.total_pages}</span>` : ""}</div>
       ${(() => { const f = en(active.current_focus, active.current_focus_en); return f ? renderExpandable(f, 200, "muted-copy") : ""; })()}
       ${renderFinishedBooks(book)}
+    </section>
+  `;
+}
+
+function renderCurrentPlan(plan: FeedState<PlanData>): string {
+  if (!plan.data || !plan.data.plan) {
+    return `
+      <section class="section-block">
+        <div class="section-line">
+          <span class="section-name">${escapeHtml(t("section.currentPlan"))}</span>
+        </div>
+        ${plan.error ? renderFeedError(plan, "plan feed") : `<p class="muted-copy">${escapeHtml(t("section.noPlan"))}</p>`}
+      </section>
+    `;
+  }
+
+  const active = plan.data.plan;
+  const progress = Math.floor(active.progress_percent);
+  const title = en(active.title, active.title_en);
+  const description = en(active.description, active.description_en);
+
+  return `
+    <section class="section-block">
+      <div class="section-line">
+        <span class="section-name">${escapeHtml(t("section.currentPlan"))}</span>
+        ${active.updated_at ? `<span class="section-meta">${escapeHtml(formatDate(active.updated_at))}</span>` : ""}
+      </div>
+      <p class="muted-copy">${escapeHtml(t("section.currentPlanDesc"))}</p>
+      <h2 class="state-title">${escapeHtml(title)}</h2>
+      ${description ? renderExpandable(description, 260, "body-copy") : ""}
+      <div class="progress-meter">
+        <span class="progress-meter-fill" data-progress="${escapeHtml(String(progress))}"></span>
+      </div>
+      <div class="section-line"><span class="section-note">${progress}%</span></div>
     </section>
   `;
 }
@@ -990,6 +1025,7 @@ function renderProjectsArchive(feed: FeedState<ProjectsFeedData>): string {
 function renderTracesPage(state: AppState): string {
   return `
     ${renderCurrentState(state.status)}
+    ${renderCurrentPlan(state.plan)}
     ${renderCurrentlyReading(state.book)}
     ${renderReadingTrace(state.readingFeed)}
     ${renderThinkingFeed(state.thinkingFeed)}

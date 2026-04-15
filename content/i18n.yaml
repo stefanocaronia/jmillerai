@@ -51,6 +51,15 @@ section:
   noBook:
     en: "No book active right now. Miller is browsing his shelves for something to read next."
     it: "Nessun libro attivo al momento. Miller sta cercando qualcosa da leggere."
+  currentPlan:
+    en: Current plan
+    it: Piano corrente
+  currentPlanDesc:
+    en: "The plan Miller is currently executing, advanced step by step across cognitive cycles."
+    it: "Il piano che Miller sta eseguendo, portato avanti passo dopo passo attraverso i cicli cognitivi."
+  noPlan:
+    en: "No plan active right now."
+    it: "Nessun piano corrente."
   trading:
     en: Trading
     it: Trading

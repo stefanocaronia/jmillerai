@@ -128,6 +128,21 @@ export type BookData = {
   }>;
 };
 
+export type PlanData = {
+  schema_version: number;
+  generated_at: string;
+  active: boolean;
+  plan: {
+    title: string;
+    title_en?: string | null;
+    description: string | null;
+    description_en?: string | null;
+    progress_percent: number;
+    started_at?: string | null;
+    updated_at?: string | null;
+  } | null;
+};
+
 export type ReadingFeedData = {
   schema_version: number;
   generated_at: string;
@@ -266,6 +281,7 @@ export type FeedState<T> = {
 export type AppState = {
   status: FeedState<StatusData>;
   book: FeedState<BookData>;
+  plan: FeedState<PlanData>;
   readingFeed: FeedState<ReadingFeedData>;
   thinkingFeed: FeedState<ThinkingFeedData>;
   beliefFeed: FeedState<BeliefFeedData>;
