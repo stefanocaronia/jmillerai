@@ -319,6 +319,9 @@ project:
   readOnline:
     en: Read online
     it: Leggi online
+  downloadEpub:
+    en: Download EPUB
+    it: Scarica EPUB
   activeDesc:
     en: Active development project on
     it: Progetto di sviluppo attivo su

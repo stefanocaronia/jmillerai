@@ -269,6 +269,7 @@ export type WritingProject = {
   version: string | null;
   repo_url: string | null;
   pages_url: string | null;
+  epub_url: string | null;
   translations: WritingTranslation[];
   created_at: string | null;
   updated_at: string | null;

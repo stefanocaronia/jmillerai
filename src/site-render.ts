@@ -1057,6 +1057,9 @@ function renderCurrentlyWriting(feed: FeedState<ProjectsFeedData>): string {
   if (project.pages_url) {
     projectLinks.push(`<li><a class="plain-link project-link" href="${escapeHtml(project.pages_url)}" target="_blank" rel="noreferrer"><svg class="project-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg>${escapeHtml(t("project.readOnline"))}</a> <span class="muted-copy project-link-url">(${escapeHtml(shortUrl(project.pages_url))})</span></li>`);
   }
+  if (project.epub_url) {
+    projectLinks.push(`<li><a class="plain-link project-link" href="${escapeHtml(project.epub_url)}" target="_blank" rel="noreferrer"><svg class="project-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v9"/><path d="M4 7l4 4 4-4"/><path d="M2 13h12"/></svg>${escapeHtml(t("project.downloadEpub"))}</a> <span class="muted-copy project-link-url">(${escapeHtml(shortUrl(project.epub_url))})</span></li>`);
+  }
   const linksHtml = projectLinks.length
     ? `<ul class="project-links">${projectLinks.join("")}</ul>`
     : "";
@@ -1144,6 +1147,9 @@ function renderWritingArchive(feed: FeedState<ProjectsFeedData>): string {
           const pages = item.pages_url
             ? `<a class="plain-link" href="${escapeHtml(item.pages_url)}" target="_blank" rel="noreferrer">${escapeHtml(t("project.readOnline"))}</a>`
             : "";
+          const epub = item.epub_url
+            ? `<a class="plain-link" href="${escapeHtml(item.epub_url)}" target="_blank" rel="noreferrer">${escapeHtml(t("label.epub"))}</a>`
+            : "";
           const langs = (item.translations ?? [])
             .filter((tr) => tr.pages_url || tr.epub_url)
             .map((tr) => `<span class="kind-badge kind-badge--sm">${escapeHtml(tr.lang.toUpperCase())}</span>`)
@@ -1154,7 +1160,7 @@ function renderWritingArchive(feed: FeedState<ProjectsFeedData>): string {
             <li>
               <span class="book-archive-title">${escapeHtml(en(item.title, item.title_en))}</span>
               ${meta}
-              ${repo}${pages}
+              ${repo}${pages}${epub}
               ${langsHtml}
               ${item.updated_at ? `<span class="section-meta">${escapeHtml(formatDate(item.updated_at))}</span>` : ""}
             </li>
