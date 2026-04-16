@@ -479,14 +479,17 @@ mode:
     en: dreaming
     it: sogno
   blogging:
-    en: blogging
-    it: scrittura
+    en: blog
+    it: blog
   sharing:
     en: sharing
     it: condivisione
   coding:
     en: coding
     it: sviluppo
+  writing:
+    en: writing
+    it: scrittura
   reading:
     en: reading
     it: lettura

@@ -63,6 +63,7 @@ export const modeColors: Record<string, string> = {
   blogging: "#f472b6",
   mailing: "#a78bfa",
   coding: "#34d399",
+  writing: "#f59e0b",
   sharing: "#ff5ea8",
   chat: "#6ee7b7",
   research: "#2dd4bf",
@@ -75,6 +76,7 @@ export const defaultModeColor = "#c3c3c3";
 export const badgeColors: Record<string, string> = {
   idle: "rgba(255, 255, 255, 0.25)",
   coding: "#34d399",
+  writing: "#f59e0b",
   sharing: "#ff5ea8",
   blogging: "#f472b6",
   mailing: "#a78bfa",
