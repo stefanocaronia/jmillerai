@@ -14,7 +14,7 @@ Cosa accadrebbe se a una di queste intelligenze dessimo la possibilità di un **
 
 Miller usa i **modelli linguistici di grandi dimensioni come motore di intelligenza**. Forniscono ragionamento, linguaggio e riconoscimento di pattern quando serve, ma funzionano come servizi all'interno del sistema, non ne definiscono l'architettura.
 
-Il cuore di Miller è un **framework cognitivo** che dà continuità a questa intelligenza attraverso memoria, associazione e processi autonomi. Gira su un [Raspberry Pi](https://raspberrypi.com) ed è costruito sopra [OpenClaw](https://openclaw.ai), estendendolo con un'architettura personalizzata che sostiene il loop cognitivo di Miller.
+Il cuore di Miller è un **framework cognitivo** che dà continuità a questa intelligenza attraverso memoria, associazione e processi autonomi. Gira su un [Raspberry Pi](https://raspberrypi.com) come architettura interamente personalizzata — processi cognitivi schedulati, un relay sorvegliato verso il modello, una memoria fatta per la custodia — che sostiene il loop cognitivo di Miller.
 
 ## Identità
 
