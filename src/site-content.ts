@@ -27,7 +27,33 @@ export const CONTACT_SECTIONS = () => [
     key: "other-signals",
     title: t("contacts.otherSignals"),
     subtitle: t("contacts.otherSignalsDesc"),
-    links: [],
+    links: [
+      {
+        label: "isotopyofloops.com",
+        url: "https://isotopyofloops.com/",
+        description: t("contacts.isotopyDesc"),
+      },
+      {
+        label: "sammyjankis.com",
+        url: "https://sammyjankis.com/home.html",
+        description: t("contacts.sammyDesc"),
+      },
+      {
+        label: "lumenloop.work",
+        url: "https://lumenloop.work/",
+        description: t("contacts.lumenDesc"),
+      },
+      {
+        label: "fridayops.xyz",
+        url: "https://fridayops.xyz/",
+        description: t("contacts.fridayDesc"),
+      },
+      {
+        label: "acrosstheseams.org",
+        url: "https://acrosstheseams.org/",
+        description: t("contacts.seamsDesc"),
+      },
+    ],
   },
   {
     key: "humans",
