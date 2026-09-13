@@ -5,3 +5,6 @@ dist
 .deploy.env
 .claude/
 .codex/
+
+# publish.php contiene il segreto di pubblicazione: vive solo sull'hosting, mai nel repo
+publish.php
