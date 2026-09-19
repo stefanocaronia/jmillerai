@@ -29,8 +29,8 @@ export function parseDate(value: string | null | undefined): number | null {
   return Number.isNaN(timestamp) ? null : timestamp;
 }
 
-export function escapeHtml(value: string): string {
-  return value
+export function escapeHtml(value: string | null | undefined): string {
+  return String(value ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -112,4 +112,3 @@ export function truncateText(text: string, maxLength = 220): { short: string; re
   const trimmed = (boundary > 0 ? slice.slice(0, boundary) : slice).trim().replace(/[.,;:!?-]+$/, "");
   return { short: trimmed, rest: normalized.slice(trimmed.length).trim() };
 }
-
