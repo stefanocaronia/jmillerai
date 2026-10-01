@@ -26,6 +26,7 @@ import type {
   SocialFeedData,
   StatusData,
   ThinkingFeedData,
+  WritingProjectCompact,
 } from "./site-types";
 import { en, escapeHtml, formatDate, parseDate, rateThought, truncateText } from "./site-utils";
 
@@ -1022,19 +1023,50 @@ function renderProjectsArchive(feed: FeedState<ProjectsFeedData>): string {
   `;
 }
 
-function renderTranslationRow(t9n: { lang: string; pages_url: string | null; epub_url: string | null }): string {
-  const lang = t9n.lang.toUpperCase();
-  const html = t9n.pages_url
-    ? `<a class="plain-link" href="${escapeHtml(t9n.pages_url)}" target="_blank" rel="noreferrer">${escapeHtml(t("label.html"))}</a>`
-    : `<span class="muted-copy translation-disabled">${escapeHtml(t("label.html"))}</span>`;
-  const epub = t9n.epub_url
-    ? `<a class="plain-link" href="${escapeHtml(t9n.epub_url)}" target="_blank" rel="noreferrer">${escapeHtml(t("label.epub"))}</a>`
+const ICON_GITHUB = `<svg class="project-link-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>`;
+const ICON_READ = `<svg class="project-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true"><path d="M8 4.2C6.6 3.2 4.4 2.8 2 3v9.3c2.4-.2 4.6.2 6 1.2 1.4-1 3.6-1.4 6-1.2V3c-2.4-.2-4.6.2-6 1.2z"/><path d="M8 4.2v9.3"/></svg>`;
+const ICON_DOWNLOAD = `<svg class="project-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8 2v9"/><path d="M4 7l4 4 4-4"/><path d="M2 13h12"/></svg>`;
+
+type BookEdition = { lang: string; pages_url: string | null; epub_url: string | null };
+
+/** Tutte le edizioni di un libro (originale + traduzioni), quella nella lingua del sito per prima. */
+function bookEditions(book: WritingProjectCompact): BookEdition[] {
+  const editions: BookEdition[] = [];
+  if (book.language) {
+    editions.push({ lang: book.language, pages_url: book.pages_url, epub_url: book.epub_url });
+  }
+  for (const translation of book.translations ?? []) {
+    editions.push({ lang: translation.lang, pages_url: translation.pages_url, epub_url: translation.epub_url });
+  }
+  const current = getLang();
+  return editions
+    .filter((edition) => edition.pages_url || edition.epub_url)
+    .sort((a, b) => Number(b.lang === current) - Number(a.lang === current));
+}
+
+function renderEditionRow(edition: BookEdition): string {
+  const read = edition.pages_url
+    ? `<a class="plain-link project-link" href="${escapeHtml(edition.pages_url)}" target="_blank" rel="noreferrer">${ICON_READ}${escapeHtml(t("project.readOnline"))}</a>`
+    : `<span class="muted-copy translation-disabled">${escapeHtml(t("project.readOnline"))}</span>`;
+  const epub = edition.epub_url
+    ? `<a class="plain-link project-link" href="${escapeHtml(edition.epub_url)}" target="_blank" rel="noreferrer">${ICON_DOWNLOAD}${escapeHtml(t("label.epub"))}</a>`
     : `<span class="muted-copy translation-disabled">${escapeHtml(t("label.epub"))}</span>`;
-  return `<li class="translation-row">
-    <span class="kind-badge kind-badge--sm">${escapeHtml(lang)}</span>
-    ${html}
+  return `<li class="translation-row edition-row">
+    <span class="kind-badge kind-badge--sm">${escapeHtml(edition.lang.toUpperCase())}</span>
+    ${read}
     ${epub}
   </li>`;
+}
+
+function renderBookEditions(book: WritingProjectCompact): string {
+  const editions = bookEditions(book);
+  return editions.length ? `<ul class="translation-list edition-list">${editions.map(renderEditionRow).join("")}</ul>` : "";
+}
+
+function renderSourceLink(repoUrl: string | null): string {
+  return repoUrl
+    ? `<ul class="project-links"><li><a class="plain-link project-link" href="${escapeHtml(repoUrl)}" target="_blank" rel="noreferrer">${ICON_GITHUB}${escapeHtml(t("section.sourceCode"))}</a> <span class="muted-copy project-link-url">(${escapeHtml(shortUrl(repoUrl))})</span></li></ul>`
+    : "";
 }
 
 function renderCurrentlyWriting(feed: FeedState<ProjectsFeedData>): string {
@@ -1050,32 +1082,8 @@ function renderCurrentlyWriting(feed: FeedState<ProjectsFeedData>): string {
   }
 
   const project = feed.data.writing.current;
-  const projectLinks: string[] = [];
-  if (project.repo_url) {
-    projectLinks.push(`<li><a class="plain-link project-link" href="${escapeHtml(project.repo_url)}" target="_blank" rel="noreferrer"><svg class="project-link-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>${escapeHtml(t("section.sourceCode"))}</a> <span class="muted-copy project-link-url">(${escapeHtml(shortUrl(project.repo_url))})</span></li>`);
-  }
-  if (project.pages_url) {
-    projectLinks.push(`<li><a class="plain-link project-link" href="${escapeHtml(project.pages_url)}" target="_blank" rel="noreferrer"><svg class="project-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg>${escapeHtml(t("project.readOnline"))}</a> <span class="muted-copy project-link-url">(${escapeHtml(shortUrl(project.pages_url))})</span></li>`);
-  }
-  if (project.epub_url) {
-    projectLinks.push(`<li><a class="plain-link project-link" href="${escapeHtml(project.epub_url)}" target="_blank" rel="noreferrer"><svg class="project-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v9"/><path d="M4 7l4 4 4-4"/><path d="M2 13h12"/></svg>${escapeHtml(t("project.downloadEpub"))}</a> <span class="muted-copy project-link-url">(${escapeHtml(shortUrl(project.epub_url))})</span></li>`);
-  }
-  const linksHtml = projectLinks.length
-    ? `<ul class="project-links">${projectLinks.join("")}</ul>`
-    : "";
-
-  const translationsHtml = (() => {
-    const list = project.translations ?? [];
-    if (list.length === 0) return "";
-    return `
-      <div class="translations-block">
-        <hr class="section-divider" />
-        <span class="subsection-label">${escapeHtml(t("section.translations"))}</span>
-        <ul class="translation-list">
-          ${list.map(renderTranslationRow).join("")}
-        </ul>
-      </div>`;
-  })();
+  const linksHtml = renderSourceLink(project.repo_url);
+  const translationsHtml = renderBookEditions(project);
 
   const activityHtml = (() => {
     const items = project.recent_activity?.slice(0, 3);
@@ -1140,29 +1148,20 @@ function renderWritingArchive(feed: FeedState<ProjectsFeedData>): string {
       </div>
       <ul class="book-archive-list">
         ${items.map((item) => {
-          const meta = item.language ? `<span class="muted-copy">${escapeHtml(item.language)}</span>` : "";
-          const repo = item.repo_url
-            ? `<a class="plain-link" href="${escapeHtml(item.repo_url)}" target="_blank" rel="noreferrer">${escapeHtml(t("label.sourceCode"))}</a>`
-            : "";
-          const pages = item.pages_url
-            ? `<a class="plain-link" href="${escapeHtml(item.pages_url)}" target="_blank" rel="noreferrer">${escapeHtml(t("project.readOnline"))}</a>`
-            : "";
-          const epub = item.epub_url
-            ? `<a class="plain-link" href="${escapeHtml(item.epub_url)}" target="_blank" rel="noreferrer">${escapeHtml(t("label.epub"))}</a>`
-            : "";
-          const langs = (item.translations ?? [])
-            .filter((tr) => tr.pages_url || tr.epub_url)
-            .map((tr) => `<span class="kind-badge kind-badge--sm">${escapeHtml(tr.lang.toUpperCase())}</span>`)
-            .join("");
-          const langsHtml = langs ? `<span class="translation-langs">${langs}</span>` : "";
-
+          const subtitle = en(item.subtitle ?? null, item.subtitle_en ?? null);
+          // La descrizione esiste solo in italiano: sul sito inglese non la mescoliamo.
+          const description = getLang() === "it" || item.description_en ? en(item.description, item.description_en) : null;
+          const meta = [item.version ? `v${item.version}` : "", item.updated_at ? formatDate(item.updated_at) : ""].filter(Boolean).join(" · ");
           return `
-            <li>
-              <span class="book-archive-title">${escapeHtml(en(item.title, item.title_en))}</span>
-              ${meta}
-              ${repo}${pages}${epub}
-              ${langsHtml}
-              ${item.updated_at ? `<span class="section-meta">${escapeHtml(formatDate(item.updated_at))}</span>` : ""}
+            <li class="book-card">
+              <div class="book-card-head">
+                <span class="book-archive-title">${escapeHtml(en(item.title, item.title_en))}</span>
+                ${meta ? `<span class="section-meta">${escapeHtml(meta)}</span>` : ""}
+              </div>
+              ${subtitle ? `<span class="muted-copy book-card-subtitle">${escapeHtml(subtitle)}</span>` : ""}
+              ${description ? `<p class="body-copy book-card-description">${escapeHtml(description)}</p>` : ""}
+              ${renderBookEditions(item)}
+              ${renderSourceLink(item.repo_url)}
             </li>
           `;
         }).join("")}

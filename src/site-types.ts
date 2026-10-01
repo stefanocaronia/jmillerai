@@ -256,12 +256,16 @@ export type WritingTranslation = {
   lang: string;
   pages_url: string | null;
   epub_url: string | null;
+  title?: string | null;
+  subtitle?: string | null;
 };
 
 export type WritingProject = {
   slug: string;
   title: string;
   title_en?: string | null;
+  subtitle?: string | null;
+  subtitle_en?: string | null;
   description: string | null;
   description_en?: string | null;
   language: string | null;

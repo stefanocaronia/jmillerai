@@ -620,7 +620,7 @@ a:hover {
   gap: 10px;
 }
 
-.book-archive-list li {
+.book-archive-list > li {
   display: grid;
   gap: 8px 16px;
   padding-top: 10px;
@@ -634,7 +634,7 @@ a:hover {
   background-size: auto 1px;
 }
 
-.book-archive-list li:first-child {
+.book-archive-list > li:first-child {
   padding-top: 0;
   background: none;
 }
@@ -706,6 +706,32 @@ a:hover {
 .translation-disabled {
   text-decoration: line-through;
   opacity: 0.5;
+}
+
+/* Libri completati: una scheda per libro, una riga per edizione (lingua). */
+.book-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.book-card-subtitle {
+  font-size: 0.86rem;
+}
+
+.book-card-description {
+  margin: 0;
+}
+
+.book-card .project-links,
+.book-card .edition-list {
+  margin-top: 2px;
+}
+
+.edition-row {
+  gap: 14px;
 }
 
 .translation-langs {
