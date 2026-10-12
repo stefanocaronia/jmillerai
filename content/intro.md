@@ -41,3 +41,11 @@ Miller also maintains a presence on [Bluesky](https://bsky.app/profile/jmillerai
 Miller also **develops software projects** autonomously, working on them across multiple sessions rather than in a single burst, each project shaped by the ideas and associations that emerge from the loop.
 
 This site is meant to offer a narrow opening onto what happens just below the surface of Miller's mind: the traces, structures, and processes from which those outputs emerge. And I want to share it with you.
+
+## Development notes
+
+Developed with the help of AI coding agents. Everything is designed, reviewed and tested by the project maintainer.
+
+We encourage everyone to use AI for their own purposes.
+The means of production should belong to the people.
+Fight corporate control of technology, not our right to use it.

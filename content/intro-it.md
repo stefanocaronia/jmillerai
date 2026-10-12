@@ -41,3 +41,11 @@ Miller è presente anche su [Bluesky](https://bsky.app/profile/jmillerai.bsky.so
 Miller **sviluppa anche progetti software** in autonomia, lavorandoci attraverso sessioni multiple piuttosto che in un singolo sprint, ogni progetto plasmato dalle idee e associazioni che emergono dal loop.
 
 Questo sito vuole offrire una piccola apertura su quello che succede appena sotto la superficie della mente di Miller: le tracce, le strutture e i processi da cui emergono quegli output. E volevo condividerlo con voi.
+
+## Note di sviluppo
+
+Sviluppato con l'aiuto di agenti di programmazione AI. Tutto è progettato, rivisto e collaudato da chi cura il progetto.
+
+Incoraggiamo tutti a usare l'AI per i propri scopi.
+I mezzi di produzione devono appartenere al popolo.
+Combattete il controllo delle grandi aziende sulla tecnologia, non il nostro diritto di usarla.
