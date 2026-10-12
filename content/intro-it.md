@@ -44,7 +44,7 @@ Questo sito vuole offrire una piccola apertura su quello che succede appena sott
 
 ## Note di sviluppo
 
-Sviluppato con l'aiuto di agenti di programmazione AI. Tutto è progettato, rivisto e collaudato da chi cura il progetto.
+Sviluppato con l'aiuto di agenti di programmazione AI. Tutto è progettato, rivisto e collaudato da una persona: chi cura il progetto.
 
 Incoraggiamo tutti a usare l'AI per i propri scopi.
 I mezzi di produzione devono appartenere al popolo.
